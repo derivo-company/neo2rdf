@@ -1,5 +1,6 @@
 package de.derivo.neo4jconverter.rdf;
 
+import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -14,8 +15,8 @@ public class Neo4jDBToTurtle extends Neo4jToRDFConverter {
     private TurtleWriter turtleWriter;
     private final OutputStream outputStream;
 
-    public Neo4jDBToTurtle(NeoStores neoStores, String basePrefix, OutputStream outputStream) {
-        super(neoStores, basePrefix);
+    public Neo4jDBToTurtle(NeoStores neoStores, ConversionConfig config, OutputStream outputStream) {
+        super(neoStores, config);
         this.outputStream = outputStream;
     }
 

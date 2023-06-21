@@ -1,6 +1,6 @@
 package de.derivo.neo4jconverter.rdf;
 
-import de.derivo.neo4jconverter.utils.ConsoleUtils;
+import de.derivo.neo4jconverter.util.ConsoleUtil;
 import org.neo4j.configuration.Config;
 import org.neo4j.internal.id.DefaultIdGeneratorFactory;
 import org.neo4j.io.fs.DefaultFileSystemAbstraction;
@@ -26,7 +26,7 @@ import java.io.File;
 import static org.neo4j.index.internal.gbptree.RecoveryCleanupWorkCollector.immediate;
 
 public class Neo4jStoreFactory {
-    private static final Logger log = ConsoleUtils.getLogger();
+    private static final Logger log = ConsoleUtil.getLogger();
 
     public static NeoStores getNeo4jStore(File neo4jDBDirectory) {
         log.info("Generating Neo4j store from database directory: " + neo4jDBDirectory);

@@ -1,17 +1,19 @@
 package de.derivo.neo4jconverter.rdf.model;
 
 import de.derivo.neo4jconverter.schema.IndexedNeo4jSchema;
+import de.derivo.neo4jconverter.util.ReificationVocabulary;
 
 public class Neo4jToRDFMapperBuilder {
 
     private String baseURI;
     private String nodePrefix = "node-";
     private String classPrefix = "label-";
-    private String relationshipPrefix = "rel";
-    private String pointPrefix = "point";
+    private String relationshipPrefix = "rel-";
+    private String pointPrefix = "point-";
 
-    private String listBNodePrefix = "list";
+    private String listBNodePrefix = "list-";
     private final IndexedNeo4jSchema schema;
+    private ReificationVocabulary reificationVocabulary = ReificationVocabulary.RDF_REIFICATION;
 
     public Neo4jToRDFMapperBuilder(String baseURI, IndexedNeo4jSchema schema) {
         this.baseURI = baseURI;
@@ -48,6 +50,10 @@ public class Neo4jToRDFMapperBuilder {
         return this;
     }
 
+    public void setReificationVocabulary(ReificationVocabulary reificationVocabulary) {
+        this.reificationVocabulary = reificationVocabulary;
+    }
+
     public Neo4jToRDFMapper build() {
         return new Neo4jToRDFMapper(baseURI,
                 nodePrefix,
@@ -55,6 +61,7 @@ public class Neo4jToRDFMapperBuilder {
                 relationshipPrefix,
                 pointPrefix,
                 listBNodePrefix,
-                schema);
+                schema,
+                reificationVocabulary);
     }
 }

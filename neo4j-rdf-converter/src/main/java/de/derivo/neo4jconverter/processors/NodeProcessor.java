@@ -1,6 +1,6 @@
 package de.derivo.neo4jconverter.processors;
 
-import de.derivo.neo4jconverter.utils.ConsoleUtils;
+import de.derivo.neo4jconverter.util.ConsoleUtil;
 import org.neo4j.internal.recordstorage.RecordNodeCursor;
 import org.neo4j.internal.recordstorage.RecordStorageReader;
 import org.neo4j.io.pagecache.context.CursorContext;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 
 public abstract class NodeProcessor {
 
-    private final Logger log = ConsoleUtils.getLogger();
+    private final Logger log = ConsoleUtil.getLogger();
     private long processedNodes = 0;
     private final long PROGRESS_MESSAGE_AFTER_X_NODES = 100_000;
     private final NeoStores neoStores;
@@ -50,7 +50,7 @@ public abstract class NodeProcessor {
 
             processedNodes++;
             if (processedNodes % PROGRESS_MESSAGE_AFTER_X_NODES == 0) {
-                log.info("Processed %s nodes.".formatted(ConsoleUtils.formatDecimal(
+                log.info("Processed %s nodes.".formatted(ConsoleUtil.formatDecimal(
                         processedNodes)));
             }
         }

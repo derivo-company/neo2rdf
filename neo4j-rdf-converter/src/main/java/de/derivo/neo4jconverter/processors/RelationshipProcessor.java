@@ -1,6 +1,6 @@
 package de.derivo.neo4jconverter.processors;
 
-import de.derivo.neo4jconverter.utils.ConsoleUtils;
+import de.derivo.neo4jconverter.util.ConsoleUtil;
 import org.neo4j.internal.recordstorage.RecordRelationshipScanCursor;
 import org.neo4j.internal.recordstorage.RecordStorageReader;
 import org.neo4j.io.pagecache.context.CursorContext;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 
 public abstract class RelationshipProcessor {
 
-    private final Logger log = ConsoleUtils.getLogger();
+    private final Logger log = ConsoleUtil.getLogger();
     private final NeoStores neoStores;
     private final StoreCursors storeCursors;
 
@@ -59,7 +59,7 @@ public abstract class RelationshipProcessor {
 
             processedRelationships++;
             if (processedRelationships % PROGRESS_MESSAGE_AFTER_X_RELATIONSHIPS == 0) {
-                log.info("Processed %s relationships.".formatted(ConsoleUtils.formatDecimal(
+                log.info("Processed %s relationships.".formatted(ConsoleUtil.formatDecimal(
                         processedRelationships)));
             }
         }

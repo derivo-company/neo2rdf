@@ -1,48 +1,20 @@
 package de.derivo.neo4jconverter;
 
-import de.derivo.neo4jconverter.rdf.Neo4jDBToTurtle;
-import de.derivo.neo4jconverter.rdf.Neo4jStoreFactory;
-import de.derivo.neo4jconverter.rdf.Neo4jToRDFConverter;
-import org.eclipse.rdf4j.model.Statement;
-import org.junit.jupiter.api.BeforeAll;
+import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
+import de.derivo.neo4jconverter.rdf.config.ConversionConfigBuilder;
+import de.derivo.neo4jconverter.store.RDFStoreTestExtension;
 import org.junit.jupiter.api.Test;
-import org.neo4j.kernel.impl.store.NeoStores;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Neo4jDatatypeTests extends ConverterTestBase {
 
-    private static NeoStores neoStores;
-    private static String baseIRI = "https://www.example.org/";
-
-    @BeforeAll
-    public static void initStore() {
-        File testStoreDir = getResource("neo4j-datatypes-example");
-        neoStores = Neo4jStoreFactory.getNeo4jStore(testStoreDir);
-    }
+    @RegisterExtension
+    private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-datatypes-example");
+    private static final ConversionConfig config = ConversionConfigBuilder.newBuilder().build();
 
     @Test
-    public void neo4jToRDFConverter() throws FileNotFoundException {
-        Neo4jToRDFConverter neo4jToRDFConverter = new Neo4jToRDFConverter(neoStores, baseIRI) {
-            @Override
-            protected void processStatement(Statement s) {
-                System.out.println(s);
-            }
-
-            @Override
-            protected void onStart() {
-            }
-
-            @Override
-            protected void onFinish() {
-            }
-        };
-        neo4jToRDFConverter.startProcessing();
-
-        File outputFile = getResource("temp/test.ttl");
-        Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, baseIRI, new FileOutputStream(outputFile));
-        neo4jDBToTurtle.startProcessing();
+    public void neo4jToRDFConverter() {
+        storeTestExtension.convertAndImportIntoStore("neo4j-datatypes-test.ttl", config);
+        // TODO
     }
 }
