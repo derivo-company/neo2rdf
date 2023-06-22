@@ -3,6 +3,8 @@ package de.derivo.neo4jconverter.rdf.config;
 import de.derivo.neo4jconverter.util.ReificationVocabulary;
 import de.derivo.neo4jconverter.util.SequenceConversionType;
 
+import java.io.File;
+
 public class ConversionConfigBuilder {
     private String basePrefix = "https://www.example.org#";
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
@@ -13,6 +15,7 @@ public class ConversionConfigBuilder {
     private boolean deriveClassHierarchyByLabelSubsetCheck = false;
 
     private boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
+    private File schemaOutputPath = null;
 
     public ConversionConfigBuilder() {
     }
@@ -61,6 +64,11 @@ public class ConversionConfigBuilder {
         return this;
     }
 
+    public ConversionConfigBuilder setSchemaOutputPath(File schemaOutputPath) {
+        this.schemaOutputPath = schemaOutputPath;
+        return this;
+    }
+
     public ConversionConfig build() {
         ConversionConfig config = new ConversionConfig();
         config.reificationVocabulary = reificationVocabulary;
@@ -71,6 +79,7 @@ public class ConversionConfigBuilder {
         config.sequenceConversionType = sequenceConversionType;
         config.deriveClassHierarchyByLabelSubsetCheck = deriveClassHierarchyByLabelSubsetCheck;
         config.derivePropertyHierarchyByRelationshipSubsetCheck = derivePropertyHierarchyByRelationshipSubsetCheck;
+        config.schemaOutputPath = schemaOutputPath;
         return config;
     }
 }

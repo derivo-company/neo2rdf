@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import java.util.Set;
 
 
-public class Neo4jHistoryTests extends ConverterTestBase {
+public class Neo4jHistoryTests {
 
     @RegisterExtension
     private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-history");

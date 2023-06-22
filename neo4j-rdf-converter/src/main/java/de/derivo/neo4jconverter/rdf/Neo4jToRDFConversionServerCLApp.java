@@ -8,10 +8,6 @@ import picocli.CommandLine;
 import java.io.File;
 
 public class Neo4jToRDFConversionServerCLApp implements Runnable {
-    @CommandLine.Option(names = {"-o", "--outputPath"},
-            required = true)
-    private File outputPath;
-
     @CommandLine.Option(names = {"-p", "--port"},
             required = true)
     private int port;

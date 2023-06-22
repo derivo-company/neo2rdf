@@ -5,8 +5,6 @@ import de.derivo.neo4jconverter.processors.PropertyProcessor;
 import de.derivo.neo4jconverter.processors.RelationshipProcessor;
 import de.derivo.neo4jconverter.rdf.Neo4jDBToTurtle;
 import de.derivo.neo4jconverter.rdf.Neo4jStoreFactory;
-import de.derivo.neo4jconverter.rdf.Neo4jToRDFTurtleCLApp;
-import de.derivo.neo4jconverter.rdf.Neo4jToTurtleConversionServer;
 import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
 import de.derivo.neo4jconverter.rdf.config.ConversionConfigBuilder;
 import de.derivo.neo4jconverter.schema.IndexedNeo4jSchema;
@@ -23,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.neo4j.kernel.impl.store.PropertyType;
 import org.neo4j.values.storable.Value;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RecordIteratorTests extends ConverterTestBase {
+public class RecordIteratorTests {
+    public Logger log = ConsoleUtil.getLogger();
 
     private static NeoStores neoStores;
     private static IndexedNeo4jSchema schema;
@@ -77,17 +77,6 @@ public class RecordIteratorTests extends ConverterTestBase {
 
     }
 
-    public void tcpNeo4jDBToTurtleConverterServer() {
-        Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(8080, neoStores, config);
-        server.startServer();
-    }
-
-    public void turtleConversionCLApp() {
-        String[] args = {"--neo4jDBDirectory=" + TestUtil.getResource("neo4j-db-example").toPath(),
-                "--baseIRI=http://www.example.org/",
-                "--outputPath=conversion-result.ttl"};
-        Neo4jToRDFTurtleCLApp.main(args);
-    }
 
     @Test
     public void convertMovieDBToRDF() throws FileNotFoundException {

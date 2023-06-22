@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.util.List;
 
 public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEachCallback, BeforeEachCallback {
-    private RDF4JInMemoryStore rdf4JInMemoryStore;
 
     private NeoStores neoStores;
     private final String neo4jDBDirectory;
@@ -24,7 +23,16 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
         this.neo4jDBDirectory = neo4jDBDirectory;
     }
 
+    public RDFStoreTestExtension(String neo4jDBDirectory, boolean rdfsReasoning) {
+        this.rdfsReasoning = true;
+        this.neo4jDBDirectory = neo4jDBDirectory;
+    }
+
     public void convertAndImportIntoStore(String outputFileName, ConversionConfig config) {
+        convertAndImportIntoStore(outputFileName, config, false);
+    }
+
+    public void convertAndImportIntoStore(String outputFileName, ConversionConfig config, boolean rdfsReasoning) {
         clearStore();
 
         File testStoreDir = TestUtil.getResource(neo4jDBDirectory);
@@ -38,16 +46,21 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+
+        if (rdfsReasoning) {
+            materializeDataset(outputFile, outputFile);
+        }
+
         this.importData(List.of(outputFile));
     }
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) {
-        rdf4JInMemoryStore = new RDF4JInMemoryStore();
+        init(List.of());
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext) {
-        rdf4JInMemoryStore.terminate();
+        terminate();
     }
 }

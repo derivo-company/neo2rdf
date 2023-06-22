@@ -49,7 +49,7 @@ public abstract class Neo4jToRDFConverter {
 
     private final ValueFactory valueFactory = Values.getValueFactory();
 
-    private final ConversionConfig config;
+    protected final ConversionConfig config;
 
     public Neo4jToRDFConverter(NeoStores neoStores, ConversionConfig config) {
         this.neoStores = neoStores;
@@ -79,6 +79,8 @@ public abstract class Neo4jToRDFConverter {
 
 
     protected abstract void processStatement(Statement s);
+
+    protected abstract void processStatementForDerivedSchema(Statement s);
 
     public void startProcessing() {
         onStart();
@@ -233,7 +235,7 @@ public abstract class Neo4jToRDFConverter {
                         RDFS.SUBCLASSOF,
                         superClassIRI
                 );
-                processStatement(s);
+                processStatementForDerivedSchema(s);
             }
         });
     }
@@ -250,7 +252,7 @@ public abstract class Neo4jToRDFConverter {
                         RDFS.SUBPROPERTYOF,
                         superPropertyIRI
                 );
-                processStatement(s);
+                processStatementForDerivedSchema(s);
             }
         });
     }

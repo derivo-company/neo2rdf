@@ -18,6 +18,7 @@ public class ConversionConfig {
     boolean includeDeletedRelationshipTypes = false;
     boolean deriveClassHierarchyByLabelSubsetCheck = false;
     boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
+    File schemaOutputPath = null;
 
     ConversionConfig() {
     }
@@ -48,6 +49,10 @@ public class ConversionConfig {
 
     public String getBasePrefix() {
         return basePrefix;
+    }
+
+    public File getSchemaOutputPath() {
+        return schemaOutputPath;
     }
 
     public SequenceConversionType getSequenceConversionType() {
