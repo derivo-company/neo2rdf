@@ -39,6 +39,7 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
         neoStores = Neo4jStoreFactory.getNeo4jStore(testStoreDir);
 
         File outputFile = TestUtil.getResource("temp/" + outputFileName);
+        outputFile.getParentFile().mkdirs();
         Neo4jDBToTurtle neo4jDBToTurtle = null;
         try {
             neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, new FileOutputStream(outputFile));
