@@ -34,8 +34,11 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
 
     public void convertAndImportIntoStore(String outputFileName, ConversionConfig config, boolean rdfsReasoning) {
         clearStore();
-
         File testStoreDir = TestUtil.getResource(neo4jDBDirectory);
+
+        if (neoStores != null) {
+            neoStores.close();
+        }
         neoStores = Neo4jStoreFactory.getNeo4jStore(testStoreDir);
 
         File outputFile = TestUtil.getResource("temp/" + outputFileName);
@@ -63,5 +66,8 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
     @Override
     public void afterEach(ExtensionContext extensionContext) {
         terminate();
+        if (neoStores != null) {
+            neoStores.close();
+        }
     }
 }
