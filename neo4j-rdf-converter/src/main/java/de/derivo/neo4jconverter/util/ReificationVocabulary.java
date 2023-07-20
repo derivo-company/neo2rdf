@@ -41,7 +41,7 @@ public enum ReificationVocabulary {
                 return OWL.ANNOTATEDPROPERTY;
             }
             case RDF_REIFICATION -> {
-                return RDF.PROPERTY;
+                return RDF.PREDICATE;
             }
             default -> throw new IllegalStateException();
         }
