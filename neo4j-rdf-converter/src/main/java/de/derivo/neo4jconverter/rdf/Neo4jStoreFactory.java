@@ -2,9 +2,14 @@ package de.derivo.neo4jconverter.rdf;
 
 import de.derivo.neo4jconverter.util.ConsoleUtil;
 import org.neo4j.configuration.Config;
+import org.neo4j.dbms.archive.DumpFormatSelector;
+import org.neo4j.dbms.archive.IncorrectFormat;
+import org.neo4j.dbms.archive.Loader;
 import org.neo4j.internal.id.DefaultIdGeneratorFactory;
 import org.neo4j.io.fs.DefaultFileSystemAbstraction;
 import org.neo4j.io.fs.FileSystemAbstraction;
+import org.neo4j.io.layout.DatabaseLayout;
+import org.neo4j.io.layout.Neo4jLayout;
 import org.neo4j.io.layout.recordstorage.RecordDatabaseLayout;
 import org.neo4j.io.pagecache.PageCache;
 import org.neo4j.io.pagecache.context.CursorContextFactory;
@@ -22,6 +27,7 @@ import org.neo4j.scheduler.JobScheduler;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.neo4j.index.internal.gbptree.RecoveryCleanupWorkCollector.immediate;
 
@@ -50,16 +56,36 @@ public class Neo4jStoreFactory {
         return store;
     }
 
+    public static NeoStores getNeo4jStoreFromDump(File neo4jDumpPath, File outputDirectory) {
+        log.info("Extracting Neo4j database from dump: " + neo4jDumpPath);
+        try {
+            DefaultFileSystemAbstraction fileSystemAbstraction = new DefaultFileSystemAbstraction();
+            Loader loader = new Loader(fileSystemAbstraction);
+            DatabaseLayout databaseLayout = Neo4jLayout.of(Config.defaults()).databaseLayout(outputDirectory.getName());
+            fileSystemAbstraction.mkdirs(databaseLayout.databaseDirectory());
+            fileSystemAbstraction.mkdirs(databaseLayout.getNeo4jLayout().transactionLogsRootDirectory());
+
+            loader.load(neo4jDumpPath.toPath(),
+                    RecordDatabaseLayout.ofFlat(outputDirectory.toPath()),
+                    true,
+                    true,
+                    DumpFormatSelector::decompress);
+
+            return getNeo4jStore(outputDirectory);
+        } catch (IOException | IncorrectFormat e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static PageCache getPageCache(FileSystemAbstraction fileSystemAbstraction) {
         JobScheduler scheduler = JobSchedulerFactory.createInitialisedScheduler();
-        MuninnPageCache pageCache = new MuninnPageCache(
+
+        return new MuninnPageCache(
                 new SingleFilePageSwapperFactory(fileSystemAbstraction,
                         new DefaultPageCacheTracer(),
                         new LocalMemoryTracker()),
                 scheduler,
                 MuninnPageCache.config(100)
         );
-
-        return pageCache;
     }
 }
