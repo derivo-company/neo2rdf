@@ -46,7 +46,7 @@ public class Neo4jToRDFMapper {
     private Map<Long, IRI> propertyKeyIDToIRI;
     private final ReificationVocabulary reificationVocabulary;
 
-    private final ValueFactory valueFactory = Values.getValueFactory();
+    private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
 
     public Neo4jToRDFMapper(String baseURI,
                             String nodePrefix,
@@ -72,19 +72,16 @@ public class Neo4jToRDFMapper {
 
 
         this.relationshipTypeIDToIRI = new HashMap<>(schema.getRelationshipTypeIDToStr().size());
-        schema.getRelationshipTypeIDToStr().forEach((relationshipTypeID, str) -> {
-            this.relationshipTypeIDToIRI.put(relationshipTypeID, Values.iri(baseNamespace, uriEncode(str)));
-        });
+        schema.getRelationshipTypeIDToStr()
+                .forEach((relationshipTypeID, str) -> this.relationshipTypeIDToIRI.put(relationshipTypeID,
+                        Values.iri(baseNamespace, uriEncode(str))));
 
         this.propertyKeyIDToIRI = new HashMap<>(schema.getPropertyKeyIDToStr().size());
-        schema.getPropertyKeyIDToStr().forEach((propertyKeyID, str) -> {
-            this.propertyKeyIDToIRI.put(propertyKeyID, Values.iri(baseNamespace, uriEncode(str)));
-        });
+        schema.getPropertyKeyIDToStr()
+                .forEach((propertyKeyID, str) -> this.propertyKeyIDToIRI.put(propertyKeyID, Values.iri(baseNamespace, uriEncode(str))));
 
         labelIDToIRI = new HashMap<>(schema.getLabelIDToStr().size());
-        schema.getLabelIDToStr().forEach((labelID, str) -> {
-            labelIDToIRI.put(labelID, Values.iri(baseNamespace, uriEncode(str)));
-        });
+        schema.getLabelIDToStr().forEach((labelID, str) -> labelIDToIRI.put(labelID, Values.iri(baseNamespace, uriEncode(str))));
     }
 
     private String uriEncode(String s) {
@@ -123,16 +120,14 @@ public class Neo4jToRDFMapper {
                                    SequenceConversionType sequenceConversionType) {
         switch (sequenceConversionType) {
             case RDF_COLLECTION -> sequenceValueToRDFListStatements(resource, propertyKeyID, sequenceValue, rdfListStatementConsumer);
-            case SEPARATE_LITERALS -> {
-                sequenceValue.iterator().forEachRemaining(val -> {
-                    Statement statement = valueFactory.createStatement(
-                            resource,
-                            propertyKeyIDToResource(propertyKeyID),
-                            Values.literal(((Value) val).asObject())
-                    );
-                    rdfListStatementConsumer.accept(statement);
-                });
-            }
+            case SEPARATE_LITERALS -> sequenceValue.iterator().forEachRemaining(val -> {
+                Statement statement = valueFactory.createStatement(
+                        resource,
+                        propertyKeyIDToResource(propertyKeyID),
+                        Values.literal(valueFactory, ((Value) val).asObject(), true)
+                );
+                rdfListStatementConsumer.accept(statement);
+            });
         }
     }
 
@@ -145,8 +140,7 @@ public class Neo4jToRDFMapper {
         listBNodeFactory.getCurrentListElementID().set(0);
 
         BNode listHeadBNode = Values.bnode(listBNodeID);
-        Statement hasListStatement = Values.getValueFactory()
-                .createStatement(resource, propertyKeyIDToResource(propertyKeyID), listHeadBNode);
+        Statement hasListStatement = valueFactory.createStatement(resource, propertyKeyIDToResource(propertyKeyID), listHeadBNode);
         rdfListStatementConsumer.accept(hasListStatement);
 
         Iterable<?> list = Streams.stream(sequenceValue.iterator())
@@ -177,8 +171,10 @@ public class Neo4jToRDFMapper {
                     double y = coordinates[1];
                     statementConsumer.accept(valueFactory.createStatement(pointIRI,
                             Neo4jRDFSchema.longitudePropertyKey,
-                            Values.literal(x)));
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.latitudePropertyKey, Values.literal(y)));
+                            valueFactory.createLiteral(x)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.latitudePropertyKey,
+                            valueFactory.createLiteral(y)));
                 }
                 break;
                 case 3: {
@@ -188,9 +184,13 @@ public class Neo4jToRDFMapper {
                     double z = coordinates[2];
                     statementConsumer.accept(valueFactory.createStatement(pointIRI,
                             Neo4jRDFSchema.longitudePropertyKey,
-                            Values.literal(x)));
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.latitudePropertyKey, Values.literal(y)));
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.heightPropertyKey, Values.literal(z)));
+                            valueFactory.createLiteral(x)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.latitudePropertyKey,
+                            valueFactory.createLiteral(y)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.heightPropertyKey,
+                            valueFactory.createLiteral(z)));
                 }
                 break;
                 default:
@@ -206,8 +206,12 @@ public class Neo4jToRDFMapper {
                     pointType = Neo4jRDFSchema.cartesianPoint2D;
                     double x = coordinates[0];
                     double y = coordinates[1];
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.xPropertyKey, Values.literal(x)));
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.yPropertyKey, Values.literal(y)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.xPropertyKey,
+                            valueFactory.createLiteral(x)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.yPropertyKey,
+                            valueFactory.createLiteral(y)));
                 }
                 break;
                 case 3: {
@@ -215,9 +219,15 @@ public class Neo4jToRDFMapper {
                     double x = coordinates[0];
                     double y = coordinates[1];
                     double z = coordinates[2];
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.xPropertyKey, Values.literal(x)));
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.yPropertyKey, Values.literal(y)));
-                    statementConsumer.accept(valueFactory.createStatement(pointIRI, Neo4jRDFSchema.zPropertyKey, Values.literal(z)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.xPropertyKey,
+                            valueFactory.createLiteral(x)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.yPropertyKey,
+                            valueFactory.createLiteral(y)));
+                    statementConsumer.accept(valueFactory.createStatement(pointIRI,
+                            Neo4jRDFSchema.zPropertyKey,
+                            valueFactory.createLiteral(z)));
                 }
                 break;
                 default:

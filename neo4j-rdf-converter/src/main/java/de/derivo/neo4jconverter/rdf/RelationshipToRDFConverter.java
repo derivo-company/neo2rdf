@@ -3,6 +3,7 @@ package de.derivo.neo4jconverter.rdf;
 import de.derivo.neo4jconverter.processors.RelationshipProcessor;
 import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
 import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFMapper;
+import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFValueFactory;
 import de.derivo.neo4jconverter.util.SequenceConversionType;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Statement;
@@ -21,7 +22,7 @@ import java.util.Set;
 public class RelationshipToRDFConverter extends RelationshipProcessor {
     private final Neo4jToRDFConverter neo4jToRDFConverter;
     private final Neo4jToRDFMapper neo4jToRDFMapper;
-    private final ValueFactory valueFactory = Values.getValueFactory();
+    private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
 
     private Set<Long> deployedRelationshiptypes;
     private Set<Long> datatypePropertyKeys;
@@ -102,7 +103,7 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
             Statement statement = valueFactory.createStatement(
                     neo4jToRDFMapper.relationshipIDToResource(relationshipID),
                     neo4jToRDFMapper.propertyKeyIDToResource(propertyKeyID),
-                    Values.literal(value.asObject())
+                    Values.literal(valueFactory, value.asObject(), true)
             );
             neo4jToRDFConverter.processStatement(statement);
         }

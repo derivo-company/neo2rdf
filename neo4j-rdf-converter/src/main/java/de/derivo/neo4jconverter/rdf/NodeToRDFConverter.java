@@ -3,6 +3,7 @@ package de.derivo.neo4jconverter.rdf;
 import de.derivo.neo4jconverter.processors.NodeProcessor;
 import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
 import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFMapper;
+import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFValueFactory;
 import de.derivo.neo4jconverter.util.SequenceConversionType;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Statement;
@@ -23,7 +24,7 @@ public class NodeToRDFConverter extends NodeProcessor {
 
     private final Neo4jToRDFConverter neo4jToRDFConverter;
     private final Neo4jToRDFMapper neo4jToRDFMapper;
-    private final ValueFactory valueFactory = Values.getValueFactory();
+    private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
 
     private Set<Long> datatypePropertyKeys;
     private Set<Long> objectPropertyKeys;
@@ -94,7 +95,7 @@ public class NodeToRDFConverter extends NodeProcessor {
             Statement statement = valueFactory.createStatement(
                     neo4jToRDFMapper.nodeIDToResource(nodeID),
                     neo4jToRDFMapper.propertyKeyIDToResource(propertyKeyID),
-                    Values.literal(value.asObject()));
+                    Values.literal(valueFactory, value.asObject(), true));
             neo4jToRDFConverter.processStatement(statement);
         }
     }

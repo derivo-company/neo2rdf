@@ -4,6 +4,7 @@ import de.derivo.neo4jconverter.rdf.checks.SubsetCheck;
 import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
 import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFMapper;
 import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFMapperBuilder;
+import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFValueFactory;
 import de.derivo.neo4jconverter.schema.IndexedNeo4jSchema;
 import de.derivo.neo4jconverter.schema.IndexedNeo4jSchemaGenerator;
 import de.derivo.neo4jconverter.util.ConsoleUtil;
@@ -11,7 +12,6 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -47,7 +47,7 @@ public abstract class Neo4jToRDFConverter {
     private Set<Long> objectPropertyKeys;
     private Set<Long> annotationPropertyKeys;
 
-    private final ValueFactory valueFactory = Values.getValueFactory();
+    private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
 
     protected final ConversionConfig config;
 
@@ -139,7 +139,7 @@ public abstract class Neo4jToRDFConverter {
             Statement s = valueFactory.createStatement(
                     rdfClass,
                     RDFS.LABEL,
-                    Values.literal(str)
+                    valueFactory.createLiteral(str)
             );
             processStatement(s);
             s = valueFactory.createStatement(
@@ -162,7 +162,7 @@ public abstract class Neo4jToRDFConverter {
             Statement s = valueFactory.createStatement(
                     dataProperty,
                     RDFS.LABEL,
-                    Values.literal(str)
+                    valueFactory.createLiteral(str)
             );
             processStatement(s);
 
@@ -210,7 +210,7 @@ public abstract class Neo4jToRDFConverter {
             Statement s = valueFactory.createStatement(
                     objectProperty,
                     RDFS.LABEL,
-                    Values.literal(str)
+                    valueFactory.createLiteral(str)
             );
             processStatement(s);
             s = valueFactory.createStatement(

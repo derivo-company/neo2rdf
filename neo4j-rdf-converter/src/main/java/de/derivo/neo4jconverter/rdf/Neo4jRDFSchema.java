@@ -1,5 +1,6 @@
 package de.derivo.neo4jconverter.rdf;
 
+import de.derivo.neo4jconverter.rdf.model.Neo4jToRDFValueFactory;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
@@ -9,7 +10,6 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import java.util.*;
 
 public class Neo4jRDFSchema {
-    public static Namespace rdfNamespace = Values.namespace(RDF.PREFIX, RDF.NAMESPACE);
     public static Namespace neo4jNamespace = Values.namespace("neo4j", "https://neo4j.com/");
     public static IRI pointClass = Values.iri(
             "https://neo4j.com/docs/graphql-manual/current/type-definitions/types/#type-definitions-types-point");
@@ -30,8 +30,9 @@ public class Neo4jRDFSchema {
 
     public static final List<Statement> AXIOMATIC_TRIPLES;
 
+    private static final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
+
     static {
-        ValueFactory valueFactory = Values.getValueFactory();
         List<Statement> axiomaticTriples = new ArrayList<>();
         axiomaticTriples.add(valueFactory.createStatement(pointClass, RDF.TYPE, OWL.CLASS));
         axiomaticTriples.add(valueFactory.createStatement(cartesianPoint, RDF.TYPE, OWL.CLASS));
@@ -104,10 +105,10 @@ public class Neo4jRDFSchema {
 
     private static List<Statement> getStatementsForClass(IRI classIRI, String label, Collection<Resource> subClassOf) {
         List<Statement> statements = new ArrayList<>();
-        statements.add(Values.getValueFactory().createStatement(classIRI, RDFS.LABEL, Values.literal(label)));
-        statements.add(Values.getValueFactory().createStatement(classIRI, RDF.TYPE, OWL.CLASS));
+        statements.add(valueFactory.createStatement(classIRI, RDFS.LABEL, valueFactory.createLiteral(label)));
+        statements.add(valueFactory.createStatement(classIRI, RDF.TYPE, OWL.CLASS));
         for (Resource superClass : subClassOf) {
-            statements.add(Values.getValueFactory().createStatement(classIRI, RDFS.SUBCLASSOF, superClass));
+            statements.add(valueFactory.createStatement(classIRI, RDFS.SUBCLASSOF, superClass));
         }
         return statements;
     }
@@ -119,16 +120,16 @@ public class Neo4jRDFSchema {
                                                             Collection<Resource> domainClasses,
                                                             Collection<Resource> rangeClasses) {
         List<Statement> statements = new ArrayList<>();
-        statements.add(Values.getValueFactory().createStatement(propertyIRI, RDFS.LABEL, Values.literal(label)));
-        statements.add(Values.getValueFactory().createStatement(propertyIRI, RDF.TYPE, propertyType));
+        statements.add(valueFactory.createStatement(propertyIRI, RDFS.LABEL, valueFactory.createLiteral(label)));
+        statements.add(valueFactory.createStatement(propertyIRI, RDF.TYPE, propertyType));
         for (Resource superClass : subPropertyOf) {
-            statements.add(Values.getValueFactory().createStatement(propertyIRI, RDFS.SUBPROPERTYOF, superClass));
+            statements.add(valueFactory.createStatement(propertyIRI, RDFS.SUBPROPERTYOF, superClass));
         }
         for (Resource domainClass : domainClasses) {
-            statements.add(Values.getValueFactory().createStatement(propertyIRI, RDFS.DOMAIN, domainClass));
+            statements.add(valueFactory.createStatement(propertyIRI, RDFS.DOMAIN, domainClass));
         }
         for (Resource rangeClass : rangeClasses) {
-            statements.add(Values.getValueFactory().createStatement(propertyIRI, RDFS.RANGE, rangeClass));
+            statements.add(valueFactory.createStatement(propertyIRI, RDFS.RANGE, rangeClass));
         }
         return statements;
     }

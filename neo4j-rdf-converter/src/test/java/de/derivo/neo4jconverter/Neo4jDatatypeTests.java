@@ -17,7 +17,7 @@ import java.util.Set;
 public class Neo4jDatatypeTests {
 
     @RegisterExtension
-    private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-datatypes-example");
+    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-datatypes-example");
     private static final ConversionConfig config = ConversionConfigBuilder.newBuilder().build();
 
     @Test
@@ -26,13 +26,15 @@ public class Neo4jDatatypeTests {
 
         String q = """
                 PREFIX : <%s>
-                SELECT ?time ?localTime ?date ?integer ?float 
+                SELECT ?time ?localTime ?date ?integer ?float ?double ?invalidDouble
                 WHERE {
                     ?node :time ?time ;
                         :localTime ?localTime ;
                         :date ?date ;
                         :integer ?integer ;
-                        :float ?float .
+                        :float ?float ;
+                        :double ?double ;
+                        :invalidXSDDouble ?invalidDouble .
                 }
                 """.formatted(config.getBasePrefix());
         try (TupleQueryResult bindingSets = storeTestExtension.executeQuery(q)) {
@@ -42,6 +44,11 @@ public class Neo4jDatatypeTests {
                 Literal dateLit = ((Literal) bindingSet.getValue("date"));
                 Literal integerLit = ((Literal) bindingSet.getValue("integer"));
                 Literal floatLit = ((Literal) bindingSet.getValue("float"));
+                Literal doubleLit = ((Literal) bindingSet.getValue("double"));
+                Literal invalidDoubleLit = ((Literal) bindingSet.getValue("invalidDouble"));
+
+                System.out.println(doubleLit);
+                System.out.println(invalidDoubleLit);
 
                 Assertions.assertEquals(CoreDatatype.XSD.TIME, timeLit.getCoreDatatype());
                 Assertions.assertEquals("12:50:35.556+01:00", timeLit.stringValue());
@@ -72,6 +79,10 @@ public class Neo4jDatatypeTests {
         String b = config.getBasePrefix();
 
         // data properties
+        System.out.println("Data properties:");
+        for (String dataProperty : dataProperties) {
+            System.out.println(dataProperty);
+        }
         Assertions.assertTrue(dataProperties.contains(b + "name"));
         Assertions.assertTrue(dataProperties.contains(b + "time"));
         Assertions.assertTrue(dataProperties.contains(b + "localTime"));
@@ -81,9 +92,15 @@ public class Neo4jDatatypeTests {
         Assertions.assertTrue(dataProperties.contains(b + "dateTime"));
         Assertions.assertTrue(dataProperties.contains(b + "integer"));
         Assertions.assertTrue(dataProperties.contains(b + "float"));
-        Assertions.assertEquals(16, dataProperties.size());
+        Assertions.assertTrue(dataProperties.contains(b + "invalidXSDDouble"));
+        Assertions.assertTrue(dataProperties.contains(b + "double"));
+        Assertions.assertEquals(18, dataProperties.size());
 
         // object properties
+        System.out.println("Object properties:");
+        for (String objectProperty : objectProperties) {
+            System.out.println(objectProperty);
+        }
         Assertions.assertTrue(objectProperties.contains(b + "cartesian3d"));
         Assertions.assertTrue(objectProperties.contains(b + "geo3d"));
         Assertions.assertTrue(objectProperties.contains(b + "intList"));
@@ -92,6 +109,10 @@ public class Neo4jDatatypeTests {
         Assertions.assertEquals(5, objectProperties.size());
 
         // annotation properties
+        System.out.println("Annotation properties:");
+        for (String annotationProperty : annotationProperties) {
+            System.out.println(annotationProperty);
+        }
         Assertions.assertTrue(annotationProperties.contains(b + "name"));
         Assertions.assertEquals(1, annotationProperties.size());
     }
