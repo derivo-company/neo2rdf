@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ConversionConfig {
-    String basePrefix;
+    String basePrefix = "https://www.example.org/";
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
     boolean includeDeletedNeo4jLabels = false;
