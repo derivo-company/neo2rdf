@@ -8,8 +8,8 @@ import org.neo4j.dbms.archive.Loader;
 import org.neo4j.internal.id.DefaultIdGeneratorFactory;
 import org.neo4j.io.fs.DefaultFileSystemAbstraction;
 import org.neo4j.io.fs.FileSystemAbstraction;
+import org.neo4j.io.fs.FileUtils;
 import org.neo4j.io.layout.DatabaseLayout;
-import org.neo4j.io.layout.Neo4jLayout;
 import org.neo4j.io.layout.recordstorage.RecordDatabaseLayout;
 import org.neo4j.io.pagecache.PageCache;
 import org.neo4j.io.pagecache.context.CursorContextFactory;
@@ -56,17 +56,18 @@ public class Neo4jStoreFactory {
         return store;
     }
 
+
     public static NeoStores getNeo4jStoreFromDump(File neo4jDumpPath, File outputDirectory) {
         log.info("Extracting Neo4j database from dump: " + neo4jDumpPath);
         try {
+            FileUtils.deleteDirectory(outputDirectory.toPath());
+            DatabaseLayout databaseLayout = RecordDatabaseLayout.ofFlat(outputDirectory.toPath().toAbsolutePath());
+
             DefaultFileSystemAbstraction fileSystemAbstraction = new DefaultFileSystemAbstraction();
             Loader loader = new Loader(fileSystemAbstraction);
-            DatabaseLayout databaseLayout = Neo4jLayout.of(Config.defaults()).databaseLayout(outputDirectory.getName());
-            fileSystemAbstraction.mkdirs(databaseLayout.databaseDirectory());
-            fileSystemAbstraction.mkdirs(databaseLayout.getNeo4jLayout().transactionLogsRootDirectory());
 
             loader.load(neo4jDumpPath.toPath(),
-                    RecordDatabaseLayout.ofFlat(outputDirectory.toPath()),
+                    databaseLayout,
                     true,
                     true,
                     DumpFormatSelector::decompress);

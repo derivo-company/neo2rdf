@@ -17,7 +17,7 @@ public class Neo4jToRDFConversionServerCLApp extends Neo4jToRDFConversionCLApp i
 
     @Override
     public void run() {
-        NeoStores neoStores = Neo4jStoreFactory.getNeo4jStore(neo4jDBDirectory);
+        NeoStores neoStores = getNeo4jStore();
         ConversionConfig config = getConversionConfig();
         Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(port, neoStores, config);
         server.startServer();
