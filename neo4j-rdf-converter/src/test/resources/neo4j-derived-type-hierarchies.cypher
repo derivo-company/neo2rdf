@@ -1,0 +1,17 @@
+CREATE
+  (alice:Entity:Animal:Mammal:Human {name: 'Alice'}),
+  (bob:Entity:Animal:Mammal:Human {name: 'Bob'}),
+  (charlie:Entity:Animal:Mammal:Cat {name: 'Charlie'}),
+  (bubbles:Entity:Animal:Fish {name: 'Bubbles'}),
+  (alice)-[:FRIENDS_WITH]->(bob),
+  (alice)-[:KNOWS]->(bob),
+  (alice)-[:SOCIAL_RELATION]->(bob),
+  (bob)-[:FRIENDS_WITH]->(alice),
+  (bob)-[:KNOWS]->(alice),
+  (bob)-[:SOCIAL_RELATION]->(alice),
+  (alice)-[:HAS_PET]->(charlie),
+  (alice)-[:KNOWS]->(charlie),
+  (alice)-[:SOCIAL_RELATION]->(charlie),
+  (bob)-[:HAS_PET]->(bubbles),
+  (bob)-[:KNOWS]->(bubbles),
+  (bob)-[:SOCIAL_RELATION]->(bubbles);

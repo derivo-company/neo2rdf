@@ -1,48 +1,119 @@
 package de.derivo.neo4jconverter;
 
-import de.derivo.neo4jconverter.rdf.Neo4jDBToTurtle;
-import de.derivo.neo4jconverter.rdf.Neo4jStoreFactory;
-import de.derivo.neo4jconverter.rdf.Neo4jToRDFConverter;
-import org.eclipse.rdf4j.model.Statement;
-import org.junit.jupiter.api.BeforeAll;
+import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
+import de.derivo.neo4jconverter.rdf.config.ConversionConfigBuilder;
+import de.derivo.neo4jconverter.store.RDFStoreTestExtension;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.model.base.CoreDatatype;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.neo4j.kernel.impl.store.NeoStores;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.util.Set;
 
-public class Neo4jDatatypeTests extends ConverterTestBase {
+public class Neo4jDatatypeTests {
 
-    private static NeoStores neoStores;
-    private static String baseIRI = "https://www.example.org/";
+    @RegisterExtension
+    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-datatypes-example");
+    private static final ConversionConfig config = ConversionConfigBuilder.newBuilder().build();
 
-    @BeforeAll
-    public static void initStore() {
-        File testStoreDir = getResource("neo4j-datatypes-example");
-        neoStores = Neo4jStoreFactory.getNeo4jStore(testStoreDir);
+    @Test
+    public void testNeo4jDatatypes() {
+        storeTestExtension.convertAndImportIntoStore("neo4j-datatypes-test.ttl", config);
+
+        String q = """
+                PREFIX : <%s>
+                SELECT ?time ?localTime ?date ?integer ?float ?double ?invalidDouble
+                WHERE {
+                    ?node :time ?time ;
+                        :localTime ?localTime ;
+                        :date ?date ;
+                        :integer ?integer ;
+                        :float ?float ;
+                        :double ?double ;
+                        :invalidXSDDouble ?invalidDouble .
+                }
+                """.formatted(config.getBasePrefix());
+        try (TupleQueryResult bindingSets = storeTestExtension.executeQuery(q)) {
+            for (BindingSet bindingSet : bindingSets) {
+                Literal timeLit = ((Literal) bindingSet.getValue("time"));
+                Literal localTimeLit = ((Literal) bindingSet.getValue("localTime"));
+                Literal dateLit = ((Literal) bindingSet.getValue("date"));
+                Literal integerLit = ((Literal) bindingSet.getValue("integer"));
+                Literal floatLit = ((Literal) bindingSet.getValue("float"));
+                Literal doubleLit = ((Literal) bindingSet.getValue("double"));
+                Literal invalidDoubleLit = ((Literal) bindingSet.getValue("invalidDouble"));
+
+                System.out.println(doubleLit);
+                System.out.println(invalidDoubleLit);
+
+                Assertions.assertEquals(CoreDatatype.XSD.TIME, timeLit.getCoreDatatype());
+                Assertions.assertEquals("12:50:35.556+01:00", timeLit.stringValue());
+
+                Assertions.assertEquals(CoreDatatype.XSD.TIME, localTimeLit.getCoreDatatype());
+                Assertions.assertEquals("12:50:35.556", localTimeLit.stringValue());
+
+                Assertions.assertEquals(CoreDatatype.XSD.DATE, dateLit.getCoreDatatype());
+                Assertions.assertEquals("1967-01-21", dateLit.stringValue());
+
+                Assertions.assertEquals(CoreDatatype.XSD.LONG, integerLit.getCoreDatatype());
+                Assertions.assertEquals("195", integerLit.stringValue());
+
+                Assertions.assertEquals(CoreDatatype.XSD.DOUBLE, floatLit.getCoreDatatype());
+                Assertions.assertEquals("4.2222222E0", floatLit.stringValue());
+            }
+        }
     }
 
     @Test
-    public void neo4jToRDFConverter() throws FileNotFoundException {
-        Neo4jToRDFConverter neo4jToRDFConverter = new Neo4jToRDFConverter(neoStores, baseIRI) {
-            @Override
-            protected void processStatement(Statement s) {
-                System.out.println(s);
-            }
+    public void testDerivedPropertyTypes() {
+        storeTestExtension.convertAndImportIntoStore("neo4j-datatypes-test.ttl", config);
 
-            @Override
-            protected void onStart() {
-            }
+        Set<String> objectProperties = storeTestExtension.getInstances(OWL.OBJECTPROPERTY.toString());
+        Set<String> annotationProperties = storeTestExtension.getInstances(OWL.ANNOTATIONPROPERTY.toString());
+        Set<String> dataProperties = storeTestExtension.getInstances(OWL.DATATYPEPROPERTY.toString());
 
-            @Override
-            protected void onFinish() {
-            }
-        };
-        neo4jToRDFConverter.startProcessing();
+        String b = config.getBasePrefix();
 
-        File outputFile = getResource("temp/test.ttl");
-        Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, baseIRI, new FileOutputStream(outputFile));
-        neo4jDBToTurtle.startProcessing();
+        // data properties
+        System.out.println("Data properties:");
+        for (String dataProperty : dataProperties) {
+            System.out.println(dataProperty);
+        }
+        Assertions.assertTrue(dataProperties.contains(b + "name"));
+        Assertions.assertTrue(dataProperties.contains(b + "time"));
+        Assertions.assertTrue(dataProperties.contains(b + "localTime"));
+        Assertions.assertTrue(dataProperties.contains(b + "date"));
+        Assertions.assertTrue(dataProperties.contains(b + "weekDateFormat"));
+        Assertions.assertTrue(dataProperties.contains(b + "localDateTime"));
+        Assertions.assertTrue(dataProperties.contains(b + "dateTime"));
+        Assertions.assertTrue(dataProperties.contains(b + "integer"));
+        Assertions.assertTrue(dataProperties.contains(b + "float"));
+        Assertions.assertTrue(dataProperties.contains(b + "invalidXSDDouble"));
+        Assertions.assertTrue(dataProperties.contains(b + "double"));
+        Assertions.assertEquals(18, dataProperties.size());
+
+        // object properties
+        System.out.println("Object properties:");
+        for (String objectProperty : objectProperties) {
+            System.out.println(objectProperty);
+        }
+        Assertions.assertTrue(objectProperties.contains(b + "cartesian3d"));
+        Assertions.assertTrue(objectProperties.contains(b + "geo3d"));
+        Assertions.assertTrue(objectProperties.contains(b + "intList"));
+        Assertions.assertTrue(objectProperties.contains(b + "floatList"));
+        Assertions.assertTrue(objectProperties.contains(b + "RELATION"));
+        Assertions.assertEquals(5, objectProperties.size());
+
+        // annotation properties
+        System.out.println("Annotation properties:");
+        for (String annotationProperty : annotationProperties) {
+            System.out.println(annotationProperty);
+        }
+        Assertions.assertTrue(annotationProperties.contains(b + "name"));
+        Assertions.assertEquals(1, annotationProperties.size());
     }
 }

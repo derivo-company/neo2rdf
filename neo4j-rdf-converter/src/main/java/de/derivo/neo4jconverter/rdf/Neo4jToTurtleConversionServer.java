@@ -1,6 +1,7 @@
 package de.derivo.neo4jconverter.rdf;
 
-import de.derivo.neo4jconverter.utils.ConsoleUtils;
+import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
+import de.derivo.neo4jconverter.util.ConsoleUtil;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.slf4j.Logger;
 
@@ -14,13 +15,13 @@ public class Neo4jToTurtleConversionServer {
 
     private final int portNumber;
     private final NeoStores neoStores;
-    private final String baseIRI;
-    private final Logger log = ConsoleUtils.getLogger();
+    private final Logger log = ConsoleUtil.getLogger();
+    private final ConversionConfig config;
 
-    public Neo4jToTurtleConversionServer(int portNumber, NeoStores neoStores, String baseIRI) {
+    public Neo4jToTurtleConversionServer(int portNumber, NeoStores neoStores, ConversionConfig config) {
         this.portNumber = portNumber;
         this.neoStores = neoStores;
-        this.baseIRI = baseIRI;
+        this.config = config;
     }
 
     private static int getFreePort() {
@@ -44,7 +45,7 @@ public class Neo4jToTurtleConversionServer {
                 log.info("New client connected: " + s);
                 threadPool.submit(() -> {
                     try {
-                        Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, baseIRI, s.getOutputStream());
+                        Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, s.getOutputStream());
                         neo4jDBToTurtle.startProcessing();
                         s.close();
                     } catch (IOException e) {
