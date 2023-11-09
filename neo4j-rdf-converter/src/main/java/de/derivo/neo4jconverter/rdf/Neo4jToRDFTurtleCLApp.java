@@ -23,7 +23,7 @@ public class Neo4jToRDFTurtleCLApp extends Neo4jToRDFConversionCLApp implements 
     public void run() {
         try {
             ConversionConfig config = getConversionConfig();
-            NeoStores neoStores = Neo4jStoreFactory.getNeo4jStore(neo4jDBDirectory);
+            NeoStores neoStores = getNeo4jStore();
             Neo4jDBToTurtle neo4jDBToTurtle;
             neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, new FileOutputStream(outputPath));
             neo4jDBToTurtle.startProcessing();
