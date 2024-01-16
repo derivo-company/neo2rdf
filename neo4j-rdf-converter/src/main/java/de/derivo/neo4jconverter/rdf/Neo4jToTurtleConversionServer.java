@@ -1,60 +1,83 @@
 package de.derivo.neo4jconverter.rdf;
 
+import com.sun.net.httpserver.HttpServer;
 import de.derivo.neo4jconverter.rdf.config.ConversionConfig;
 import de.derivo.neo4jconverter.util.ConsoleUtil;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Neo4jToTurtleConversionServer {
 
     private final int portNumber;
+    private final int numberOfServerThreads;
     private final NeoStores neoStores;
     private final Logger log = ConsoleUtil.getLogger();
     private final ConversionConfig config;
+    private final File neo4jDBDirectory;
 
-    public Neo4jToTurtleConversionServer(int portNumber, NeoStores neoStores, ConversionConfig config) {
+    public Neo4jToTurtleConversionServer(File neo4jDBDirectory,
+                                         NeoStores neoStores,
+                                         ConversionConfig config,
+                                         int portNumber, int numberOfServerThreads) {
         this.portNumber = portNumber;
+        this.numberOfServerThreads = numberOfServerThreads;
         this.neoStores = neoStores;
         this.config = config;
-    }
-
-    private static int getFreePort() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            int portNumber = serverSocket.getLocalPort();
-            serverSocket.close();
-            return portNumber;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Could not find a free port.", e);
-        }
+        this.neo4jDBDirectory = neo4jDBDirectory;
     }
 
     public void startServer() {
-        try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
-            ExecutorService threadPool = Executors.newFixedThreadPool(1);
-            log.info("Starting neo4j to RDF conversion server on port " + portNumber + "...");
-            while (true) {
-                Socket s = serverSocket.accept();
-                log.info("New client connected: " + s);
-                threadPool.submit(() -> {
-                    try {
-                        Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, s.getOutputStream());
-                        neo4jDBToTurtle.startProcessing();
-                        s.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+        HttpServer server = null;
+        try {
+            server = HttpServer.create();
+            log.info("Starting neo4j to RDF conversion server on port %d with %d thread(s)..."
+                    .formatted(portNumber, numberOfServerThreads));
+            server.bind(new InetSocketAddress("localhost", this.portNumber), 0);
+            server.createContext("/", exchange -> {
+                log.info(ConsoleUtil.getSeparator());
+                log.info("New client connected. Converting data...");
+                exchange.getResponseHeaders().add("Content-Type", "text/ttl");
+                exchange.getResponseHeaders().add("Transfer-Encoding", "chunked");
+
+                String filename = "%s_neo4j2rdf.ttl".formatted(neo4jDBDirectory.getName());
+                String contentDisposition = "attachment; filename=%s".formatted(filename);
+                exchange.getResponseHeaders().add("Content-Disposition", contentDisposition);
+                exchange.sendResponseHeaders(200, 0);
+
+                OutputStream responseBody = exchange.getResponseBody();
+                Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, responseBody);
+                neo4jDBToTurtle.startProcessing();
+
+                responseBody.flush();
+                responseBody.close();
+                log.info("Conversion finished.");
+            });
+
+            ExecutorService executor = Executors.newFixedThreadPool(numberOfServerThreads);
+            server.setExecutor(executor);
+
+            server.start();
+
+            log.info("Server started. Press enter to stop.");
+            //noinspection ResultOfMethodCallIgnored
+            System.in.read();
+            // Stop the server and the executor
+            server.stop(0);
+
+            log.info("Server stopped.");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("An error occurred. Terminating Neo4j to RDF conversion server.", e);
+        } finally {
+            if (server != null) {
+                server.stop(0);
+            }
         }
     }
 }

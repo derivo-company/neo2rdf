@@ -9,6 +9,9 @@ public class Neo4jToRDFConversionServerCLApp extends Neo4jToRDFConversionCLApp i
             required = true)
     private int port;
 
+    @CommandLine.Option(names = {"-t", "--numberOfServerThreads"})
+    private int numberOfServerThreads = 2;
+
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Neo4jToRDFConversionServerCLApp()).execute(args);
@@ -19,7 +22,10 @@ public class Neo4jToRDFConversionServerCLApp extends Neo4jToRDFConversionCLApp i
     public void run() {
         NeoStores neoStores = getNeo4jStore();
         ConversionConfig config = getConversionConfig();
-        Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(port, neoStores, config);
+        Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(neo4jDBDirectory,
+                neoStores,
+                config,
+                port, numberOfServerThreads);
         server.startServer();
     }
 }
