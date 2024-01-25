@@ -1,0 +1,33 @@
+<assembly>
+    <id>release</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <files>
+        <file>
+            <source>${project.build.directory}/neo4j-rdf-converter-${revision}.jar</source>
+            <outputDirectory>/</outputDirectory>
+            <destName>neo2rdf.jar</destName>
+        </file>
+        <file>
+            <source>LICENSE</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>README.md</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>build-resources/CHANGELOG.md</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>build-resources/neo2rdf.bat</source>
+            <fileMode>0755</fileMode>
+        </file>
+        <file>
+            <source>build-resources/neo2rdf.sh</source>
+            <fileMode>0755</fileMode>
+        </file>
+    </files>
+</assembly>
