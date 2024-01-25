@@ -19,7 +19,7 @@ public class ConversionConfigurationTests {
 
     @Test
     public void readWriteConversionConfig() {
-        File outputFile = TestUtil.getResource("temp/configTest.yaml");
+        File outputFile = TestUtil.getTempFile("configTest.yaml");
         outputFile.getParentFile().mkdirs();
         config.write(outputFile);
         Assertions.assertTrue(outputFile.exists());

@@ -16,8 +16,8 @@ public class Neo4jConvertDumpTests {
 
     @RegisterExtension
     public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(
-            "neo4j-db-example.dump",
-            "temp/neo4j-db-dump-output-example");
+            TestUtil.getResource("neo4j-db-example.dump"),
+            TestUtil.getTempDirectory("neo4j-db-dump-output-example"));
 
 
     @Test

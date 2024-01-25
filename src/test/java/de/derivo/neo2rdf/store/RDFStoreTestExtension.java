@@ -19,20 +19,20 @@ import java.util.List;
 public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEachCallback, BeforeEachCallback {
 
     private NeoStores neoStores;
-    private final String neo4jDBDirectory;
+    private final File neo4jDBDirectory;
 
-    private String neo4jDumpPath = null;
+    private File neo4jDumpPath = null;
 
-    public RDFStoreTestExtension(String neo4jDBDirectory) {
+    public RDFStoreTestExtension(File neo4jDBDirectory) {
         this.neo4jDBDirectory = neo4jDBDirectory;
     }
 
-    public RDFStoreTestExtension(String neo4jDumpPath, String neo4jDBDirectory) {
+    public RDFStoreTestExtension(File neo4jDumpPath, File neo4jDBDirectory) {
         this.neo4jDumpPath = neo4jDumpPath;
         this.neo4jDBDirectory = neo4jDBDirectory;
     }
 
-    public RDFStoreTestExtension(String neo4jDBDirectory, boolean rdfsReasoning) {
+    public RDFStoreTestExtension(File neo4jDBDirectory, boolean rdfsReasoning) {
         this.rdfsReasoning = rdfsReasoning;
         this.neo4jDBDirectory = neo4jDBDirectory;
     }
@@ -43,7 +43,6 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
 
     public void convertAndImportIntoStore(String outputFileName, ConversionConfig config, boolean rdfsReasoning) {
         clearStore();
-        File testStoreDir = TestUtil.getResource(neo4jDBDirectory);
 
         if (neoStores != null) {
             neoStores.close();
@@ -51,17 +50,16 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
 
         if (neo4jDumpPath != null) {
             try {
-                FileUtils.deleteDirectory(testStoreDir);
+                FileUtils.deleteDirectory(neo4jDBDirectory);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            File dumpFilePath = TestUtil.getResource(neo4jDumpPath);
-            neoStores = Neo4jStoreFactory.getNeo4jStoreFromDump(dumpFilePath, testStoreDir);
+            neoStores = Neo4jStoreFactory.getNeo4jStoreFromDump(neo4jDumpPath, neo4jDBDirectory);
         } else {
-            neoStores = Neo4jStoreFactory.getNeo4jStore(testStoreDir);
+            neoStores = Neo4jStoreFactory.getNeo4jStore(neo4jDBDirectory);
         }
 
-        File outputFile = TestUtil.getResource("temp/" + outputFileName);
+        File outputFile = TestUtil.getTempFile(outputFileName);
         outputFile.getParentFile().mkdirs();
         Neo4jDBToTurtle neo4jDBToTurtle;
         try {

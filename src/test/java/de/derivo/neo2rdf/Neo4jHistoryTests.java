@@ -14,7 +14,7 @@ import java.util.Set;
 public class Neo4jHistoryTests {
 
     @RegisterExtension
-    private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-history");
+    private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getResource("neo4j-history"));
 
     @Test
     public void includeDeletedLabelsPropertyKeysAndRelationshipTypes() {

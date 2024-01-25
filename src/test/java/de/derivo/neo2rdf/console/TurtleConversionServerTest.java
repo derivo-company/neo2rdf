@@ -14,7 +14,7 @@ public class TurtleConversionServerTest {
             .build();
 
     public static void main(String[] args) {
-        File configPath = TestUtil.getResource("temp/configTest.yaml");
+        File configPath = TestUtil.getTempFile("configTest.yaml");
         config.write(configPath);
 
         args = new String[]{

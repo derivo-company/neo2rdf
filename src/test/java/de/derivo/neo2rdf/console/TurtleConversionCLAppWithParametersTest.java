@@ -16,14 +16,14 @@ public class TurtleConversionCLAppWithParametersTest {
             .setSequenceConversionType(SequenceConversionType.SEPARATE_LITERALS)
             .setDerivePropertyHierarchyByRelationshipSubsetCheck(true)
             .setDeriveClassHierarchyByLabelSubsetCheck(true)
-            .setSchemaOutputPath(TestUtil.getResource("temp/test-schema.ttl"))
+            .setSchemaOutputPath(TestUtil.getTempFile("test-schema.ttl"))
             .build();
 
     public static void main(String[] args) {
-        File configPath = TestUtil.getResource("temp/config.yaml");
+        File configPath = TestUtil.getTempFile("config.yaml");
         config.write(configPath);
-        File outputPath = TestUtil.getResource("temp/command-line-conversion-output.ttl");
-        File schemaOutputPath = TestUtil.getResource("temp/command-line-conversion-schema-output.ttl");
+        File outputPath = TestUtil.getTempFile("command-line-conversion-output.ttl");
+        File schemaOutputPath = TestUtil.getTempFile("command-line-conversion-schema-output.ttl");
 
         args = new String[]{"--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-derived-type-hierarchy").toString()),
                 "--basePrefix=%s".formatted(FOAF.NAMESPACE),

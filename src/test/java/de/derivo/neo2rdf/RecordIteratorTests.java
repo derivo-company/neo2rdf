@@ -18,14 +18,16 @@ import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.neo4j.kernel.impl.store.PropertyType;
 import org.neo4j.values.storable.Value;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,18 +81,19 @@ public class RecordIteratorTests {
 
 
     @Test
-    public void convertMovieDBToRDF() throws FileNotFoundException {
-        File outputFile = TestUtil.getResource("temp/movie-db-test.ttl");
-        Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, new FileOutputStream(outputFile));
-        neo4jDBToTurtle.startProcessing();
-        RDF4JInMemoryStore store = new RDF4JInMemoryStore(List.of(outputFile));
-        Set<String> assignedClasses = store.getAssignedClasses(config.getBasePrefix() + "node-1");
-        Assertions.assertEquals(Set.of(config.getBasePrefix() + "Person"), assignedClasses);
+    public void convertMovieDBToRDF(@TempDir File tempDir) throws IOException {
+        File outputFile = Paths.get(tempDir.toString(), "movie-db-test.ttl").toFile();
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+            Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, outputStream);
+            neo4jDBToTurtle.startProcessing();
+            RDF4JInMemoryStore store = new RDF4JInMemoryStore(List.of(outputFile));
+            Set<String> assignedClasses = store.getAssignedClasses(config.getBasePrefix() + "node-1");
+            Assertions.assertEquals(Set.of(config.getBasePrefix() + "Person"), assignedClasses);
 
-        Set<String> allClasses = store.getInstances(OWL.CLASS.toString());
-        Assertions.assertTrue(allClasses.contains(config.getBasePrefix() + "Person"));
-        Assertions.assertTrue(allClasses.contains(config.getBasePrefix() + "Movie"));
-
+            Set<String> allClasses = store.getInstances(OWL.CLASS.toString());
+            Assertions.assertTrue(allClasses.contains(config.getBasePrefix() + "Person"));
+            Assertions.assertTrue(allClasses.contains(config.getBasePrefix() + "Movie"));
+        }
     }
 
     @Test
