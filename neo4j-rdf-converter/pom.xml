@@ -22,6 +22,13 @@
 
     <build>
         <plugins>
+            <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/license-maven-plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.4.0</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
