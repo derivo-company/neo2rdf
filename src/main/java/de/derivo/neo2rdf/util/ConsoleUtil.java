@@ -12,7 +12,7 @@ public class ConsoleUtil {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###");
 
     static {
-        log = LoggerFactory.getLogger("Neo4j-to-RDF-Converter");
+        log = LoggerFactory.getLogger("Neo2RDF");
     }
 
     public static Logger getLogger() {

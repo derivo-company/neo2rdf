@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.derivo</groupId>
-    <artifactId>neo4j-rdf-converter</artifactId>
+    <artifactId>neo2rdf</artifactId>
     <version>${revision}</version>
 
     <properties>
