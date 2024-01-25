@@ -5,7 +5,7 @@
     </formats>
     <files>
         <file>
-            <source>${project.build.directory}/neo4j-rdf-converter-${revision}.jar</source>
+            <source>${project.build.directory}/neo2rdf-${revision}.jar</source>
             <outputDirectory>/</outputDirectory>
             <destName>neo2rdf.jar</destName>
         </file>
