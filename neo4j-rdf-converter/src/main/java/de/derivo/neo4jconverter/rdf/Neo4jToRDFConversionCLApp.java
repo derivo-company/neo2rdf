@@ -21,7 +21,10 @@ public class Neo4jToRDFConversionCLApp {
                     """)
     protected File neo4jDBDumpPath = null;
 
-    @CommandLine.Option(names = {"-cfg", "--config"})
+    @CommandLine.Option(names = {"-cfg", "--config"},
+            description = """
+                    Instead of specifying the configuration in terms of command line parameters, it is also possible to use an external YAML configuration.
+                    """)
     private File conversionConfigFile = null;
 
     @CommandLine.Option(names = {"--basePrefix"},

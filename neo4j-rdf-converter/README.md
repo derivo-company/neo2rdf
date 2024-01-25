@@ -1,10 +1,20 @@
 # Neo4j to RDF Converter
 
-## File-to-File Conversion
+The Neo4j-RDF-Converter represents an application that can be used in order to convert a Neo4j database into an RDF file
+in Turtle format. It is implemented in Java and uses the official Neo4j record storage reader to iterate over all
+entries of a Neo4j database to accomplish the conversion.
 
-## File-to-Stream Conversion
+## Conversion Modes
 
-## Configuration YAML File
+There exist two distinct conversion modes:
+
+- **DB-to-File**: The Neo4j database is converted into an RDF file in Turtle format, which is written to a specified
+  location on disk.
+- **DB-to-Stream**: The application starts an HTTP server for the provided Neo4j database. When a GET request is sent to
+  the server, the conversion procedure is initiated and the response returns an RDF Turtle stream to the client.
+
+## External Configuration YAML File
+
 ```YAML
 # Prefix that is used for all converted nodes, property keys, relationship types, and relationships.
 basePrefix: "https://www.example.org#"
