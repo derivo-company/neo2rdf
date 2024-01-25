@@ -17,7 +17,7 @@ public class Neo4jHistoryTests {
     private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-history");
 
     @Test
-    public void testIncludeDeletedLabelsPropertyKeysAndRelationshipTypes() {
+    public void includeDeletedLabelsPropertyKeysAndRelationshipTypes() {
         boolean include = true;
         ConversionConfig config = ConversionConfigBuilder.newBuilder()
                 .setIncludeDeletedNeo4jLabels(include)
@@ -44,7 +44,7 @@ public class Neo4jHistoryTests {
 
 
     @Test
-    public void testExcludeDeletedLabelsPropertyKeysAndRelationshipTypes() {
+    public void excludeDeletedLabelsPropertyKeysAndRelationshipTypes() {
         boolean include = false;
         ConversionConfig config = ConversionConfigBuilder.newBuilder()
                 .setIncludeDeletedNeo4jLabels(include)

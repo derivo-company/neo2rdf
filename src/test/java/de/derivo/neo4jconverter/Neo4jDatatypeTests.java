@@ -21,7 +21,7 @@ public class Neo4jDatatypeTests {
     private static final ConversionConfig config = ConversionConfigBuilder.newBuilder().build();
 
     @Test
-    public void testNeo4jDatatypes() {
+    public void neo4jDatatypes() {
         storeTestExtension.convertAndImportIntoStore("neo4j-datatypes-test.ttl", config);
 
         String q = """
@@ -69,7 +69,7 @@ public class Neo4jDatatypeTests {
     }
 
     @Test
-    public void testDerivedPropertyTypes() {
+    public void derivedPropertyTypes() {
         storeTestExtension.convertAndImportIntoStore("neo4j-datatypes-test.ttl", config);
 
         Set<String> objectProperties = storeTestExtension.getInstances(OWL.OBJECTPROPERTY.toString());

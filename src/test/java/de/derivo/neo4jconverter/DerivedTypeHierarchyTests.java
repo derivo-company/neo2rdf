@@ -22,8 +22,9 @@ public class DerivedTypeHierarchyTests {
     @RegisterExtension
     private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension("neo4j-derived-type-hierarchy");
 
+
     @Test
-    public void testDerivedClassHierarchy() {
+    public void derivedClassHierarchy() {
         String outputFileName = "neo4j-derived-hierarchies-test.ttl";
         storeTestExtension.convertAndImportIntoStore(outputFileName, config);
         {
@@ -67,7 +68,7 @@ public class DerivedTypeHierarchyTests {
     }
 
     @Test
-    public void testRDFSMaterialization() {
+    public void rdfsMaterialization() {
         String outputFileName = "neo4j-derived-hierarchies-test-materialized.ttl";
         storeTestExtension.convertAndImportIntoStore(outputFileName, config, true);
         {
@@ -99,7 +100,7 @@ public class DerivedTypeHierarchyTests {
     }
 
     @Test
-    public void testDerivedPropertyHierarchy() {
+    public void derivedPropertyHierarchy() {
         String outputFileName = "neo4j-derived-hierarchies-test.ttl";
         storeTestExtension.convertAndImportIntoStore(outputFileName, config);
 

@@ -93,7 +93,6 @@ public class RecordIteratorTests {
 
     }
 
-
     @Test
     public void nodeProcessor() {
         Map<Long, String> propertyKeyMap = schema.getPropertyKeyIDToStr();

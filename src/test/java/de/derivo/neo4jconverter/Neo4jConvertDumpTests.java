@@ -21,7 +21,7 @@ public class Neo4jConvertDumpTests {
 
 
     @Test
-    public void loadArchiveAndConvertDBTest() {
+    public void loadArchiveAndConvertDB() {
         storeTestExtension.convertAndImportIntoStore("neo4j-dump-output.ttl", config, true);
         Assertions.assertFalse(storeTestExtension.getInstances(RDFS.RESOURCE.toString()).isEmpty());
     }
