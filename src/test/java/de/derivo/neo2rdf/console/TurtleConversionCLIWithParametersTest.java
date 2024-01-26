@@ -10,7 +10,7 @@ import org.eclipse.rdf4j.model.vocabulary.FOAF;
 
 import java.io.File;
 
-public class TurtleConversionCLAppWithParametersTest {
+public class TurtleConversionCLIWithParametersTest {
 
     private static final ConversionConfig config = ConversionConfigBuilder.newBuilder()
             .setSequenceConversionType(SequenceConversionType.SEPARATE_LITERALS)
@@ -25,7 +25,9 @@ public class TurtleConversionCLAppWithParametersTest {
         File outputPath = TestUtil.getTempFile("command-line-conversion-output.ttl");
         File schemaOutputPath = TestUtil.getTempFile("command-line-conversion-schema-output.ttl");
 
-        args = new String[]{"--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-derived-type-hierarchy").toString()),
+        args = new String[]{
+                "dump",
+                "--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-derived-type-hierarchy").toString()),
                 "--basePrefix=%s".formatted(FOAF.NAMESPACE),
                 "--reificationVocabulary=%s".formatted(ReificationVocabulary.OWL_REIFICATION),
                 "--sequenceConversionType=%s".formatted(SequenceConversionType.SEPARATE_LITERALS),
@@ -35,7 +37,7 @@ public class TurtleConversionCLAppWithParametersTest {
                 "--deriveClassHierarchyByLabelSubsetCheck=%s".formatted(true),
                 "--derivePropertyHierarchyByRelationshipSubsetCheck=%s".formatted(true),
                 "--schemaOutputPath=%s".formatted(schemaOutputPath),
-                "dump --outputPath=%s".formatted(outputPath),
+                "--outputPath=%s".formatted(outputPath),
         };
         Neo4jToRDFConversionCLI.main(args);
     }

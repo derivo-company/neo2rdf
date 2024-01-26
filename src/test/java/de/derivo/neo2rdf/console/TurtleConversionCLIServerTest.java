@@ -8,7 +8,7 @@ import de.derivo.neo2rdf.util.SequenceConversionType;
 
 import java.io.File;
 
-public class TurtleConversionServerTest {
+public class TurtleConversionCLIServerTest {
     private static final ConversionConfig config = ConversionConfigBuilder.newBuilder()
             .setSequenceConversionType(SequenceConversionType.SEPARATE_LITERALS)
             .build();

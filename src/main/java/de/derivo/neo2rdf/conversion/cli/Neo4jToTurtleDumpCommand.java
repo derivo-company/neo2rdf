@@ -10,7 +10,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 @CommandLine.Command(name = "dump",
-        description = "Example for dump conversion:      dump -db=./path/to/neo4jdb -o=output/path/data.ttl")
+        description = """
+                The Neo4j database is converted into an RDF file in Turtle format, which is written to the specified location on disk.
+                Exemplary usage: dump -db=./path/to/neo4jdb -o=output/path/data.ttl
+                """)
 public class Neo4jToTurtleDumpCommand implements Runnable {
 
     @CommandLine.Mixin

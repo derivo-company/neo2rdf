@@ -8,13 +8,23 @@
     <artifactId>neo2rdf</artifactId>
     <version>${revision}</version>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <properties>
+                <revision>${version}</revision>
+            </properties>
+        </profile>
+    </profiles>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <!--suppress UnresolvedMavenProperty -->
         <sha1>${git.branch}</sha1>
+        <version>0.3.0</version>
         <changelist/>
-        <revision>0.3.0-${sha1}${changelist}</revision>
+        <revision>${version}-${sha1}${changelist}</revision>
         <version.mvn.plugin.flatten>1.1.0</version.mvn.plugin.flatten>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>5.15.0</neo4j.version>
@@ -23,6 +33,34 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>write-version-to-file</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/prepared-build-resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${user.dir}/build-resources</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>VERSION</include>
+                                        <include>CHANGELOG.md</include>
+                                        <include>README.md</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/license-maven-plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -54,6 +92,24 @@
                         <includeOnlyProperty>^git.branch</includeOnlyProperty>
                     </includeOnlyProperties>
                     <commitIdGenerationMode>full</commitIdGenerationMode>
+                    <replacementProperties>
+                        <replacementProperty>
+                            <property>git.branch</property>
+                            <token>^([^\/]*)\/([^\/]*)$</token>
+                            <value>$1-$2</value>
+                            <regex>true</regex>
+                            <transformationRules>
+                                <transformationRule>
+                                    <apply>BEFORE</apply>
+                                    <action>UPPER_CASE</action>
+                                </transformationRule>
+                                <transformationRule>
+                                    <apply>AFTER</apply>
+                                    <action>LOWER_CASE</action>
+                                </transformationRule>
+                            </transformationRules>
+                        </replacementProperty>
+                    </replacementProperties>
                 </configuration>
             </plugin>
             <plugin>
@@ -126,12 +182,15 @@
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Multi-Release>true</Multi-Release>
+                                        <Implementation-Version>${project.version}</Implementation-Version>
                                     </manifestEntries>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <filters>
                                 <filter>
@@ -142,7 +201,8 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
-                                        <exclude>**/Log4j2Plugins.dat</exclude> <!-- Leads otherwise to error log messages on startup -->
+                                        <exclude>**/Log4j2Plugins.dat
+                                        </exclude> <!-- Leads otherwise to error log messages on startup -->
                                     </excludes>
                                 </filter>
                             </filters>
@@ -425,5 +485,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
 </project>

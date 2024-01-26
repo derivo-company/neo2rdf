@@ -1,0 +1,44 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-job:
+    uses: ./.github/workflows/java-build.yml
+    with:
+      java-version: 17
+      maven-options: "-P release"
+  release-job:
+    needs: build-job
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-build
+          path: release-artifacts/
+      - name: Get path name of artifact
+        run: echo "ARTIFACT_PATHNAME=$(ls release-artifacts/*.zip | head -n 1)" >> $GITHUB_ENV
+      - name: Get basename of artifact path
+        run: echo "ARTIFACT_NAME=$(basename ${{ env.ARTIFACT_PATHNAME }})" >> $GITHUB_ENV
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATHNAME }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/zip

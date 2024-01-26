@@ -22,9 +22,9 @@ public class TurtleConversionCLITest {
         config.write(configPath);
         File outputPath = TestUtil.getTempFile("command-line-conversion-output.ttl");
 
-        args = new String[]{"--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-derived-type-hierarchy").toString()),
+        args = new String[]{"dump", "--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-derived-type-hierarchy").toString()),
                 "--config=%s".formatted(configPath.toString()),
-                "dump --outputPath=%s".formatted(outputPath)};
+                "--outputPath=%s".formatted(outputPath)};
         Neo4jToRDFConversionCLI.main(args);
     }
 }

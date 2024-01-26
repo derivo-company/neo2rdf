@@ -18,7 +18,11 @@
             <fileMode>0644</fileMode>
         </file>
         <file>
-            <source>build-resources/CHANGELOG.md</source>
+            <source>${project.build.directory}/prepared-build-resources/CHANGELOG.md</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>${project.build.directory}/prepared-build-resources/VERSION</source>
             <fileMode>0644</fileMode>
         </file>
         <file>
