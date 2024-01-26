@@ -1,12 +1,11 @@
 # Neo2RDF
 
-Neo2RDF represents an application that can be used in order to convert a Neo4j database into an RDF file
-in Turtle format. It is implemented in Java and uses the official Neo4j record storage reader to iterate over all
-entries of a Neo4j database to accomplish the conversion.
+Neo2RDF is a tool that converts a Neo4j database into an RDF file in Turtle format. It is implemented in Java and uses
+the official Neo4j record storage reader.
 
 ## Conversion Modes
 
-There exist two distinct conversion modes:
+Two conversion modes are available:
 
 - **DB-to-File**: The Neo4j database is converted into an RDF file in Turtle format, which is written to a specified
   location on disk.
