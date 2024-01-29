@@ -39,8 +39,8 @@ Two conversion modes are available:
   ./neo2rdf.sh server -db=./path/to/neo4jdb -p=8080
   ```
 
-To get more information on the available configuration parameters execute `./neo2rdf.sh dump -h`
-or `./neo2rdf.sh server -h`.
+To get more information on the available configuration parameters execute `./neo2rdf.sh help dump`
+or `./neo2rdf.sh help server`.
 
 ## Advanced Configuration
 

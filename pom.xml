@@ -24,7 +24,7 @@
         <sha1>${git.branch}</sha1>
         <version>0.3.0</version>
         <changelist/>
-        <revision>${version}-${sha1}${changelist}</revision>
+        <revision>${version}-${sha1}${changelist}-SNAPSHOT</revision>
         <version.mvn.plugin.flatten>1.1.0</version.mvn.plugin.flatten>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>5.15.0</neo4j.version>
