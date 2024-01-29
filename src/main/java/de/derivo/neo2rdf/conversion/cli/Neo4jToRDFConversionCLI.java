@@ -3,7 +3,8 @@ package de.derivo.neo2rdf.conversion.cli;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-        name = "",
+        name = "neo2rdf",
+        aliases = "",
         subcommands = {Neo4jToTurtleDumpCommand.class, Neo4jToRDFConversionServerCommand.class},
         mixinStandardHelpOptions = true,
         versionProvider = Neo2RDFVersionProvider.class,
