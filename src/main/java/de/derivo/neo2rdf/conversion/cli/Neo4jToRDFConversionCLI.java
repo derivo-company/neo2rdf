@@ -4,7 +4,9 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "neo2rdf",
-        aliases = "",
+        description = """
+                Converts a Neo4j database into an RDF file in Turtle format.
+                """,
         subcommands = {Neo4jToTurtleDumpCommand.class, Neo4jToRDFConversionServerCommand.class},
         mixinStandardHelpOptions = true,
         versionProvider = Neo2RDFVersionProvider.class,
