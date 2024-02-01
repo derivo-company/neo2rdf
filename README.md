@@ -48,13 +48,14 @@ execute `./neo2rdf.sh help <COMMAND>`.
 NEO2RDF(1)			       Neo2rdf Manual				  NEO2RDF(1)
 
 NAME
-       neo2rdf - Converts a Neo4j database into an RDF file in Turtle format.
+       neo2rdf - Converts a Neo4j database to RDF Turtle
 
 SYNOPSIS
        neo2rdf [-hV] [COMMAND]
 
 DESCRIPTION
-       Converts a Neo4j database into an RDF file in Turtle format.
+       Neo2RDF is a command line application that converts a Neo4j database into RDF Turtle
+       format. It is implemented in Java and uses the official Neo4j record storage reader.
 
 OPTIONS
        -h, --help
@@ -65,17 +66,10 @@ OPTIONS
 
 COMMANDS
        dump
-	   The Neo4j database is converted into an RDF file in Turtle format, which is
-	   written to the specified location on disk.
-
-	   Exemplary usage: dump -db=./path/to/neo4jdb -o=output/path/data.ttl
+	   Converts a Neo4j database into an RDF file in Turtle format
 
        server
-	   The application starts an HTTP server for the provided Neo4j database. When a GET
-	   request is sent to the server, the conversion procedure is initiated and the
-	   response returns an RDF Turtle stream to the client.
-
-	   Exemplary usage: server -db=./path/to/neo4jdb -p=8080
+	   Starts an HTTP server that serves the conversion result as RDF Turtle stream
 
        help
 	   Display help information about the specified command.
@@ -87,9 +81,7 @@ COMMANDS
 NEO2RDF-DUMP(1)			       Neo2rdf Manual			     NEO2RDF-DUMP(1)
 
 NAME
-       neo2rdf-dump - The Neo4j database is converted into an RDF file in Turtle format,
-       which is written to the specified location on disk. Exemplary usage: `dump
-       -db=./path/to/neo4jdb -o=output/path/data.ttl`
+       neo2rdf-dump - Converts a Neo4j database into an RDF file in Turtle format
 
 SYNOPSIS
        neo2rdf dump [--deriveClassHierarchyByLabelSubsetCheck]
@@ -113,10 +105,9 @@ OPTIONS
 
        -cfg, --config=<conversionConfigFile>
 	   Instead of specifying non-mandatory options in terms of command line parameters,
-	   it is also possible to use an external YAML configuration.
-
-	   The YAML keys must have the same identifiers as the long option names, e.g.,
-	   'basePrefix: https://www.example.org/other-prefix#'.
+	   it is also possible to use an external YAML configuration. The YAML keys must
+	   have the same identifiers as the long option names, e.g., 'basePrefix:
+	   https://www.example.org/other-prefix#'.
 
        -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
 	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
@@ -178,10 +169,8 @@ OPTIONS
 NEO2RDF-SERVER(1)		       Neo2rdf Manual			   NEO2RDF-SERVER(1)
 
 NAME
-       neo2rdf-server - The application starts an HTTP server for the provided Neo4j
-       database. When a GET request is sent to the server, the conversion procedure is
-       initiated and the response returns an RDF Turtle stream to the client. Exemplary
-       usage: `server -db=./path/to/neo4jdb -p=8080`
+       neo2rdf-server - Starts an HTTP server that serves the conversion result as RDF
+       Turtle stream
 
 SYNOPSIS
        neo2rdf server [--deriveClassHierarchyByLabelSubsetCheck]
@@ -205,10 +194,9 @@ OPTIONS
 
        -cfg, --config=<conversionConfigFile>
 	   Instead of specifying non-mandatory options in terms of command line parameters,
-	   it is also possible to use an external YAML configuration.
-
-	   The YAML keys must have the same identifiers as the long option names, e.g.,
-	   'basePrefix: https://www.example.org/other-prefix#'.
+	   it is also possible to use an external YAML configuration. The YAML keys must
+	   have the same identifiers as the long option names, e.g., 'basePrefix:
+	   https://www.example.org/other-prefix#'.
 
        -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
 	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is

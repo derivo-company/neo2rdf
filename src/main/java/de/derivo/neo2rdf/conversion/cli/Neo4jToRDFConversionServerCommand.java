@@ -6,6 +6,7 @@ import org.neo4j.kernel.impl.store.NeoStores;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "server",
+        header = "Starts an HTTP server that serves the conversion result as RDF Turtle stream",
         description = """
                 The application starts an HTTP server for the provided Neo4j database. When a GET request is sent to the server, the conversion procedure is initiated and the response returns an RDF Turtle stream to the client.
                 Exemplary usage: `server -db=./path/to/neo4jdb -p=8080`
