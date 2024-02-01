@@ -1,0 +1,18 @@
+## Neo2RDF CLI Manual
+
+```
+${BASE}
+```
+
+### DB-to-File - Dump Command
+
+```
+${DUMP}
+```
+
+
+### DB-to-stream - Server Command
+
+```
+${SERVER}
+```
