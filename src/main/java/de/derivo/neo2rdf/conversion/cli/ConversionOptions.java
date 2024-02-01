@@ -24,9 +24,9 @@ public class ConversionOptions {
 
 
     @CommandLine.Option(names = {"-cfg", "--config"},
-            description = """
-                    Instead of specifying the configuration in terms of command line parameters, it is also possible to use an external YAML configuration.
-                    """)
+            description =
+                    "Instead of specifying non-mandatory options in terms of command line parameters, it is also possible to use an external YAML configuration. " +
+                            "The YAML keys must have the same identifiers as the long option names, e.g., 'basePrefix: https://www.example.org/other-prefix#'.")
     private File conversionConfigFile = null;
 
 
@@ -40,16 +40,16 @@ public class ConversionOptions {
             description = """
                     The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID) should be reified in RDF.
                     Options:
-                     - RDF_COLLECTION: Neo4j sequences are converted into open lists in RDF.
-                     - SEPARATE_LITERALS: Neo4j sequences are converted into separate assertions, e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
+                     - `RDF_COLLECTION`: Neo4j sequences are converted into open lists in RDF.
+                     - `SEPARATE_LITERALS`: Neo4j sequences are converted into separate assertions, e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
                     """)
     private ReificationVocabulary reificationVocabulary = null;
 
     @CommandLine.Option(names = {"--sequenceConversionType"},
             description = """
                     Options:
-                    - RDF_COLLECTION: Neo4j sequences are converted into open lists in RDF.
-                    - SEPARATE_LITERALS: Neo4j sequences are converted into separate assertions, e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
+                    - `RDF_COLLECTION`: Neo4j sequences are converted into open lists in RDF.
+                    - `SEPARATE_LITERALS`: Neo4j sequences are converted into separate assertions, e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
                     """)
     private SequenceConversionType sequenceConversionType = null;
 
