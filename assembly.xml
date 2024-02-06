@@ -1,0 +1,37 @@
+<assembly>
+    <id>release</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <files>
+        <file>
+            <source>${project.build.directory}/neo2rdf-${revision}.jar</source>
+            <outputDirectory>/</outputDirectory>
+            <destName>neo2rdf.jar</destName>
+        </file>
+        <file>
+            <source>LICENSE</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>README.md</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>${project.build.directory}/prepared-build-resources/CHANGELOG.md</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>${project.build.directory}/prepared-build-resources/VERSION</source>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
+            <source>build-resources/neo2rdf.bat</source>
+            <fileMode>0755</fileMode>
+        </file>
+        <file>
+            <source>build-resources/neo2rdf.sh</source>
+            <fileMode>0755</fileMode>
+        </file>
+    </files>
+</assembly>

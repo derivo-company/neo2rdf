@@ -1,0 +1,14 @@
+name: Dev build
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+    branches-ignore:
+      - master
+
+jobs:
+  build-and-upload:
+    uses: ./.github/workflows/java-build.yml
+    with:
+      java-version: 17
