@@ -22,7 +22,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <!--suppress UnresolvedMavenProperty -->
         <sha1>${git.branch}</sha1>
-        <version>0.3.0</version>
+        <version>1.0.0</version>
         <changelist/>
         <revision>${version}-${sha1}${changelist}-SNAPSHOT</revision>
         <version.mvn.plugin.flatten>1.1.0</version.mvn.plugin.flatten>
