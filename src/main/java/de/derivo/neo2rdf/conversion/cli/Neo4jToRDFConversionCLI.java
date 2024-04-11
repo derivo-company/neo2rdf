@@ -11,6 +11,7 @@ import picocli.CommandLine;
                 """,
         subcommands = {Neo4jToTurtleDumpCommand.class, Neo4jToRDFConversionServerCommand.class, CommandLine.HelpCommand.class},
         mixinStandardHelpOptions = true,
+        showDefaultValues = true,
         versionProvider = Neo2RDFVersionProvider.class,
         usageHelpWidth = 100)
 public class Neo4jToRDFConversionCLI {
