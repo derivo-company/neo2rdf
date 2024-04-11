@@ -101,7 +101,7 @@ public abstract class Neo4jToRDFConverter {
 
         log.info("Processing relationships...");
         relationshipProcessor.startProcessing();
-        this.deployedRelationshipTypes = relationshipProcessor.getDeployedRelationshiptypes();
+        this.deployedRelationshipTypes = relationshipProcessor.getDeployedRelationshipTypes();
         this.annotationPropertyKeys = new UnifiedSet<>(indexedSchema.getPropertyKeyIDToStr().size());
         this.annotationPropertyKeys.addAll(relationshipProcessor.getObjectPropertyKeys());
         this.annotationPropertyKeys.addAll(relationshipProcessor.getDatatypePropertyKeys());

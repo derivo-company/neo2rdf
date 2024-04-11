@@ -36,6 +36,7 @@ public class TurtleConversionCLIWithParametersTest {
                 "--includeDeletedRelationshipTypes=%s".formatted(true),
                 "--deriveClassHierarchyByLabelSubsetCheck=%s".formatted(true),
                 "--derivePropertyHierarchyByRelationshipSubsetCheck=%s".formatted(true),
+                "--reifyOnlyStatementsWithAnnotations=%s".formatted(true),
                 "--schemaOutputPath=%s".formatted(schemaOutputPath),
                 "--outputPath=%s".formatted(outputPath),
         };

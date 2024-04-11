@@ -12,6 +12,7 @@ import java.io.IOException;
 public class ConversionConfig {
     String basePrefix = "https://www.example.org/";
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
+    boolean reifyOnlyStatementsWithAnnotations = false;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
     boolean includeDeletedNeo4jLabels = false;
     boolean includeDeletedPropertyKeys = false;
@@ -53,6 +54,10 @@ public class ConversionConfig {
 
     public File getSchemaOutputPath() {
         return schemaOutputPath;
+    }
+
+    public boolean isReifyOnlyStatementsWithAnnotations() {
+        return reifyOnlyStatementsWithAnnotations;
     }
 
     public SequenceConversionType getSequenceConversionType() {
