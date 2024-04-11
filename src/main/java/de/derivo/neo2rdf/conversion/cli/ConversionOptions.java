@@ -17,16 +17,16 @@ public class ConversionOptions {
 
     @CommandLine.Option(names = {"-d", "--neo4jDBDumpPath"},
             description = """
-                    If a path to a Neo4j dump has been specified using this parameter, the DB dump is extracted to the appropriate target
-                    Neo4j DB directory first, and subsequently, the conversion procedure gets executed as usual.
+                    If a path to a Neo4j dump has been specified using this parameter, the DB dump is extracted to the appropriate target Neo4j DB directory first, and subsequently, the conversion procedure gets executed as usual.
                     """)
     protected File neo4jDBDumpPath = null;
 
 
     @CommandLine.Option(names = {"-cfg", "--config"},
-            description =
-                    "Instead of specifying non-mandatory options in terms of command line parameters, it is also possible to use an external YAML configuration. " +
-                            "The YAML keys must have the same identifiers as the long option names, e.g., 'basePrefix: https://www.example.org/other-prefix#'.")
+            description = """
+                    Instead of specifying non-mandatory options in terms of command line parameters, it is also possible to use an external YAML configuration.
+                    The YAML keys must have the same identifiers as the long option names, e.g., 'basePrefix: https://www.example.org/other-prefix#'.
+                    """)
     private File conversionConfigFile = null;
 
 
@@ -34,16 +34,24 @@ public class ConversionOptions {
             description = """
                     Prefix that is used for all converted nodes, property keys, relationship types, and relationships.
                     """)
-    private String basePrefix = null;
+    private String basePrefix = "https://www.example.org/";
 
     @CommandLine.Option(names = {"--reificationVocabulary"},
             description = """
-                    The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID) should be reified in RDF.
+                    The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID) should be reified.
                     Options:
-                     - `RDF_COLLECTION`: Neo4j sequences are converted into open lists in RDF.
-                     - `SEPARATE_LITERALS`: Neo4j sequences are converted into separate assertions, e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
+                     - `RDF_REIFICATION`: uses the RDF reification vocabulary, i.e.,  rdf:Statement, rdf:subject, rdf:predicate, and rdf:object
+                        (cf. https://www.w3.org/TR/rdf11-mt/#reification)
+                     - `OWL_REIFICATION`: uses the OWL vocabulary, i.e.,  owl:Axiom, rdf:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
+                     (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
                     """)
-    private ReificationVocabulary reificationVocabulary = null;
+    private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
+
+    @CommandLine.Option(names = {"--reifyOnlyStatementsWithAnnotations"},
+            description = """
+                    If this option is set, only Neo4j relationships with existing properties will be reified in RDF.
+                    """)
+    private Boolean reifyOnlyStatementsWithAnnotations = false;
 
     @CommandLine.Option(names = {"--sequenceConversionType"},
             description = """
@@ -51,23 +59,23 @@ public class ConversionOptions {
                     - `RDF_COLLECTION`: Neo4j sequences are converted into open lists in RDF.
                     - `SEPARATE_LITERALS`: Neo4j sequences are converted into separate assertions, e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
                     """)
-    private SequenceConversionType sequenceConversionType = null;
+    private SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
 
     @CommandLine.Option(names = {"--includeDeletedNeo4jLabels"})
-    private Boolean includeDeletedNeo4jLabels = null;
+    private Boolean includeDeletedNeo4jLabels = false;
 
     @CommandLine.Option(names = {"--includeDeletedPropertyKeys"})
-    private Boolean includeDeletedPropertyKeys = null;
+    private Boolean includeDeletedPropertyKeys = false;
 
     @CommandLine.Option(names = {"--includeDeletedRelationshipTypes"})
-    private Boolean includeDeletedRelationshipTypes = null;
+    private Boolean includeDeletedRelationshipTypes = false;
 
     @CommandLine.Option(names = {"--deriveClassHierarchyByLabelSubsetCheck"},
             description = """
                     Indicates whether the RDF class hierarchy should be derived.
                     For this purpose, it is examined which sets of Neo4j nodes with an assigned label are a subset of one another.
                     """)
-    private Boolean deriveClassHierarchyByLabelSubsetCheck = null;
+    private Boolean deriveClassHierarchyByLabelSubsetCheck = false;
 
     @CommandLine.Option(names = {"--derivePropertyHierarchyByRelationshipSubsetCheck"},
             description = """
@@ -77,10 +85,10 @@ public class ConversionOptions {
                     """)
     private Boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
 
+
     @CommandLine.Option(names = {"--schemaOutputPath"},
             description = """
-                    If the RDF schema is derived from the Neo4j dataset, e.g., the class or property hierarchy,
-                    an additional path can be specified to store it separately on disk.
+                    If the RDF schema is derived from the Neo4j dataset, e.g., the class or property hierarchy, an additional path can be specified to store it separately on disk.
                     If the value is null or left out, the derived schema is stored along with the data.
                     """)
     private File schemaOutputPath = null;
@@ -96,33 +104,16 @@ public class ConversionOptions {
             config = ConversionConfig.read(conversionConfigFile);
         } else {
             ConversionConfigBuilder builder = ConversionConfigBuilder.newBuilder();
-            if (basePrefix != null) {
-                builder.setBasePrefix(basePrefix);
-            }
-            if (reificationVocabulary != null) {
-                builder.setReificationVocabulary(reificationVocabulary);
-            }
-            if (sequenceConversionType != null) {
-                builder.setSequenceConversionType(sequenceConversionType);
-            }
-            if (includeDeletedNeo4jLabels != null) {
-                builder.setIncludeDeletedNeo4jLabels(includeDeletedNeo4jLabels);
-            }
-            if (includeDeletedPropertyKeys != null) {
-                builder.setIncludeDeletedPropertyKeys(includeDeletedPropertyKeys);
-            }
-            if (includeDeletedRelationshipTypes != null) {
-                builder.setIncludeDeletedRelationshipTypes(includeDeletedRelationshipTypes);
-            }
-            if (derivePropertyHierarchyByRelationshipSubsetCheck != null) {
-                builder.setDerivePropertyHierarchyByRelationshipSubsetCheck(derivePropertyHierarchyByRelationshipSubsetCheck);
-            }
-            if (deriveClassHierarchyByLabelSubsetCheck != null) {
-                builder.setDeriveClassHierarchyByLabelSubsetCheck(deriveClassHierarchyByLabelSubsetCheck);
-            }
-            if (schemaOutputPath != null) {
-                builder.setSchemaOutputPath(schemaOutputPath);
-            }
+            builder.setBasePrefix(basePrefix);
+            builder.setReificationVocabulary(reificationVocabulary);
+            builder.setReifyOnlyStatementsWithAnnotations(reifyOnlyStatementsWithAnnotations);
+            builder.setSequenceConversionType(sequenceConversionType);
+            builder.setIncludeDeletedNeo4jLabels(includeDeletedNeo4jLabels);
+            builder.setIncludeDeletedPropertyKeys(includeDeletedPropertyKeys);
+            builder.setIncludeDeletedRelationshipTypes(includeDeletedRelationshipTypes);
+            builder.setDerivePropertyHierarchyByRelationshipSubsetCheck(derivePropertyHierarchyByRelationshipSubsetCheck);
+            builder.setDeriveClassHierarchyByLabelSubsetCheck(deriveClassHierarchyByLabelSubsetCheck);
+            builder.setSchemaOutputPath(schemaOutputPath);
             config = builder.build();
         }
         return config;
