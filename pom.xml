@@ -8,23 +8,12 @@
     <artifactId>neo2rdf</artifactId>
     <version>${revision}</version>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <properties>
-                <revision>${version}</revision>
-            </properties>
-        </profile>
-    </profiles>
-
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <!--suppress UnresolvedMavenProperty -->
-        <sha1>${git.branch}</sha1>
-        <version>1.0.0</version>
+        <sha1/>
         <changelist/>
-        <revision>${version}-${sha1}${changelist}-SNAPSHOT</revision>
+        <revision>1.0.0${sha1}${changelist}</revision>
         <version.mvn.plugin.flatten>1.1.0</version.mvn.plugin.flatten>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>5.18.1</neo4j.version>
@@ -66,51 +55,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.4.0</version>
-            </plugin>
-            <!-- https://mvnrepository.com/artifact/io.github.git-commit-id/git-commit-id-maven-plugin -->
-            <plugin>
-                <groupId>io.github.git-commit-id</groupId>
-                <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>7.0.0</version>
-                <executions>
-                    <execution>
-                        <id>get-the-git-infos</id>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                        <phase>initialize</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <generateGitPropertiesFilename>${project.build.directory}/git.properties
-                    </generateGitPropertiesFilename>
-                    <injectAllReactorProjects>true</injectAllReactorProjects>
-                    <includeOnlyProperties>
-                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
-                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
-                        <includeOnlyProperty>^git.branch</includeOnlyProperty>
-                    </includeOnlyProperties>
-                    <commitIdGenerationMode>full</commitIdGenerationMode>
-                    <replacementProperties>
-                        <replacementProperty>
-                            <property>git.branch</property>
-                            <token>^([^\/]*)\/([^\/]*)$</token>
-                            <value>$1-$2</value>
-                            <regex>true</regex>
-                            <transformationRules>
-                                <transformationRule>
-                                    <apply>BEFORE</apply>
-                                    <action>UPPER_CASE</action>
-                                </transformationRule>
-                                <transformationRule>
-                                    <apply>AFTER</apply>
-                                    <action>LOWER_CASE</action>
-                                </transformationRule>
-                            </transformationRules>
-                        </replacementProperty>
-                    </replacementProperties>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
