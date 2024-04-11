@@ -8,7 +8,26 @@ on:
       - master
 
 jobs:
-  build-and-upload:
-    uses: ./.github/workflows/java-build.yml
-    with:
-      java-version: 17
+  dev-build:
+    name: "Build Artifacts"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/mvn-setup
+
+      - name: Build with Maven
+        run: mvn --no-transfer-progress -B package --file pom.xml -Dchangelist=${CHANGELIST}
+
+      - name: Get artifact path
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        run: |
+          echo "build_name=neo2rdf-build_${{ env.NORMALIZED_BRANCH_NAME }}" >> $GITHUB_ENV
+          echo "build_path=$(ls target/*.zip | head -n 1)" >> $GITHUB_ENV
+
+      - name: Upload RDF build
+        uses: actions/upload-artifact@v4
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        with:
+          name: ${{ env.build_name }}
+          path: ${{ env.build_path }}
