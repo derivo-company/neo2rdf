@@ -87,9 +87,9 @@ SYNOPSIS
        neo2rdf dump [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
        [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
-       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>]
-       -db=<neo4jDBDirectory> -o=<outputPath>
-       [--reificationVocabulary=<reificationVocabulary>]
+       [--reifyOnlyStatementsWithAnnotations] [--basePrefix=<basePrefix>]
+       [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory>
+       -o=<outputPath> [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>]
 
@@ -103,6 +103,8 @@ OPTIONS
 	   Prefix that is used for all converted nodes, property keys, relationship types,
 	   and relationships.
 
+	       Default: https://www.example.org/
+
        -cfg, --config=<conversionConfigFile>
 	   Instead of specifying non-mandatory options in terms of command line parameters,
 	   it is also possible to use an external YAML configuration. The YAML keys must
@@ -112,22 +114,18 @@ OPTIONS
        -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
 	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
 	   extracted to the appropriate target
-
 	   Neo4j DB directory first, and subsequently, the conversion procedure gets
 	   executed as usual.
 
        -db, --neo4jDBDirectory=<neo4jDBDirectory>, --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
-
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
 
        --derivePropertyHierarchyByRelationshipSubsetCheck
 	   Indicates whether the RDF property hierarchy should be derived.
-
 	   For this, the node-node combinations for each relationship type are initially
 	   collected in a set.
-
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
@@ -135,31 +133,33 @@ OPTIONS
        --includeDeletedRelationshipTypes, -o, --outputPath=<outputPath>,
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
-	   should be reified in RDF.
-
+	   should be reified.
 	   Options:
+	   •   RDF_REIFICATION: uses the RDF reification vocabulary, i.e.,  rdf:Statement,
+	       rdf:subject, rdf:predicate, and rdf:object
+		   (cf. https://www.w3.org/TR/rdf11-mt/#reification)
+	   •   OWL_REIFICATION: uses the OWL vocabulary, i.e.,	owl:Axiom,
+	       rdf:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
+		   (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
 
-	   •   RDF_COLLECTION: Neo4j sequences are converted into open lists in RDF.
+		   Default: OWL_REIFICATION
 
-	   •   SEPARATE_LITERALS: Neo4j sequences are converted into separate assertions,
-	       e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
+       --reifyOnlyStatementsWithAnnotations
+	   If enabled, whether only statements with annotations should be reified.
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property
-	   hierarchy,
-
-	   an additional path can be specified to store it separately on disk.
-
+	   hierarchy, an additional path can be specified to store it separately on disk.
 	   If the value is null or left out, the derived schema is stored along with the
 	   data.
 
        --sequenceConversionType=<sequenceConversionType>
 	   Options:
-
 	   •   RDF_COLLECTION: Neo4j sequences are converted into open lists in RDF.
-
 	   •   SEPARATE_LITERALS: Neo4j sequences are converted into separate assertions,
 	       e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
+
+		   Default: RDF_COLLECTION
 ```
 
 
@@ -176,8 +176,9 @@ SYNOPSIS
        neo2rdf server [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
        [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
-       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>]
-       -db=<neo4jDBDirectory> -p=<port> [--reificationVocabulary=<reificationVocabulary>]
+       [--reifyOnlyStatementsWithAnnotations] [--basePrefix=<basePrefix>]
+       [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory> -p=<port>
+       [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
 
@@ -192,6 +193,8 @@ OPTIONS
 	   Prefix that is used for all converted nodes, property keys, relationship types,
 	   and relationships.
 
+	       Default: https://www.example.org/
+
        -cfg, --config=<conversionConfigFile>
 	   Instead of specifying non-mandatory options in terms of command line parameters,
 	   it is also possible to use an external YAML configuration. The YAML keys must
@@ -200,55 +203,58 @@ OPTIONS
 
        -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
 	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
-	   extracted to the appropriate target
-
-	   Neo4j DB directory first, and subsequently, the conversion procedure gets
-	   executed as usual.
+	   extracted to the appropriate target Neo4j DB directory first, and subsequently,
+	   the conversion procedure gets executed as usual.
 
        -db, --neo4jDBDirectory=<neo4jDBDirectory>, --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
-
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
 
        --derivePropertyHierarchyByRelationshipSubsetCheck
 	   Indicates whether the RDF property hierarchy should be derived.
-
 	   For this, the node-node combinations for each relationship type are initially
 	   collected in a set.
-
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
        --includeDeletedNeo4jLabels, --includeDeletedPropertyKeys,
-       --includeDeletedRelationshipTypes, -p, --port=<port>,
+       --includeDeletedRelationshipTypes 
+       
+       -p, --port=<port>
+	      Default: 8080
+
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
-	   should be reified in RDF.
+	   should be reified.
 
 	   Options:
+	   •   RDF_REIFICATION: uses the RDF reification vocabulary, i.e.,  rdf:Statement,
+	       rdf:subject, rdf:predicate, and rdf:object
+		   (cf. https://www.w3.org/TR/rdf11-mt/#reification)
+	   •   OWL_REIFICATION: uses the OWL vocabulary, i.e.,	owl:Axiom,
+	       rdf:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
+		   (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
 
-	   •   RDF_COLLECTION: Neo4j sequences are converted into open lists in RDF.
+		   Default: OWL_REIFICATION
 
-	   •   SEPARATE_LITERALS: Neo4j sequences are converted into separate assertions,
-	       e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
+       --reifyOnlyStatementsWithAnnotations
+	   If this option is set, only Neo4j relationships with properties will be reified in RDF.
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property
-	   hierarchy,
-
-	   an additional path can be specified to store it separately on disk.
-
+	   hierarchy, an additional path can be specified to store it separately on disk.
 	   If the value is null or left out, the derived schema is stored along with the
 	   data.
 
        --sequenceConversionType=<sequenceConversionType>
 	   Options:
-
 	   •   RDF_COLLECTION: Neo4j sequences are converted into open lists in RDF.
-
 	   •   SEPARATE_LITERALS: Neo4j sequences are converted into separate assertions,
 	       e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
 
+		   Default: RDF_COLLECTION
+
        -t, --numberOfServerThreads=<numberOfServerThreads>
+	      Default: 2
 ```

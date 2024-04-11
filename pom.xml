@@ -27,7 +27,7 @@
         <revision>${version}-${sha1}${changelist}-SNAPSHOT</revision>
         <version.mvn.plugin.flatten>1.1.0</version.mvn.plugin.flatten>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>5.15.0</neo4j.version>
+        <neo4j.version>5.18.1</neo4j.version>
         <rdf4j.version>5.0.0-M2</rdf4j.version>
     </properties>
 
