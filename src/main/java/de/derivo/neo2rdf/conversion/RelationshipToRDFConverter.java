@@ -62,7 +62,7 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
                 neo4jToRDFMapper.nodeIDToResource(targetID),
                 neo4jToRDFMapper.relationshipIDToResource(relationshipID)
         );
-        if (!config.isReifyOnlyStatementsWithAnnotations() || statementHasAnnotations) {
+        if (!config.isReifyOnlyRelationshipsWithProperties() || statementHasAnnotations) {
             neo4jToRDFConverter.processStatement(statement);
             neo4jToRDFMapper.statementToReificationTriples(statement, neo4jToRDFConverter::processStatement);
         } else {

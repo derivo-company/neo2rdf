@@ -47,11 +47,12 @@ public class ConversionOptions {
                     """)
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
 
-    @CommandLine.Option(names = {"--reifyOnlyStatementsWithAnnotations"},
+    @CommandLine.Option(names = {"--reifyOnlyRelationshipsWithProperties"},
             description = """
-                    If this option is set, only Neo4j relationships with existing properties will be reified in RDF.
+                    By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+                    If this option is set, only Neo4j relationships with properties will be reified in RDF.
                     """)
-    private Boolean reifyOnlyStatementsWithAnnotations = false;
+    private Boolean reifyOnlyRelationshipsWithProperties = false;
 
     @CommandLine.Option(names = {"--sequenceConversionType"},
             description = """
@@ -106,7 +107,7 @@ public class ConversionOptions {
             ConversionConfigBuilder builder = ConversionConfigBuilder.newBuilder();
             builder.setBasePrefix(basePrefix);
             builder.setReificationVocabulary(reificationVocabulary);
-            builder.setReifyOnlyStatementsWithAnnotations(reifyOnlyStatementsWithAnnotations);
+            builder.setReifyOnlyRelationshipsWithProperties(reifyOnlyRelationshipsWithProperties);
             builder.setSequenceConversionType(sequenceConversionType);
             builder.setIncludeDeletedNeo4jLabels(includeDeletedNeo4jLabels);
             builder.setIncludeDeletedPropertyKeys(includeDeletedPropertyKeys);

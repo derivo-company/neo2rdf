@@ -12,7 +12,7 @@ import java.io.IOException;
 public class ConversionConfig {
     String basePrefix = "https://www.example.org/";
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
-    boolean reifyOnlyStatementsWithAnnotations = false;
+    boolean reifyOnlyRelationshipsWithProperties = false;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
     boolean includeDeletedNeo4jLabels = false;
     boolean includeDeletedPropertyKeys = false;
@@ -56,8 +56,8 @@ public class ConversionConfig {
         return schemaOutputPath;
     }
 
-    public boolean isReifyOnlyStatementsWithAnnotations() {
-        return reifyOnlyStatementsWithAnnotations;
+    public boolean isReifyOnlyRelationshipsWithProperties() {
+        return reifyOnlyRelationshipsWithProperties;
     }
 
     public SequenceConversionType getSequenceConversionType() {

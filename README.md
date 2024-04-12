@@ -87,7 +87,7 @@ SYNOPSIS
        neo2rdf dump [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
        [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
-       [--reifyOnlyStatementsWithAnnotations] [--basePrefix=<basePrefix>]
+       [--reifyOnlyRelationshipsWithProperties] [--basePrefix=<basePrefix>]
        [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory>
        -o=<outputPath> [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
@@ -144,8 +144,9 @@ OPTIONS
 
 		   Default: OWL_REIFICATION
 
-       --reifyOnlyStatementsWithAnnotations
-	   If enabled, whether only statements with annotations should be reified.
+       --reifyOnlyRelationshipsWithProperties
+	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+	   If this option is set, only Neo4j relationships with properties will be reified in RDF.
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property
@@ -176,7 +177,7 @@ SYNOPSIS
        neo2rdf server [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
        [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
-       [--reifyOnlyStatementsWithAnnotations] [--basePrefix=<basePrefix>]
+       [--reifyOnlyRelationshipsWithProperties] [--basePrefix=<basePrefix>]
        [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory> -p=<port>
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
@@ -238,7 +239,8 @@ OPTIONS
 
 		   Default: OWL_REIFICATION
 
-       --reifyOnlyStatementsWithAnnotations
+       --reifyOnlyRelationshipsWithProperties
+	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
 	   If this option is set, only Neo4j relationships with properties will be reified in RDF.
 
        --schemaOutputPath=<schemaOutputPath>
