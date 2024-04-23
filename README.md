@@ -117,7 +117,9 @@ OPTIONS
 	   Neo4j DB directory first, and subsequently, the conversion procedure gets
 	   executed as usual.
 
-       -db, --neo4jDBDirectory=<neo4jDBDirectory>, --deriveClassHierarchyByLabelSubsetCheck
+       -db, --neo4jDBDirectory=<neo4jDBDirectory>
+
+       --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
@@ -129,8 +131,14 @@ OPTIONS
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
-       --includeDeletedNeo4jLabels, --includeDeletedPropertyKeys,
-       --includeDeletedRelationshipTypes, -o, --outputPath=<outputPath>,
+       --includeDeletedNeo4jLabels
+
+       --includeDeletedPropertyKeys
+
+       --includeDeletedRelationshipTypes
+
+       -o, --outputPath=<outputPath>
+
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
 	   should be reified.
@@ -207,7 +215,9 @@ OPTIONS
 	   extracted to the appropriate target Neo4j DB directory first, and subsequently,
 	   the conversion procedure gets executed as usual.
 
-       -db, --neo4jDBDirectory=<neo4jDBDirectory>, --deriveClassHierarchyByLabelSubsetCheck
+       -db, --neo4jDBDirectory=<neo4jDBDirectory>
+
+       --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
@@ -219,7 +229,10 @@ OPTIONS
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
-       --includeDeletedNeo4jLabels, --includeDeletedPropertyKeys,
+       --includeDeletedNeo4jLabels
+
+       --includeDeletedPropertyKeys
+
        --includeDeletedRelationshipTypes 
        
        -p, --port=<port>
