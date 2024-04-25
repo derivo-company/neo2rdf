@@ -28,7 +28,7 @@ Two conversion modes are available:
   location on disk. \
   **Example:**
   ```
-  ./neo2rdf.sh dump -db=./path/to/neo4jdb -o=output/path/data.ttl
+  ./neo2rdf.sh dump -db=./path/to/dbmss/dbms-xxx/data/databases/neo4j/ -o=output/path/data.ttl
   ```
 
 - **DB-to-Stream**: The application starts an HTTP server for the provided Neo4j database. When a GET request is sent to
