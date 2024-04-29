@@ -13,8 +13,8 @@ public class ConversionConfigBuilder {
     private boolean includeDeletedPropertyKeys = false;
     private boolean includeDeletedRelationshipTypes = false;
     private boolean deriveClassHierarchyByLabelSubsetCheck = false;
-
     private boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
+    private boolean reifyOnlyRelationshipsWithProperties = false;
     private File schemaOutputPath = null;
 
     public ConversionConfigBuilder() {
@@ -64,6 +64,15 @@ public class ConversionConfigBuilder {
         return this;
     }
 
+    public boolean isReifyOnlyRelationshipsWithProperties() {
+        return reifyOnlyRelationshipsWithProperties;
+    }
+
+    public ConversionConfigBuilder setReifyOnlyRelationshipsWithProperties(boolean reifyOnlyRelationshipsWithProperties) {
+        this.reifyOnlyRelationshipsWithProperties = reifyOnlyRelationshipsWithProperties;
+        return this;
+    }
+
     public ConversionConfigBuilder setSchemaOutputPath(File schemaOutputPath) {
         this.schemaOutputPath = schemaOutputPath;
         return this;
@@ -72,6 +81,7 @@ public class ConversionConfigBuilder {
     public ConversionConfig build() {
         ConversionConfig config = new ConversionConfig();
         config.reificationVocabulary = reificationVocabulary;
+        config.reifyOnlyRelationshipsWithProperties = reifyOnlyRelationshipsWithProperties;
         config.includeDeletedPropertyKeys = includeDeletedPropertyKeys;
         config.includeDeletedNeo4jLabels = includeDeletedNeo4jLabels;
         config.includeDeletedRelationshipTypes = includeDeletedRelationshipTypes;

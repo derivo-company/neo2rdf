@@ -24,7 +24,7 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
     private final Neo4jToRDFMapper neo4jToRDFMapper;
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
 
-    private Set<Long> deployedRelationshiptypes;
+    private Set<Long> deployedRelationshipTypes;
     private Set<Long> datatypePropertyKeys;
     private Set<Long> objectPropertyKeys;
     private final ConversionConfig config;
@@ -40,7 +40,7 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
     }
 
     private void init() {
-        this.deployedRelationshiptypes = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getRelationshipTypeIDToStr().size());
+        this.deployedRelationshipTypes = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getRelationshipTypeIDToStr().size());
         this.datatypePropertyKeys = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeyIDToStr().size());
         this.objectPropertyKeys = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeyIDToStr().size());
 
@@ -55,14 +55,14 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
                            long targetID,
                            long typeID,
                            boolean statementHasAnnotations) {
-        deployedRelationshiptypes.add(relationshipID);
+        deployedRelationshipTypes.add(relationshipID);
         Statement statement = valueFactory.createStatement(
                 neo4jToRDFMapper.nodeIDToResource(sourceID),
                 neo4jToRDFMapper.relationshipTypeIDToIRI(typeID),
                 neo4jToRDFMapper.nodeIDToResource(targetID),
                 neo4jToRDFMapper.relationshipIDToResource(relationshipID)
         );
-        if (statementHasAnnotations) {
+        if (!config.isReifyOnlyRelationshipsWithProperties() || statementHasAnnotations) {
             neo4jToRDFConverter.processStatement(statement);
             neo4jToRDFMapper.statementToReificationTriples(statement, neo4jToRDFConverter::processStatement);
         } else {
@@ -113,8 +113,8 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
         return relationshipIDToInstanceSet;
     }
 
-    public Set<Long> getDeployedRelationshiptypes() {
-        return deployedRelationshiptypes;
+    public Set<Long> getDeployedRelationshipTypes() {
+        return deployedRelationshipTypes;
     }
 
     public Set<Long> getDatatypePropertyKeys() {

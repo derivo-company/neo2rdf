@@ -12,7 +12,6 @@ import de.derivo.neo2rdf.schema.IndexedNeo4jSchemaGenerator;
 import de.derivo.neo2rdf.store.RDF4JInMemoryStore;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import de.derivo.neo2rdf.util.SequenceConversionType;
-import org.apache.shiro.util.Assert;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.junit.jupiter.api.Assertions;
@@ -103,7 +102,6 @@ public class RecordIteratorTests {
             @Override
             protected void process(long nodeID, long assignedLabelID) {
                 String label = schema.getLabelIDToStr().get(assignedLabelID);
-                Assert.isTrue(label != null);
                 log.info(nodeID + " " + label);
             }
 
