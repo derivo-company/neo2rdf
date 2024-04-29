@@ -107,17 +107,27 @@ OPTIONS
 
        -cfg, --config=<conversionConfigFile>
 	   Instead of specifying non-mandatory options in terms of command line parameters,
-	   it is also possible to use an external YAML configuration. The YAML keys must
-	   have the same identifiers as the long option names, e.g., 'basePrefix:
-	   https://www.example.org/other-prefix#'.
+	   it is also possible to use an external YAML configuration.
+	   The YAML keys must have the same identifiers as the long option names, e.g.,
+	   'basePrefix: https://www.example.org/other-prefix#'.
 
        -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
 	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
-	   extracted to the appropriate target
-	   Neo4j DB directory first, and subsequently, the conversion procedure gets
-	   executed as usual.
+	   extracted to the appropriate target Neo4j DB directory first, and subsequently,
+	   the conversion procedure gets executed as usual.
 
        -db, --neo4jDBDirectory=<neo4jDBDirectory>
+	   If you do not know the directory location of your DBMS, check out the following
+	   link:
+	      https://neo4j.com/docs/desktop-manual/current/troubleshooting/locating-dbms/
+	   The individual DB directories of your DBMS are subsequently located under
+	    "./dbmss/dbms-XYZ/data/databases/*" (specify one for the given parameter).
+	   Although the conversion procedure often runs successfully while the Neo4j DB is
+	    running, it is suggested to correctly shut the DB down beforehand since it can
+	    also lead to execution errors.
+	   Also if the DB is not running but has not been shut down correctly, the DB files
+	    might be in a corrupt state. In this case, try to start and stop the Neo4j DB to
+	    resolve the issue.
 
        --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
@@ -154,7 +164,8 @@ OPTIONS
 
        --reifyOnlyRelationshipsWithProperties
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
-	   If this option is set, only Neo4j relationships with properties will be reified in RDF.
+	   If this option is set, only Neo4j relationships with properties will be reified
+	   in RDF.
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property
@@ -194,21 +205,20 @@ SYNOPSIS
 DESCRIPTION
        The application starts an HTTP server for the provided Neo4j database. When a GET
        request is sent to the server, the conversion procedure is initiated and the response
-       returns an RDF Turtle stream to the client. Exemplary usage: server
-       -db=./path/to/neo4jdb -p=8080
+       returns an RDF Turtle stream to the client. 
+       Exemplary usage: server -db=./path/to/neo4jdb -p=8080
 
 OPTIONS
        --basePrefix=<basePrefix>
 	   Prefix that is used for all converted nodes, property keys, relationship types,
 	   and relationships.
-
 	       Default: https://www.example.org/
 
        -cfg, --config=<conversionConfigFile>
 	   Instead of specifying non-mandatory options in terms of command line parameters,
-	   it is also possible to use an external YAML configuration. The YAML keys must
-	   have the same identifiers as the long option names, e.g., 'basePrefix:
-	   https://www.example.org/other-prefix#'.
+	   it is also possible to use an external YAML configuration.
+	   The YAML keys must have the same identifiers as the long option names, e.g.,
+	   'basePrefix: https://www.example.org/other-prefix#'.
 
        -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
 	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
@@ -216,6 +226,17 @@ OPTIONS
 	   the conversion procedure gets executed as usual.
 
        -db, --neo4jDBDirectory=<neo4jDBDirectory>
+	   If you do not know the directory location of your DBMS, check out the following
+	   link:
+	      https://neo4j.com/docs/desktop-manual/current/troubleshooting/locating-dbms/
+	   The individual DB directories of your DBMS are subsequently located under
+	    "./dbmss/dbms-XYZ/data/databases/*" (specify one for the given parameter).
+	   Although the conversion procedure often runs successfully while the Neo4j DB is
+	    running, it is suggested to correctly shut the DB down beforehand since it can
+	    also lead to execution errors.
+	   Also if the DB is not running but has not been shut down correctly, the DB files
+	    might be in a corrupt state. In this case, try to start and stop the Neo4j DB to
+	    resolve the issue.
 
        --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
@@ -254,7 +275,8 @@ OPTIONS
 
        --reifyOnlyRelationshipsWithProperties
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
-	   If this option is set, only Neo4j relationships with properties will be reified in RDF.
+	   If this option is set, only Neo4j relationships with properties will be reified
+	   in RDF.
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property

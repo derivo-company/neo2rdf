@@ -13,7 +13,7 @@ import picocli.CommandLine;
         mixinStandardHelpOptions = true,
         showDefaultValues = true,
         versionProvider = Neo2RDFVersionProvider.class,
-        usageHelpWidth = 100)
+        usageHelpWidth = 95)
 public class Neo4jToRDFConversionCLI {
 
     public static void main(String[] args) {

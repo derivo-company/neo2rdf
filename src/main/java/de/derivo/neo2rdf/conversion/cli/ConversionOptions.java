@@ -12,7 +12,17 @@ import java.io.File;
 
 public class ConversionOptions {
 
-    @CommandLine.Option(names = {"-db", "--neo4jDBDirectory"}, required = true)
+    @CommandLine.Option(names = {"-db", "--neo4jDBDirectory"},
+            required = true,
+            description = """
+                    If you do not know the directory location of your DBMS, check out the following link:
+                        https://neo4j.com/docs/desktop-manual/current/troubleshooting/locating-dbms/
+                    The individual DB directories of your DBMS are subsequently located under
+                        "./dbmss/dbms-XYZ/data/databases/*" (specify one for the given parameter).
+                    Although the conversion procedure often runs successfully while the Neo4j DB is running, it is suggested to correctly shut the DB down beforehand since it can also lead to execution errors.
+                    Also if the DB is not running but has not been shut down correctly, the DB files might be in a corrupt state. In this case, try to start and stop the Neo4j DB to resolve the issue.
+                    """
+    )
     private File neo4jDBDirectory = null;
 
     @CommandLine.Option(names = {"-d", "--neo4jDBDumpPath"},

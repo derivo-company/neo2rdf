@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 @CommandLine.Command(name = "dump",
         header = "Converts a Neo4j database into an RDF file in Turtle format",
         showDefaultValues = true,
+        usageHelpWidth = 95,
         description = """
                 The Neo4j database is converted into an RDF file in Turtle format, which is written to the specified location on disk.
                 Exemplary usage: `dump -db=./path/to/neo4jdb -o=output/path/data.ttl`
