@@ -70,7 +70,9 @@ public abstract class Neo4jToRDFConverter {
         this.relationshipTypeIDToStr = indexedSchema.getRelationshipTypeIDToStr();
 
         Neo4jToRDFMapperBuilder builder = new Neo4jToRDFMapperBuilder(config.getBasePrefix(), this.indexedSchema);
-        builder.setReificationVocabulary(config.getReificationVocabulary());
+        builder
+                .setReifyRelationships(config.isReifyRelationships())
+                .setReificationVocabulary(config.getReificationVocabulary());
         this.neo4jToRDFMapper = builder.build();
 
         nodeProcessor = new NodeToRDFConverter(neoStores, this, config);

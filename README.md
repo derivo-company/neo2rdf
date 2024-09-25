@@ -87,6 +87,7 @@ SYNOPSIS
        neo2rdf dump [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
        [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
+       [--reifyRelationships]
        [--reifyOnlyRelationshipsWithProperties] [--basePrefix=<basePrefix>]
        [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory>
        -o=<outputPath> [--reificationVocabulary=<reificationVocabulary>]
@@ -167,6 +168,10 @@ OPTIONS
 	   If this option is set, only Neo4j relationships with properties will be reified
 	   in RDF.
 
+       --reifyRelationships
+	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+	   If this option is set to false, no Neo4j relationships will be reified in RDF.
+
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property
 	   hierarchy, an additional path can be specified to store it separately on disk.
@@ -196,6 +201,7 @@ SYNOPSIS
        neo2rdf server [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
        [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
+       [--reifyRelationships]
        [--reifyOnlyRelationshipsWithProperties] [--basePrefix=<basePrefix>]
        [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory> -p=<port>
        [--reificationVocabulary=<reificationVocabulary>]
@@ -277,6 +283,10 @@ OPTIONS
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
 	   If this option is set, only Neo4j relationships with properties will be reified
 	   in RDF.
+
+       --reifyRelationships
+	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+	   If this option is set to false, no Neo4j relationships will be reified in RDF.
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property

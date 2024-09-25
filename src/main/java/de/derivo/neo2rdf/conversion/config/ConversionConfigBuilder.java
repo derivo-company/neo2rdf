@@ -14,6 +14,7 @@ public class ConversionConfigBuilder {
     private boolean includeDeletedRelationshipTypes = false;
     private boolean deriveClassHierarchyByLabelSubsetCheck = false;
     private boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
+    private boolean reifyRelationships = true;
     private boolean reifyOnlyRelationshipsWithProperties = false;
     private File schemaOutputPath = null;
 
@@ -78,6 +79,15 @@ public class ConversionConfigBuilder {
         return this;
     }
 
+    public boolean isReifyRelationships() {
+        return reifyRelationships;
+    }
+
+    public ConversionConfigBuilder setReifyRelationships(boolean reifyRelationships) {
+        this.reifyRelationships = reifyRelationships;
+        return this;
+    }
+
     public ConversionConfig build() {
         ConversionConfig config = new ConversionConfig();
         config.reificationVocabulary = reificationVocabulary;
@@ -90,6 +100,7 @@ public class ConversionConfigBuilder {
         config.deriveClassHierarchyByLabelSubsetCheck = deriveClassHierarchyByLabelSubsetCheck;
         config.derivePropertyHierarchyByRelationshipSubsetCheck = derivePropertyHierarchyByRelationshipSubsetCheck;
         config.schemaOutputPath = schemaOutputPath;
+        config.reifyRelationships = reifyRelationships;
         return config;
     }
 }

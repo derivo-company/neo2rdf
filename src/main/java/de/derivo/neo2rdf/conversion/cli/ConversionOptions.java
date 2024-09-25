@@ -57,6 +57,13 @@ public class ConversionOptions {
                     """)
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
 
+    @CommandLine.Option(names = {"--reifyRelationships"},
+            description = """
+                    By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+                    If this option is set to false, no Neo4j relationships will be reified in RDF.
+                    """)
+    private Boolean reifyRelationships = true;
+
     @CommandLine.Option(names = {"--reifyOnlyRelationshipsWithProperties"},
             description = """
                     By default, each Neo4j relationship is reified in RDF by a distinct blank node.
@@ -118,6 +125,7 @@ public class ConversionOptions {
             builder.setBasePrefix(basePrefix);
             builder.setReificationVocabulary(reificationVocabulary);
             builder.setReifyOnlyRelationshipsWithProperties(reifyOnlyRelationshipsWithProperties);
+            builder.setReifyRelationships(reifyRelationships);
             builder.setSequenceConversionType(sequenceConversionType);
             builder.setIncludeDeletedNeo4jLabels(includeDeletedNeo4jLabels);
             builder.setIncludeDeletedPropertyKeys(includeDeletedPropertyKeys);

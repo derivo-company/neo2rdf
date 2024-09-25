@@ -19,6 +19,7 @@ public class ConversionConfig {
     boolean includeDeletedRelationshipTypes = false;
     boolean deriveClassHierarchyByLabelSubsetCheck = false;
     boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
+    public boolean reifyRelationships;
     File schemaOutputPath = null;
 
     ConversionConfig() {
@@ -62,6 +63,10 @@ public class ConversionConfig {
 
     public SequenceConversionType getSequenceConversionType() {
         return sequenceConversionType;
+    }
+
+    public boolean isReifyRelationships() {
+        return reifyRelationships;
     }
 
     public void write(File outputPath) {
