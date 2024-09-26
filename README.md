@@ -73,6 +73,8 @@ COMMANDS
 
        help
 	   Display help information about the specified command.
+
+DEVELOPMENT				 2024-09-26				  NEO2RDF(1)
 ```
 
 ### DB-to-File - Dump Command
@@ -93,6 +95,8 @@ SYNOPSIS
        -o=<outputPath> [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>]
+       [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
+       <relationshipTypeReificationBlacklist>...]]...
 
 DESCRIPTION
        The Neo4j database is converted into an RDF file in Turtle format, which is written
@@ -172,6 +176,13 @@ OPTIONS
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
 	   If this option is set to false, no Neo4j relationships will be reified in RDF.
 
+       --relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,<relationshipTypeReificationBlacklist>...]
+	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+	   Using this option, the blacklisted Neo4j relationship types will not be reified
+	   in RDF.
+
+	       Default: []
+
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property
 	   hierarchy, an additional path can be specified to store it separately on disk.
@@ -207,6 +218,8 @@ SYNOPSIS
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
+       [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
+       <relationshipTypeReificationBlacklist>...]]...
 
 DESCRIPTION
        The application starts an HTTP server for the provided Neo4j database. When a GET
@@ -287,6 +300,13 @@ OPTIONS
        --reifyRelationships
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
 	   If this option is set to false, no Neo4j relationships will be reified in RDF.
+
+       --relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,<relationshipTypeReificationBlacklist>...]
+	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+	   Using this option, the blacklisted Neo4j relationship types will not be reified
+	   in RDF.
+
+	       Default: []
 
        --schemaOutputPath=<schemaOutputPath>
 	   If the RDF schema is derived from the Neo4j dataset, e.g., the class or property

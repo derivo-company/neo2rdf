@@ -4,7 +4,9 @@ import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFValueFactory;
 import de.derivo.neo2rdf.processors.RelationshipProcessor;
+import de.derivo.neo2rdf.util.ConsoleUtil;
 import de.derivo.neo2rdf.util.SequenceConversionType;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -14,12 +16,17 @@ import org.neo4j.values.SequenceValue;
 import org.neo4j.values.storable.PointValue;
 import org.neo4j.values.storable.Value;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RelationshipToRDFConverter extends RelationshipProcessor {
+    private static final Logger log = ConsoleUtil.getLogger();
+
     private final Neo4jToRDFConverter neo4jToRDFConverter;
     private final Neo4jToRDFMapper neo4jToRDFMapper;
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
@@ -28,6 +35,9 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
     private Set<Long> datatypePropertyKeys;
     private Set<Long> objectPropertyKeys;
     private final ConversionConfig config;
+
+    private boolean reifyRelationships;
+    private Set<Long> relationshipTypeIDReificationBlacklist;
 
     private Map<Long, Roaring64Bitmap> relationshipIDToInstanceSet = null;
 
@@ -44,9 +54,29 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
         this.datatypePropertyKeys = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeyIDToStr().size());
         this.objectPropertyKeys = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeyIDToStr().size());
 
-        if (config.isDerivePropertyHierarchyByRelationshipSubsetCheck()) {
-            relationshipIDToInstanceSet = new HashMap<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeyIDToStr().size());
+        if (this.config.isDerivePropertyHierarchyByRelationshipSubsetCheck()) {
+            this.relationshipIDToInstanceSet = new HashMap<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeyIDToStr().size());
         }
+        this.reifyRelationships = config.isReifyRelationships();
+        this.relationshipTypeIDReificationBlacklist = getRelationshipTypeBlacklistSet();
+    }
+
+    private Set<Long> getRelationshipTypeBlacklistSet() {
+        Map<String, Long> relationshipTypeToID = new UnifiedMap<>();
+        Map<Long, String> relationshipTypeIDToStr = this.neo4jToRDFConverter.getIndexedSchema().getRelationshipTypeIDToStr();
+        for (Map.Entry<Long, String> entry : relationshipTypeIDToStr.entrySet()) {
+            relationshipTypeToID.put(entry.getValue(), entry.getKey());
+        }
+        return config.getRelationshipTypeReificationBlacklist().stream()
+                .map(relationshipType -> {
+                    Long typeID = relationshipTypeToID.get(relationshipType);
+                    if (typeID == null) {
+                        log.warn("Provided relationship type to blacklist for reification does not exist: %s".formatted(relationshipType));
+                    }
+                    return typeID;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(UnifiedSet::new));
     }
 
     @Override
@@ -62,7 +92,9 @@ public class RelationshipToRDFConverter extends RelationshipProcessor {
                 neo4jToRDFMapper.nodeIDToResource(targetID),
                 neo4jToRDFMapper.relationshipIDToResource(relationshipID)
         );
-        if (!config.isReifyOnlyRelationshipsWithProperties() || statementHasAnnotations) {
+        if (reifyRelationships
+            && (!config.isReifyOnlyRelationshipsWithProperties() || statementHasAnnotations)
+            && (relationshipTypeIDReificationBlacklist.isEmpty() || !relationshipTypeIDReificationBlacklist.contains(typeID))) {
             neo4jToRDFConverter.processStatement(statement);
             neo4jToRDFMapper.statementToReificationTriples(statement, neo4jToRDFConverter::processStatement);
         } else {

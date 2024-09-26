@@ -9,6 +9,8 @@ import org.neo4j.kernel.impl.store.NeoStores;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConversionOptions {
 
@@ -63,6 +65,14 @@ public class ConversionOptions {
                     If this option is set to false, no Neo4j relationships will be reified in RDF.
                     """)
     private Boolean reifyRelationships = true;
+
+    @CommandLine.Option(names = {"--relationshipTypeReificationBlacklist"},
+            description = """
+                    By default, each Neo4j relationship is reified in RDF by a distinct blank node.
+                    Using this option, the blacklisted Neo4j relationship types will not be reified in RDF.
+                    """,
+            split = ",")
+    private List<String> relationshipTypeReificationBlacklist = new ArrayList<>();
 
     @CommandLine.Option(names = {"--reifyOnlyRelationshipsWithProperties"},
             description = """
@@ -126,6 +136,7 @@ public class ConversionOptions {
             builder.setReificationVocabulary(reificationVocabulary);
             builder.setReifyOnlyRelationshipsWithProperties(reifyOnlyRelationshipsWithProperties);
             builder.setReifyRelationships(reifyRelationships);
+            builder.setRelationshipTypeReificationBlacklist(relationshipTypeReificationBlacklist);
             builder.setSequenceConversionType(sequenceConversionType);
             builder.setIncludeDeletedNeo4jLabels(includeDeletedNeo4jLabels);
             builder.setIncludeDeletedPropertyKeys(includeDeletedPropertyKeys);

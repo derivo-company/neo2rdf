@@ -38,6 +38,7 @@ public class TurtleConversionCLIWithParametersTest {
                 "--derivePropertyHierarchyByRelationshipSubsetCheck=%s".formatted(true),
                 "--reifyOnlyRelationshipsWithProperties=%s".formatted(true),
                 "--reifyRelationships=%s".formatted(true),
+                "--relationshipTypeReificationBlacklist=FRIENDS_WITH,NON_EXISTENT,KNOWS",
                 "--schemaOutputPath=%s".formatted(schemaOutputPath),
                 "--outputPath=%s".formatted(outputPath),
         };

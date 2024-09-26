@@ -8,8 +8,10 @@ import de.derivo.neo2rdf.util.SequenceConversionType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class ConversionConfig {
+    public List<String> relationshipTypeReificationBlacklist;
     String basePrefix = "https://www.example.org/";
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     boolean reifyOnlyRelationshipsWithProperties = false;
@@ -67,6 +69,10 @@ public class ConversionConfig {
 
     public boolean isReifyRelationships() {
         return reifyRelationships;
+    }
+
+    public List<String> getRelationshipTypeReificationBlacklist() {
+        return relationshipTypeReificationBlacklist;
     }
 
     public void write(File outputPath) {

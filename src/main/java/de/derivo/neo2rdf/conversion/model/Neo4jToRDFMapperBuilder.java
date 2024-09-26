@@ -13,7 +13,6 @@ public class Neo4jToRDFMapperBuilder {
 
     private String listBNodePrefix = "list-";
     private final IndexedNeo4jSchema schema;
-    private boolean reifyRelationships = true;
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.RDF_REIFICATION;
 
     public Neo4jToRDFMapperBuilder(String baseURI, IndexedNeo4jSchema schema) {
@@ -51,15 +50,6 @@ public class Neo4jToRDFMapperBuilder {
         return this;
     }
 
-    public boolean isReifyRelationships() {
-        return reifyRelationships;
-    }
-
-    public Neo4jToRDFMapperBuilder setReifyRelationships(boolean reifyRelationships) {
-        this.reifyRelationships = reifyRelationships;
-        return this;
-    }
-
     public void setReificationVocabulary(ReificationVocabulary reificationVocabulary) {
         this.reificationVocabulary = reificationVocabulary;
     }
@@ -72,7 +62,6 @@ public class Neo4jToRDFMapperBuilder {
                 pointPrefix,
                 listBNodePrefix,
                 schema,
-                reifyRelationships,
                 reificationVocabulary);
     }
 }

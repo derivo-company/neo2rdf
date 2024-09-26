@@ -1,7 +1,11 @@
-## 1.2.0 (2024-09-25)
+## 1.2.0 (2024-09-26)
 
-- New feature: By default, each Neo4j relationship is reified in RDF by a distinct blank node.
-  Option `--reifyRelationships` can now be used to disable the reification of Neo4j relationships altogether.
+- New feature: Option `--reifyRelationships` can now be used to disable the reification of Neo4j relationships
+  altogether.
+
+- New feature: Option `--relationshipTypeReificationBlacklist` can now be used to blacklist Neo4j relationship types
+  which will thus
+  not be reified in RDF.
 
 ## 1.1.0 (2024-04-29)
 

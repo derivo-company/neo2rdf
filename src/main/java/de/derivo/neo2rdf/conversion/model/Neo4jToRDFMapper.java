@@ -44,7 +44,6 @@ public class Neo4jToRDFMapper {
     private Map<Long, IRI> relationshipTypeIDToIRI;
     private Map<Long, IRI> labelIDToIRI;
     private Map<Long, IRI> propertyKeyIDToIRI;
-    private final boolean reifyRelationships;
     private final ReificationVocabulary reificationVocabulary;
 
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
@@ -56,7 +55,6 @@ public class Neo4jToRDFMapper {
                             String pointPrefix,
                             String listBNodePrefix,
                             IndexedNeo4jSchema schema,
-                            boolean reifyRelationships,
                             ReificationVocabulary reificationVocabulary) {
         this.baseURI = baseURI;
         this.nodePrefix = nodePrefix;
@@ -65,7 +63,6 @@ public class Neo4jToRDFMapper {
         this.pointPrefix = pointPrefix;
         this.listBNodePrefix = listBNodePrefix;
         this.schema = schema;
-        this.reifyRelationships = reifyRelationships;
         this.reificationVocabulary = reificationVocabulary;
         init();
     }
@@ -245,9 +242,6 @@ public class Neo4jToRDFMapper {
     }
 
     public void statementToReificationTriples(Statement statement, Consumer<Statement> consumer) {
-        if (!reifyRelationships) {
-            return;
-        }
         Statement toProcess = valueFactory.createStatement(statement.getContext(), RDF.TYPE, reificationVocabulary.getStatementClassIRI());
         consumer.accept(toProcess);
 
