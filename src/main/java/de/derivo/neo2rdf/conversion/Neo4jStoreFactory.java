@@ -23,6 +23,7 @@ import org.neo4j.kernel.impl.store.StoreFactory;
 import org.neo4j.kernel.impl.transaction.log.LogTailLogVersionsMetadata;
 import org.neo4j.logging.log4j.Log4jLogProvider;
 import org.neo4j.memory.LocalMemoryTracker;
+import org.neo4j.memory.MemoryTracker;
 import org.neo4j.scheduler.JobScheduler;
 import org.slf4j.Logger;
 
@@ -33,6 +34,7 @@ import static org.neo4j.index.internal.gbptree.RecoveryCleanupWorkCollector.imme
 
 public class Neo4jStoreFactory {
     private static final Logger log = ConsoleUtil.getLogger();
+    private static final LocalMemoryTracker localMemoryTracker = new LocalMemoryTracker();
 
     public static NeoStores getNeo4jStore(File neo4jDBDirectory) {
         log.info("Generating Neo4j store from database directory: " + neo4jDBDirectory);
@@ -84,9 +86,13 @@ public class Neo4jStoreFactory {
         return new MuninnPageCache(
                 new SingleFilePageSwapperFactory(fileSystemAbstraction,
                         new DefaultPageCacheTracer(),
-                        new LocalMemoryTracker()),
+                        getDefaultMemoryTracker()),
                 scheduler,
                 MuninnPageCache.config(100)
         );
+    }
+
+    public static MemoryTracker getDefaultMemoryTracker() {
+        return localMemoryTracker;
     }
 }

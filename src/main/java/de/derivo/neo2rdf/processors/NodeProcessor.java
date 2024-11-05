@@ -1,12 +1,13 @@
 package de.derivo.neo2rdf.processors;
 
+import de.derivo.neo2rdf.conversion.Neo4jStoreFactory;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.neo4j.internal.recordstorage.RecordNodeCursor;
 import org.neo4j.internal.recordstorage.RecordStorageReader;
 import org.neo4j.io.pagecache.context.CursorContext;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.neo4j.kernel.impl.store.cursor.CachedStoreCursors;
-import org.neo4j.memory.LocalMemoryTracker;
+import org.neo4j.memory.MemoryTracker;
 import org.neo4j.storageengine.api.PropertySelection;
 import org.neo4j.storageengine.api.StoragePropertyCursor;
 import org.neo4j.storageengine.api.cursor.StoreCursors;
@@ -28,12 +29,13 @@ public abstract class NodeProcessor {
 
 
     public void startProcessing() {
+        MemoryTracker memoryTracker = Neo4jStoreFactory.getDefaultMemoryTracker();
         RecordStorageReader recordStorageReader = new RecordStorageReader(neoStores);
-        RecordNodeCursor nodeCursor = recordStorageReader.allocateNodeCursor(CursorContext.NULL_CONTEXT, storeCursors);
+        RecordNodeCursor nodeCursor = recordStorageReader.allocateNodeCursor(CursorContext.NULL_CONTEXT, storeCursors, memoryTracker);
         nodeCursor.scan();
         StoragePropertyCursor propertyCursor = recordStorageReader.allocatePropertyCursor(CursorContext.NULL_CONTEXT,
                 storeCursors,
-                new LocalMemoryTracker());
+                memoryTracker);
         while (nodeCursor.next()) {
             long nodeID = nodeCursor.getId();
             for (long labelID : nodeCursor.labels()) {
