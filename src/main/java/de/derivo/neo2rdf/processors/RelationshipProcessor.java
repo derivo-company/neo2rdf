@@ -1,12 +1,13 @@
 package de.derivo.neo2rdf.processors;
 
+import de.derivo.neo2rdf.conversion.Neo4jStoreFactory;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.neo4j.internal.recordstorage.RecordRelationshipScanCursor;
 import org.neo4j.internal.recordstorage.RecordStorageReader;
 import org.neo4j.io.pagecache.context.CursorContext;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.neo4j.kernel.impl.store.cursor.CachedStoreCursors;
-import org.neo4j.memory.LocalMemoryTracker;
+import org.neo4j.memory.MemoryTracker;
 import org.neo4j.storageengine.api.PropertySelection;
 import org.neo4j.storageengine.api.StoragePropertyCursor;
 import org.neo4j.storageengine.api.cursor.StoreCursors;
@@ -29,13 +30,15 @@ public abstract class RelationshipProcessor {
 
     public void startProcessing() {
         RecordStorageReader recordStorageReader = new RecordStorageReader(neoStores);
+        MemoryTracker memoryTracker = Neo4jStoreFactory.getDefaultMemoryTracker();
 
         RecordRelationshipScanCursor relCursor = recordStorageReader.allocateRelationshipScanCursor(CursorContext.NULL_CONTEXT,
-                storeCursors);
+                storeCursors,
+                memoryTracker);
         relCursor.scan();
         StoragePropertyCursor propertyCursor = recordStorageReader.allocatePropertyCursor(CursorContext.NULL_CONTEXT,
                 storeCursors,
-                new LocalMemoryTracker());
+                memoryTracker);
         while (relCursor.next()) {
             long relationshipID = relCursor.getId();
             long sourceID = relCursor.getFirstNode();
