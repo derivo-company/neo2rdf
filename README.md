@@ -73,8 +73,6 @@ COMMANDS
 
        help
 	   Display help information about the specified command.
-
-DEVELOPMENT				 2024-09-26				  NEO2RDF(1)
 ```
 
 ### DB-to-File - Dump Command
