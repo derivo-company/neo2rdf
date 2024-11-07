@@ -3,9 +3,12 @@ package de.derivo.neo2rdf;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TestUtil {
+    private static final boolean WRITE_TO_TMP_WORKING_DIR = false;
+
     public static File getResource(String resource) {
         return Paths.get(getResourcesDir().toString(), resource).toFile();
     }
@@ -20,7 +23,13 @@ public class TestUtil {
 
     public static File getTempFile(String filename) {
         try {
-            return Files.createTempFile("neo2rdf", filename).toFile();
+            if (TestUtil.WRITE_TO_TMP_WORKING_DIR) {
+                File tmp = Path.of(".", "tmp").resolve(filename).toFile();
+                tmp.getParentFile().mkdirs();
+                return tmp;
+            } else {
+                return Files.createTempFile("neo2rdf", filename).toFile();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
