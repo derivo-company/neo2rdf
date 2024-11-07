@@ -172,7 +172,7 @@ OPTIONS
 
        --reifyRelationships
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
-	   If this option is set to false, no Neo4j relationships will be reified in RDF.
+	   If this option is set, no Neo4j relationships will be reified in RDF.
 
        --relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,<relationshipTypeReificationBlacklist>...]
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
