@@ -5,8 +5,7 @@ import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapperBuilder;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFValueFactory;
-import de.derivo.neo2rdf.schema.IndexedNeo4jSchema;
-import de.derivo.neo2rdf.schema.IndexedNeo4jSchemaGenerator;
+import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Resource;
@@ -15,7 +14,6 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.neo4j.kernel.impl.store.NeoStores;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
 import org.slf4j.Logger;
 
@@ -25,34 +23,29 @@ import java.util.Set;
 public abstract class Neo4jToRDFConverter {
 
     protected Logger log = ConsoleUtil.getLogger();
-    private final NeoStores neoStores;
     private NodeToRDFConverter nodeProcessor;
     private RelationshipToRDFConverter relationshipProcessor;
     private boolean includeDeletedNeo4jLabels = false;
     private boolean includeDeletedPropertyKeys = false;
     private boolean includeDeletedRelationshipTypes = false;
 
-    private IndexedNeo4jSchema indexedSchema;
-
     protected Neo4jToRDFMapper neo4jToRDFMapper;
+    protected IndexedNeo4jSchema indexedSchema;
 
-    private Map<Long, String> neo4jLabelIDToStr;
-    private Map<Long, String> propertyKeyIDToStr;
-    private Map<Long, String> relationshipTypeIDToStr;
-
-    private Set<Long> deployedNeo4jLabels;
-    private Set<Long> deployedRelationshipTypes;
-    private Set<Long> deployedPropertyKeys;
-    private Set<Long> datatypePropertyKeys;
-    private Set<Long> objectPropertyKeys;
-    private Set<Long> annotationPropertyKeys;
+    private Set<String> deployedNeo4jLabels;
+    private Set<String> deployedRelationshipTypes;
+    private Set<String> deployedPropertyKeys;
+    private Set<String> datatypePropertyKeys;
+    private Set<String> objectPropertyKeys;
+    private Set<String> annotationPropertyKeys;
 
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
 
+    private final Neo4jDBConnector neo4jDBConnector;
     protected final ConversionConfig config;
 
-    public Neo4jToRDFConverter(NeoStores neoStores, ConversionConfig config) {
-        this.neoStores = neoStores;
+    public Neo4jToRDFConverter(Neo4jDBConnector neo4jDBConnector, ConversionConfig config) {
+        this.neo4jDBConnector = neo4jDBConnector;
         this.config = config;
         init();
     }
@@ -63,18 +56,14 @@ public abstract class Neo4jToRDFConverter {
         this.includeDeletedPropertyKeys = config.isIncludeDeletedPropertyKeys();
 
         log.info("Indexing schema of dataset...");
-        IndexedNeo4jSchemaGenerator indexedSchemaGenerator = new IndexedNeo4jSchemaGenerator(neoStores);
-        this.indexedSchema = indexedSchemaGenerator.generate();
-        this.neo4jLabelIDToStr = indexedSchema.getLabelIDToStr();
-        this.propertyKeyIDToStr = indexedSchema.getPropertyKeyIDToStr();
-        this.relationshipTypeIDToStr = indexedSchema.getRelationshipTypeIDToStr();
 
-        Neo4jToRDFMapperBuilder builder = new Neo4jToRDFMapperBuilder(config.getBasePrefix(), this.indexedSchema);
+        Neo4jToRDFMapperBuilder builder = new Neo4jToRDFMapperBuilder(config.getBasePrefix());
         builder.setReificationVocabulary(config.getReificationVocabulary());
         this.neo4jToRDFMapper = builder.build();
 
-        nodeProcessor = new NodeToRDFConverter(neoStores, this, config);
-        relationshipProcessor = new RelationshipToRDFConverter(neoStores, this, config);
+        indexedSchema = new IndexedNeo4jSchema(neo4jDBConnector);
+        nodeProcessor = new NodeToRDFConverter(neo4jDBConnector, this, config);
+        relationshipProcessor = new RelationshipToRDFConverter(neo4jDBConnector, this, config);
     }
 
 
@@ -88,9 +77,10 @@ public abstract class Neo4jToRDFConverter {
         processNeo4jAxiomaticTriples();
         log.info("Processing nodes...");
         nodeProcessor.startProcessing();
-        this.deployedPropertyKeys = new UnifiedSet<>(indexedSchema.getPropertyKeyIDToStr().size());
-        this.objectPropertyKeys = new UnifiedSet<>(indexedSchema.getPropertyKeyIDToStr().size());
-        this.datatypePropertyKeys = new UnifiedSet<>(indexedSchema.getPropertyKeyIDToStr().size());
+        int defaultMaxExpectedNumberOfProperties = 1_000;
+        this.deployedPropertyKeys = new UnifiedSet<>(defaultMaxExpectedNumberOfProperties);
+        this.objectPropertyKeys = new UnifiedSet<>(defaultMaxExpectedNumberOfProperties);
+        this.datatypePropertyKeys = new UnifiedSet<>(defaultMaxExpectedNumberOfProperties);
 
         this.deployedNeo4jLabels = this.nodeProcessor.getDeployedNeo4jLabels();
         this.deployedPropertyKeys.addAll(this.nodeProcessor.getDatatypePropertyKeys());
@@ -102,7 +92,7 @@ public abstract class Neo4jToRDFConverter {
         log.info("Processing relationships...");
         relationshipProcessor.startProcessing();
         this.deployedRelationshipTypes = relationshipProcessor.getDeployedRelationshipTypes();
-        this.annotationPropertyKeys = new UnifiedSet<>(indexedSchema.getPropertyKeyIDToStr().size());
+        this.annotationPropertyKeys = new UnifiedSet<>(defaultMaxExpectedNumberOfProperties);
         this.annotationPropertyKeys.addAll(relationshipProcessor.getObjectPropertyKeys());
         this.annotationPropertyKeys.addAll(relationshipProcessor.getDatatypePropertyKeys());
         this.deployedPropertyKeys.addAll(this.annotationPropertyKeys);
@@ -112,7 +102,9 @@ public abstract class Neo4jToRDFConverter {
 
         if (this.config.isDeriveClassHierarchyByLabelSubsetCheck()) {
             log.info("Deriving class hierarchy based on Neo4j label subset check...");
-            deriveClassHierarchy(nodeProcessor.getLabelIDToInstanceSet());
+            //deriveClassHierarchy(nodeProcessor.getLabelToInstanceSet());
+            // TODO
+            throw new IllegalStateException();
         }
 
         if (this.config.isDerivePropertyHierarchyByRelationshipSubsetCheck()) {
@@ -131,15 +123,15 @@ public abstract class Neo4jToRDFConverter {
     }
 
     private void processPropertyKeysAndLabels() {
-        neo4jLabelIDToStr.forEach((labelID, str) -> {
-            if (!includeDeletedNeo4jLabels && !deployedNeo4jLabels.contains(labelID)) {
+        indexedSchema.getNeo4jLabels().forEach((neo4jLabel) -> {
+            if (!includeDeletedNeo4jLabels && !deployedNeo4jLabels.contains(neo4jLabel)) {
                 return;
             }
-            Resource rdfClass = neo4jToRDFMapper.labelIDToResource(labelID);
+            Resource rdfClass = neo4jToRDFMapper.labelIDToResource(neo4jLabel);
             Statement s = valueFactory.createStatement(
                     rdfClass,
                     RDFS.LABEL,
-                    valueFactory.createLiteral(str)
+                    valueFactory.createLiteral(neo4jLabel)
             );
             processStatement(s);
             s = valueFactory.createStatement(
@@ -150,23 +142,24 @@ public abstract class Neo4jToRDFConverter {
             processStatement(s);
         });
 
-        propertyKeyIDToStr.forEach((propertyKeyID, str) -> {
-            if (!includeDeletedPropertyKeys && !deployedPropertyKeys.contains(propertyKeyID)) {
+        indexedSchema.getPropertyKeys().forEach((propertyKey) -> {
+            if (!includeDeletedPropertyKeys && !deployedPropertyKeys.contains(propertyKey)) {
                 return;
             }
-            Resource dataProperty = neo4jToRDFMapper.propertyKeyIDToResource(propertyKeyID);
-            if (str.startsWith("__org.neo4j.SchemaRule.")) {
+            Resource dataProperty = neo4jToRDFMapper.propertyKeyIDToResource(propertyKey);
+            if (propertyKey.startsWith("__org.neo4j.SchemaRule.")) {
                 // skip schema rules
+                // TODO still relevant?
                 return;
             }
             Statement s = valueFactory.createStatement(
                     dataProperty,
                     RDFS.LABEL,
-                    valueFactory.createLiteral(str)
+                    valueFactory.createLiteral(propertyKey)
             );
             processStatement(s);
 
-            if (datatypePropertyKeys.contains(propertyKeyID)) {
+            if (datatypePropertyKeys.contains(propertyKey)) {
                 s = valueFactory.createStatement(
                         dataProperty,
                         RDF.TYPE,
@@ -175,7 +168,7 @@ public abstract class Neo4jToRDFConverter {
                 processStatement(s);
             }
 
-            if (objectPropertyKeys.contains(propertyKeyID)) {
+            if (objectPropertyKeys.contains(propertyKey)) {
                 s = valueFactory.createStatement(
                         dataProperty,
                         RDF.TYPE,
@@ -184,7 +177,7 @@ public abstract class Neo4jToRDFConverter {
                 processStatement(s);
             }
 
-            if (annotationPropertyKeys.contains(propertyKeyID)) {
+            if (annotationPropertyKeys.contains(propertyKey)) {
                 s = valueFactory.createStatement(
                         dataProperty,
                         RDF.TYPE,
@@ -202,15 +195,15 @@ public abstract class Neo4jToRDFConverter {
 
         });
 
-        relationshipTypeIDToStr.forEach((relationshipTypeID, str) -> {
-            if (!includeDeletedRelationshipTypes && !deployedRelationshipTypes.contains(relationshipTypeID)) {
+        indexedSchema.getRelationshipTypes().forEach((relationshipType) -> {
+            if (!includeDeletedRelationshipTypes && !deployedRelationshipTypes.contains(relationshipType)) {
                 return;
             }
-            Resource objectProperty = neo4jToRDFMapper.relationshipTypeIDToIRI(relationshipTypeID);
+            Resource objectProperty = neo4jToRDFMapper.relationshipTypeIDToIRI(relationshipType);
             Statement s = valueFactory.createStatement(
                     objectProperty,
                     RDFS.LABEL,
-                    valueFactory.createLiteral(str)
+                    valueFactory.createLiteral(relationshipType)
             );
             processStatement(s);
             s = valueFactory.createStatement(
@@ -227,6 +220,8 @@ public abstract class Neo4jToRDFConverter {
         SubsetCheck subsetChecker = new SubsetCheck(labelIDToInstanceSet);
         Map<Long, Set<Long>> subIDToSuperIDs = subsetChecker.deriveSubsumesRelations();
         subIDToSuperIDs.forEach((subID, superIDs) -> {
+            // TODO
+            /*
             Resource subClassIRI = neo4jToRDFMapper.labelIDToResource(subID);
             for (Long superID : superIDs) {
                 Resource superClassIRI = neo4jToRDFMapper.labelIDToResource(superID);
@@ -237,6 +232,8 @@ public abstract class Neo4jToRDFConverter {
                 );
                 processStatementForDerivedSchema(s);
             }
+
+             */
         });
     }
 
@@ -244,6 +241,8 @@ public abstract class Neo4jToRDFConverter {
         SubsetCheck subsetChecker = new SubsetCheck(relationshipTypeIDToInstanceSet);
         Map<Long, Set<Long>> subIDToSuperIDs = subsetChecker.deriveSubsumesRelations();
         subIDToSuperIDs.forEach((subID, superIDs) -> {
+            // TODO
+            /*
             Resource subPropertyIRI = neo4jToRDFMapper.relationshipTypeIDToIRI(subID);
             for (Long superID : superIDs) {
                 Resource superPropertyIRI = neo4jToRDFMapper.relationshipTypeIDToIRI(superID);
@@ -254,6 +253,7 @@ public abstract class Neo4jToRDFConverter {
                 );
                 processStatementForDerivedSchema(s);
             }
+             */
         });
     }
 

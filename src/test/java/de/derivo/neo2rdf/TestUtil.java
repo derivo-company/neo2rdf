@@ -13,6 +13,18 @@ public class TestUtil {
         return Paths.get(getResourcesDir().toString(), resource).toFile();
     }
 
+    public static String getCypherQuery(String cypherQueryFileName) {
+        if (!cypherQueryFileName.endsWith(".cypher")) {
+            throw new IllegalArgumentException("Query file name does not end with '.cypher'.");
+        }
+        Path p = Paths.get(getResourcesDir().toString(), cypherQueryFileName);
+        try {
+            return Files.readString(p);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static File getRootDir() {
         return Paths.get(System.getProperty("user.dir"), "src", "test").toFile();
     }

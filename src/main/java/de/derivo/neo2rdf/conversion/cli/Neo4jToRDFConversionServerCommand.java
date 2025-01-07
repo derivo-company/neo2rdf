@@ -2,7 +2,6 @@ package de.derivo.neo2rdf.conversion.cli;
 
 import de.derivo.neo2rdf.conversion.Neo4jToTurtleConversionServer;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
-import org.neo4j.kernel.impl.store.NeoStores;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "server",
@@ -28,10 +27,8 @@ public class Neo4jToRDFConversionServerCommand implements Runnable {
 
     @Override
     public void run() {
-        NeoStores neoStores = options.getNeo4jStore();
         ConversionConfig config = options.getConversionConfig();
-        Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(options.getNeo4jDBDirectory(),
-                neoStores,
+        Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(options.getNeo4jDBConnector(),
                 config,
                 port, numberOfServerThreads);
         server.startServer();

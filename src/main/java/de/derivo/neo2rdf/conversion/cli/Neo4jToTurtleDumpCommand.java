@@ -2,7 +2,7 @@ package de.derivo.neo2rdf.conversion.cli;
 
 import de.derivo.neo2rdf.conversion.Neo4jDBToTurtle;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
-import org.neo4j.kernel.impl.store.NeoStores;
+import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -31,9 +31,9 @@ public class Neo4jToTurtleDumpCommand implements Runnable {
     public void run() {
         try {
             ConversionConfig config = options.getConversionConfig();
-            NeoStores neoStores = options.getNeo4jStore();
+            Neo4jDBConnector neo4jDBConnector = options.getNeo4jDBConnector();
             Neo4jDBToTurtle neo4jDBToTurtle;
-            neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, new FileOutputStream(outputPath));
+            neo4jDBToTurtle = new Neo4jDBToTurtle(neo4jDBConnector, config, new FileOutputStream(outputPath));
             neo4jDBToTurtle.startProcessing();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

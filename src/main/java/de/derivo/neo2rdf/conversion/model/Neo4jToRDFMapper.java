@@ -2,7 +2,6 @@ package de.derivo.neo2rdf.conversion.model;
 
 import com.google.common.collect.Streams;
 import de.derivo.neo2rdf.conversion.Neo4jRDFSchema;
-import de.derivo.neo2rdf.schema.IndexedNeo4jSchema;
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
 import org.eclipse.rdf4j.model.*;
@@ -39,11 +38,10 @@ public class Neo4jToRDFMapper {
     private final String relationshipPrefix;
     private final String pointPrefix;
     private final String listBNodePrefix;
-    private final IndexedNeo4jSchema schema;
 
-    private Map<Long, IRI> relationshipTypeIDToIRI;
-    private Map<Long, IRI> labelIDToIRI;
-    private Map<Long, IRI> propertyKeyIDToIRI;
+    private Map<String, IRI> relationshipTypeToIRI;
+    private Map<String, IRI> labelToIRI;
+    private Map<String, IRI> propertyKeyToIRI;
     private final ReificationVocabulary reificationVocabulary;
 
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
@@ -54,7 +52,6 @@ public class Neo4jToRDFMapper {
                             String relationshipPrefix,
                             String pointPrefix,
                             String listBNodePrefix,
-                            IndexedNeo4jSchema schema,
                             ReificationVocabulary reificationVocabulary) {
         this.baseURI = baseURI;
         this.nodePrefix = nodePrefix;
@@ -62,7 +59,6 @@ public class Neo4jToRDFMapper {
         this.relationshipPrefix = relationshipPrefix;
         this.pointPrefix = pointPrefix;
         this.listBNodePrefix = listBNodePrefix;
-        this.schema = schema;
         this.reificationVocabulary = reificationVocabulary;
         init();
     }
@@ -70,41 +66,45 @@ public class Neo4jToRDFMapper {
     private void init() {
         this.baseNamespace = Values.namespace("", baseURI);
 
+        this.relationshipTypeToIRI = new HashMap<>(1_000);
+        this.propertyKeyToIRI = new HashMap<>(1_000);
+        labelToIRI = new HashMap<>(10_000);
+    }
 
-        this.relationshipTypeIDToIRI = new HashMap<>(schema.getRelationshipTypeIDToStr().size());
-        schema.getRelationshipTypeIDToStr()
-                .forEach((relationshipTypeID, str) -> this.relationshipTypeIDToIRI.put(relationshipTypeID,
-                        Values.iri(baseNamespace, uriEncode(str))));
+    private IRI getRelationshipTypeIRI(String relationshipType) {
+        return relationshipTypeToIRI.computeIfAbsent(relationshipType, v -> Values.iri(baseNamespace, uriEncode(v)));
+    }
 
-        this.propertyKeyIDToIRI = new HashMap<>(schema.getPropertyKeyIDToStr().size());
-        schema.getPropertyKeyIDToStr()
-                .forEach((propertyKeyID, str) -> this.propertyKeyIDToIRI.put(propertyKeyID, Values.iri(baseNamespace, uriEncode(str))));
+    private IRI getPropertyKeyIRI(String propertyKey) {
+        return relationshipTypeToIRI.computeIfAbsent(propertyKey, v -> Values.iri(baseNamespace, uriEncode(v)));
+    }
 
-        labelIDToIRI = new HashMap<>(schema.getLabelIDToStr().size());
-        schema.getLabelIDToStr().forEach((labelID, str) -> labelIDToIRI.put(labelID, Values.iri(baseNamespace, uriEncode(str))));
+
+    private IRI getNodeLabelIRI(String neo4jNodeLabel) {
+        return relationshipTypeToIRI.computeIfAbsent(neo4jNodeLabel, v -> Values.iri(baseNamespace, uriEncode(v)));
     }
 
     private String uriEncode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
-    public IRI propertyKeyIDToResource(long propertyKeyID) {
-        return this.propertyKeyIDToIRI.get(propertyKeyID);
+    public IRI propertyKeyIDToResource(String propertyKey) {
+        return this.propertyKeyToIRI.get(propertyKey);
     }
 
-    public IRI relationshipTypeIDToIRI(long relationshipTypeID) {
-        return this.relationshipTypeIDToIRI.get(relationshipTypeID);
+    public IRI relationshipTypeIDToIRI(String relationshipTypeID) {
+        return this.relationshipTypeToIRI.get(relationshipTypeID);
     }
 
-    public Resource labelIDToResource(long labelID) {
-        return this.labelIDToIRI.get(labelID);
+    public Resource labelIDToResource(String labelID) {
+        return this.labelToIRI.get(labelID);
     }
 
-    public Resource nodeIDToResource(long nodeID) {
+    public Resource nodeIDToResource(String nodeID) {
         return Values.iri(baseNamespace, nodePrefix + nodeID);
     }
 
-    public Resource relationshipIDToResource(long relationshipID) {
+    public Resource relationshipIDToResource(String relationshipID) {
         return Values.iri(baseNamespace, relationshipPrefix + relationshipID);
     }
 
@@ -114,16 +114,16 @@ public class Neo4jToRDFMapper {
     }
 
     public void sequenceValueToRDF(Resource resource,
-                                   long propertyKeyID,
+                                   String propertyKey,
                                    SequenceValue sequenceValue,
                                    Consumer<Statement> rdfListStatementConsumer,
                                    SequenceConversionType sequenceConversionType) {
         switch (sequenceConversionType) {
-            case RDF_COLLECTION -> sequenceValueToRDFListStatements(resource, propertyKeyID, sequenceValue, rdfListStatementConsumer);
+            case RDF_COLLECTION -> sequenceValueToRDFListStatements(resource, propertyKey, sequenceValue, rdfListStatementConsumer);
             case SEPARATE_LITERALS -> sequenceValue.iterator().forEachRemaining(val -> {
                 Statement statement = valueFactory.createStatement(
                         resource,
-                        propertyKeyIDToResource(propertyKeyID),
+                        propertyKeyIDToResource(propertyKey),
                         Values.literal(valueFactory, ((Value) val).asObject(), true)
                 );
                 rdfListStatementConsumer.accept(statement);
@@ -132,7 +132,7 @@ public class Neo4jToRDFMapper {
     }
 
     private void sequenceValueToRDFListStatements(Resource resource,
-                                                  long propertyKeyID,
+                                                  String propertyKey,
                                                   SequenceValue sequenceValue,
                                                   Consumer<Statement> rdfListStatementConsumer) {
         String listBNodeID = getListHeadBlankNodeID();
@@ -140,7 +140,7 @@ public class Neo4jToRDFMapper {
         listBNodeFactory.getCurrentListElementID().set(0);
 
         BNode listHeadBNode = Values.bnode(listBNodeID);
-        Statement hasListStatement = valueFactory.createStatement(resource, propertyKeyIDToResource(propertyKeyID), listHeadBNode);
+        Statement hasListStatement = valueFactory.createStatement(resource, propertyKeyIDToResource(propertyKey), listHeadBNode);
         rdfListStatementConsumer.accept(hasListStatement);
 
         Iterable<?> list = Streams.stream(sequenceValue.iterator())
@@ -152,11 +152,11 @@ public class Neo4jToRDFMapper {
     }
 
     public void pointPropertyToRDFStatements(Resource resource,
-                                             long propertyKeyID,
+                                             String propertyKey,
                                              PointValue value,
                                              Consumer<Statement> statementConsumer) {
         Resource pointIRI = Values.iri(baseNamespace, pointPrefix + pointIDCounter.getAndIncrement());
-        Statement statement = valueFactory.createStatement(resource, propertyKeyIDToResource(propertyKeyID), pointIRI);
+        Statement statement = valueFactory.createStatement(resource, propertyKeyIDToResource(propertyKey), pointIRI);
         statementConsumer.accept(statement);
 
         CoordinateReferenceSystem referenceSystem = value.getCoordinateReferenceSystem();
@@ -195,9 +195,9 @@ public class Neo4jToRDFMapper {
                 break;
                 default:
                     throw new IllegalArgumentException("Number of dimensions for point not supported: " +
-                            referenceSystem.getDimension() +
-                            ", " +
-                            value);
+                                                       referenceSystem.getDimension() +
+                                                       ", " +
+                                                       value);
             }
 
         } else {
@@ -232,9 +232,9 @@ public class Neo4jToRDFMapper {
                 break;
                 default:
                     throw new IllegalArgumentException("Number of dimensions for point not supported: " +
-                            referenceSystem.getDimension() +
-                            ", " +
-                            value);
+                                                       referenceSystem.getDimension() +
+                                                       ", " +
+                                                       value);
             }
         }
         statement = valueFactory.createStatement(pointIRI, RDF.TYPE, pointType);

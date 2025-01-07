@@ -2,6 +2,7 @@ package de.derivo.neo2rdf.conversion;
 
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.neo4j.configuration.Config;
+import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.archive.DumpFormatSelector;
 import org.neo4j.dbms.archive.IncorrectFormat;
 import org.neo4j.dbms.archive.Loader;
@@ -20,6 +21,7 @@ import org.neo4j.io.pagecache.tracing.PageCacheTracer;
 import org.neo4j.kernel.impl.scheduler.JobSchedulerFactory;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.neo4j.kernel.impl.store.StoreFactory;
+import org.neo4j.kernel.impl.store.format.FormatFamily;
 import org.neo4j.kernel.impl.transaction.log.LogTailLogVersionsMetadata;
 import org.neo4j.logging.log4j.Log4jLogProvider;
 import org.neo4j.memory.LocalMemoryTracker;
@@ -38,10 +40,14 @@ public class Neo4jStoreFactory {
 
     public static NeoStores getNeo4jStore(File neo4jDBDirectory) {
         log.info("Generating Neo4j store from database directory: " + neo4jDBDirectory);
+        System.setProperty("NEO4J_OVERRIDE_STORE_FORMAT", "block");
+
         DefaultFileSystemAbstraction fileSystemAbstraction = new DefaultFileSystemAbstraction();
         NeoStores store = new StoreFactory(
                 RecordDatabaseLayout.ofFlat(neo4jDBDirectory.toPath()),
-                Config.newBuilder().build(),
+                Config.newBuilder()
+                        .set(GraphDatabaseSettings.db_format, FormatFamily.MULTIVERSION.name())
+                        .build(),
                 new DefaultIdGeneratorFactory(fileSystemAbstraction,
                         immediate(),
                         PageCacheTracer.NULL,

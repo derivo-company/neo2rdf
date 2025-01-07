@@ -1,11 +1,10 @@
 package de.derivo.neo2rdf.conversion.cli;
 
-import de.derivo.neo2rdf.conversion.Neo4jStoreFactory;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.conversion.config.ConversionConfigBuilder;
+import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
-import org.neo4j.kernel.impl.store.NeoStores;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -14,7 +13,8 @@ import java.util.List;
 
 public class ConversionOptions {
 
-    @CommandLine.Option(names = {"-db", "--neo4jDBDirectory"},
+    @CommandLine.Option(names = {"-db", "--database"},
+            // TODO
             required = true,
             description = """
                     If you do not know the directory location of your DBMS, check out the following link:
@@ -25,13 +25,30 @@ public class ConversionOptions {
                     Also if the DB is not running but has not been shut down correctly, the DB files might be in a corrupt state. In this case, try to start and stop the Neo4j DB to resolve the issue.
                     """
     )
-    private File neo4jDBDirectory = null;
+    private String neo4jDatabase = null;
 
-    @CommandLine.Option(names = {"-d", "--neo4jDBDumpPath"},
+    @CommandLine.Option(names = {"-u", "--user"},
+            required = true,
+            // TODO
             description = """
-                    If a path to a Neo4j dump has been specified using this parameter, the DB dump is extracted to the appropriate target Neo4j DB directory first, and subsequently, the conversion procedure gets executed as usual.
                     """)
-    protected File neo4jDBDumpPath = null;
+    protected String neo4jUser = null;
+
+    @CommandLine.Option(names = {"--uri"},
+            required = true,
+            // TODO
+            description = """
+                    """)
+    protected String neo4jURI = null;
+
+
+    @CommandLine.Option(names = {"--password"},
+            required = true,
+            // TODO
+            description = """
+                    """)
+    protected String neo4jPassword = null;
+
 
 
     @CommandLine.Option(names = {"-cfg", "--config"},
@@ -149,15 +166,11 @@ public class ConversionOptions {
         return config;
     }
 
-    protected NeoStores getNeo4jStore() {
-        if (neo4jDBDumpPath != null) {
-            return Neo4jStoreFactory.getNeo4jStoreFromDump(neo4jDBDumpPath, getNeo4jDBDirectory());
-        } else {
-            return Neo4jStoreFactory.getNeo4jStore(getNeo4jDBDirectory());
-        }
+    protected Neo4jDBConnector getNeo4jDBConnector() {
+        return new Neo4jDBConnector(neo4jURI, neo4jUser, neo4jPassword, neo4jDatabase);
     }
 
-    public File getNeo4jDBDirectory() {
-        return neo4jDBDirectory;
+    public String getNeo4jDatabase() {
+        return neo4jDatabase;
     }
 }

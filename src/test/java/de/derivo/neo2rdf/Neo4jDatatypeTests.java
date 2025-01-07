@@ -17,7 +17,8 @@ import java.util.Set;
 public class Neo4jDatatypeTests {
 
     @RegisterExtension
-    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getResource("neo4j-datatypes-example"));
+    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherQuery(
+            "neo4j-datatypes.cypher"));
     private static final ConversionConfig config = ConversionConfigBuilder.newBuilder().build();
 
     @Test
