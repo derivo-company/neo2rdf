@@ -38,7 +38,7 @@ public abstract class Neo4jConnectorRelationshipProcessor implements Relationshi
                     propertyValuePairs);
 
             if (relationshipCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_RELATIONSHIPS == 0) {
-                log.info("Processed %s relationships.".formatted(ConsoleUtil.formatDecimal(relationshipCounter.get())));
+                log.info("Processed %s relationships and their assigned properties.".formatted(ConsoleUtil.formatDecimal(relationshipCounter.get())));
             }
         });
 

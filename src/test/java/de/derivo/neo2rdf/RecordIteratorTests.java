@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("CanBeFinal")
 public class RecordIteratorTests {
     public Logger log = ConsoleUtil.getLogger();
 

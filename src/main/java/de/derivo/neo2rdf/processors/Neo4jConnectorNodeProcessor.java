@@ -6,8 +6,10 @@ import org.neo4j.driver.Value;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
@@ -30,18 +32,17 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
         AtomicLong processedNodesCounter = new AtomicLong(0);
         Consumer<Stream<Record>> recordConsumer = records -> records.forEach(record -> {
             String nodeId = record.get("nodeId").asLong() + "";
-            String propertyKey = record.get("propertyKey").asString();
-            Value value = record.get("value");
-            process(nodeId, propertyKey, value);
+            Map<String, Value> nodePropertyMap = record.get("nodeProperties").asMap(Function.identity());
+            nodePropertyMap.forEach((k, v) -> process(nodeId, k, v));
 
             if (processedNodesCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_NODES == 0) {
-                log.info("Processed properties of %s nodes.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
+                log.info("Processed %s node properties.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
             }
         });
 
         this.connector.query("""
-                        MATCH (n) UNWIND keys(n) AS propertyKey
-                        RETURN id(n) AS nodeId, propertyKey, n[propertyKey] AS value;
+                        MATCH (n)
+                        RETURN id(n) AS nodeId, properties(n) as nodeProperties;
                         """,
                 recordConsumer);
     }
