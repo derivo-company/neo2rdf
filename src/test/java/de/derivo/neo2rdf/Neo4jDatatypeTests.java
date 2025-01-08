@@ -17,7 +17,7 @@ import java.util.Set;
 public class Neo4jDatatypeTests {
 
     @RegisterExtension
-    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherQuery(
+    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherCreateQueries(
             "neo4j-datatypes.cypher"));
     private static final ConversionConfig config = ConversionConfigBuilder.newBuilder().build();
 
@@ -27,18 +27,20 @@ public class Neo4jDatatypeTests {
 
         String q = """
                 PREFIX : <%s>
-                SELECT ?time ?localTime ?date ?integer ?float ?double ?invalidDouble
+                SELECT ?time ?localTime ?date ?integer ?float ?double
                 WHERE {
                     ?node :time ?time ;
                         :localTime ?localTime ;
                         :date ?date ;
                         :integer ?integer ;
                         :float ?float ;
-                        :double ?double ;
-                        :invalidXSDDouble ?invalidDouble .
+                        :double ?double .
                 }
                 """.formatted(config.getBasePrefix());
         try (TupleQueryResult bindingSets = storeTestExtension.executeQuery(q)) {
+            if (!bindingSets.hasNext()) {
+                Assertions.fail("No statements could be fetched.");
+            }
             for (BindingSet bindingSet : bindingSets) {
                 Literal timeLit = ((Literal) bindingSet.getValue("time"));
                 Literal localTimeLit = ((Literal) bindingSet.getValue("localTime"));
@@ -46,10 +48,6 @@ public class Neo4jDatatypeTests {
                 Literal integerLit = ((Literal) bindingSet.getValue("integer"));
                 Literal floatLit = ((Literal) bindingSet.getValue("float"));
                 Literal doubleLit = ((Literal) bindingSet.getValue("double"));
-                Literal invalidDoubleLit = ((Literal) bindingSet.getValue("invalidDouble"));
-
-                System.out.println(doubleLit);
-                System.out.println(invalidDoubleLit);
 
                 Assertions.assertEquals(CoreDatatype.XSD.TIME, timeLit.getCoreDatatype());
                 Assertions.assertEquals("12:50:35.556+01:00", timeLit.stringValue());
@@ -65,6 +63,9 @@ public class Neo4jDatatypeTests {
 
                 Assertions.assertEquals(CoreDatatype.XSD.DOUBLE, floatLit.getCoreDatatype());
                 Assertions.assertEquals("4.2222222E0", floatLit.stringValue());
+
+                Assertions.assertEquals(CoreDatatype.XSD.DOUBLE, doubleLit.getCoreDatatype());
+                Assertions.assertEquals("-1.797693134862315E300", doubleLit.stringValue());
             }
         }
     }
@@ -93,9 +94,9 @@ public class Neo4jDatatypeTests {
         Assertions.assertTrue(dataProperties.contains(b + "dateTime"));
         Assertions.assertTrue(dataProperties.contains(b + "integer"));
         Assertions.assertTrue(dataProperties.contains(b + "float"));
-        Assertions.assertTrue(dataProperties.contains(b + "invalidXSDDouble"));
         Assertions.assertTrue(dataProperties.contains(b + "double"));
-        Assertions.assertEquals(18, dataProperties.size());
+        Assertions.assertTrue(dataProperties.contains(b + "relationshipInteger"));
+        Assertions.assertEquals(21, dataProperties.size());
 
         // object properties
         System.out.println("Object properties:");
@@ -115,6 +116,7 @@ public class Neo4jDatatypeTests {
             System.out.println(annotationProperty);
         }
         Assertions.assertTrue(annotationProperties.contains(b + "name"));
-        Assertions.assertEquals(1, annotationProperties.size());
+        Assertions.assertTrue(annotationProperties.contains(b + "relationshipInteger"));
+        Assertions.assertEquals(2, annotationProperties.size());
     }
 }

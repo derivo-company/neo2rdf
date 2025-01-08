@@ -2,11 +2,13 @@ package de.derivo.neo2rdf.processors;
 
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.Value;
 import org.slf4j.Logger;
 
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public abstract class Neo4jConnectorRelationshipProcessor implements RelationshipProcessor {
@@ -26,19 +28,14 @@ public abstract class Neo4jConnectorRelationshipProcessor implements Relationshi
     private void processRelationships() {
         AtomicLong relationshipCounter = new AtomicLong(0);
         Consumer<Stream<Record>> recordConsumer = records -> records.forEach(record -> {
-            String nodeIdSource = record.get("nodeIdSource").asString();
-            String nodeIdTarget = record.get("nodeIdTarget").asString();
+            String nodeIdSource = record.get("nodeIdSource").asLong() + "";
+            String nodeIdTarget = record.get("nodeIdTarget").asLong() + "";
             String relationshipType = record.get("relationshipType").asString();
-            String relId = record.get("relationshipId").asString();
-            List<Object> relationshipProperties = record.get("relationshipProperties").asList();
-
-            System.out.println(nodeIdSource);
-            System.out.println(nodeIdTarget);
-            System.out.println(relationshipType);
-            System.out.println(relId);
-            System.out.println(relationshipProperties);
-            // TODO
-            System.out.println("------------------");
+            String relId = record.get("relationshipId").asLong() + "";
+            Value properties = record.get("relationshipProperties");
+            Map<String, Value> propertyValuePairs = properties.asMap(Function.identity());
+            process(relId, nodeIdSource, nodeIdTarget, relationshipType,
+                    propertyValuePairs);
 
             if (relationshipCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_RELATIONSHIPS == 0) {
                 log.info("Processed %s relationships.".formatted(ConsoleUtil.formatDecimal(relationshipCounter.get())));
@@ -47,14 +44,11 @@ public abstract class Neo4jConnectorRelationshipProcessor implements Relationshi
 
         this.connector.query("""
                         MATCH (n)-[r]->(m)
-                        RETURN elementId(n) AS nodeIdSource,
-                               elementId(m) AS nodeIdTarget,
+                        RETURN id(n) AS nodeIdSource,
+                               id(m) AS nodeIdTarget,
                                type(r) AS relationshipType,
-                               elementId(r) AS relationshipId,
-                               CASE
-                                   WHEN size(keys(r)) > 0 THEN reduce(s = [], key IN keys(r) | s + {key: key, value: r[key]})
-                                   ELSE []
-                               END AS relationshipProperties;
+                               id(r) AS relationshipId,
+                               properties(r) AS relationshipProperties;
                         """,
                 recordConsumer);
     }

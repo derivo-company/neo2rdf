@@ -20,7 +20,7 @@ public class DerivedTypeHierarchyTests {
             .build();
 
     @RegisterExtension
-    private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherQuery(
+    private static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherCreateQueries(
             "neo4j-derived-type-hierarchies.cypher"));
 
 

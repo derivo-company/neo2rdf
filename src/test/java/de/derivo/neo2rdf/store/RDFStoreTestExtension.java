@@ -1,9 +1,9 @@
 package de.derivo.neo2rdf.store;
 
+import de.derivo.neo2rdf.Neo4jTestDBStub;
 import de.derivo.neo2rdf.TestUtil;
 import de.derivo.neo2rdf.conversion.Neo4jDBToTurtle;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
-import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -15,21 +15,16 @@ import java.util.List;
 
 public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEachCallback, BeforeEachCallback {
 
-    private String cypherCreateQuery;
-    private Neo4jDBConnector neo4jDBConnector;
-    // TODO adjust
-    private String uri = "bolt://localhost:7687";
-    private String user = "neo4j";
-    private String password = "aaaaaaaa";
-    private String database = "neo2rdf-test-db";
+    private final List<String> cypherCreateQueries;
+    private Neo4jTestDBStub neo4jDBConnector;
 
-    public RDFStoreTestExtension(String cypherCreateQuery) {
-        this.cypherCreateQuery = cypherCreateQuery;
+    public RDFStoreTestExtension(List<String> cypherCreateQueries) {
+        this.cypherCreateQueries = cypherCreateQueries;
         init();
     }
 
-    public RDFStoreTestExtension(String cypherCreateQuery, boolean rdfsReasoning) {
-        this.cypherCreateQuery = cypherCreateQuery;
+    public RDFStoreTestExtension(List<String> cypherCreateQueries, boolean rdfsReasoning) {
+        this.cypherCreateQueries = cypherCreateQueries;
         this.rdfsReasoning = rdfsReasoning;
         init();
     }
@@ -39,10 +34,9 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
     }
 
     private void init() {
-        this.neo4jDBConnector = new Neo4jDBConnector(uri, user, password, database);
+        this.neo4jDBConnector = new Neo4jTestDBStub();
         this.neo4jDBConnector.clearDatabase();
-        this.neo4jDBConnector.query(this.cypherCreateQuery, (r) -> {
-        });
+        this.neo4jDBConnector.updateQuery(cypherCreateQueries);
     }
 
     public void convertAndImportIntoStore(String outputFileName, ConversionConfig config, boolean rdfsReasoning) {
@@ -73,5 +67,9 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
     @Override
     public void afterEach(ExtensionContext extensionContext) {
         terminate();
+    }
+
+    public Neo4jTestDBStub getNeo4jDBConnector() {
+        return neo4jDBConnector;
     }
 }

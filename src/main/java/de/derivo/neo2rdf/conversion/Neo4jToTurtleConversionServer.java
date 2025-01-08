@@ -2,7 +2,7 @@ package de.derivo.neo2rdf.conversion;
 
 import com.sun.net.httpserver.HttpServer;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
-import de.derivo.neo2rdf.processors.Neo4jDBConnector;
+import de.derivo.neo2rdf.processors.Neo4jDBServerConnector;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.slf4j.Logger;
 
@@ -14,13 +14,13 @@ import java.util.concurrent.Executors;
 
 public class Neo4jToTurtleConversionServer {
 
-    private final Neo4jDBConnector neo4jDBConnector;
+    private final Neo4jDBServerConnector neo4jDBConnector;
     private final int portNumber;
     private final int numberOfServerThreads;
     private final Logger log = ConsoleUtil.getLogger();
     private final ConversionConfig config;
 
-    public Neo4jToTurtleConversionServer(Neo4jDBConnector neo4jDBConnector,
+    public Neo4jToTurtleConversionServer(Neo4jDBServerConnector neo4jDBConnector,
                                          ConversionConfig config,
                                          int portNumber, int numberOfServerThreads) {
         this.neo4jDBConnector = neo4jDBConnector;
@@ -42,7 +42,7 @@ public class Neo4jToTurtleConversionServer {
                 exchange.getResponseHeaders().add("Content-Type", "text/ttl");
                 exchange.getResponseHeaders().add("Transfer-Encoding", "chunked");
 
-                String filename = "%s_neo2rdf.ttl".formatted(neo4jDBConnector.getDatabase());
+                String filename = "%s.ttl".formatted(neo4jDBConnector.getDatabase());
                 String contentDisposition = "attachment; filename=%s".formatted(filename);
                 exchange.getResponseHeaders().add("Content-Disposition", contentDisposition);
                 exchange.sendResponseHeaders(200, 0);

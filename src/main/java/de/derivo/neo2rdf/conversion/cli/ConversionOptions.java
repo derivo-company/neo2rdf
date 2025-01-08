@@ -2,7 +2,7 @@ package de.derivo.neo2rdf.conversion.cli;
 
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.conversion.config.ConversionConfigBuilder;
-import de.derivo.neo2rdf.processors.Neo4jDBConnector;
+import de.derivo.neo2rdf.processors.Neo4jDBServerConnector;
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
 import picocli.CommandLine;
@@ -14,42 +14,26 @@ import java.util.List;
 public class ConversionOptions {
 
     @CommandLine.Option(names = {"-db", "--database"},
-            // TODO
             required = true,
-            description = """
-                    If you do not know the directory location of your DBMS, check out the following link:
-                        https://neo4j.com/docs/desktop-manual/current/troubleshooting/locating-dbms/
-                    The individual DB directories of your DBMS are subsequently located under
-                        "./dbmss/dbms-XYZ/data/databases/*" (specify one for the given parameter).
-                    Although the conversion procedure often runs successfully while the Neo4j DB is running, it is suggested to correctly shut the DB down beforehand since it can also lead to execution errors.
-                    Also if the DB is not running but has not been shut down correctly, the DB files might be in a corrupt state. In this case, try to start and stop the Neo4j DB to resolve the issue.
-                    """
+            description = "The name of the Neo4j database to connect to."
     )
     private String neo4jDatabase = null;
 
     @CommandLine.Option(names = {"-u", "--user"},
             required = true,
-            // TODO
-            description = """
-                    """)
+            description = "The username for the Neo4j instance.")
     protected String neo4jUser = null;
 
     @CommandLine.Option(names = {"--uri"},
             required = true,
-            // TODO
-            description = """
-                    """)
+            description = "The URI for the Neo4j instance. Example: bolt://localhost:7687")
     protected String neo4jURI = null;
 
 
     @CommandLine.Option(names = {"--password"},
             required = true,
-            // TODO
-            description = """
-                    """)
+            description = "The password for the Neo4j user.")
     protected String neo4jPassword = null;
-
-
 
     @CommandLine.Option(names = {"-cfg", "--config"},
             description = """
@@ -166,8 +150,8 @@ public class ConversionOptions {
         return config;
     }
 
-    protected Neo4jDBConnector getNeo4jDBConnector() {
-        return new Neo4jDBConnector(neo4jURI, neo4jUser, neo4jPassword, neo4jDatabase);
+    protected Neo4jDBServerConnector getNeo4jDBConnector() {
+        return new Neo4jDBServerConnector(neo4jURI, neo4jUser, neo4jPassword, neo4jDatabase);
     }
 
     public String getNeo4jDatabase() {

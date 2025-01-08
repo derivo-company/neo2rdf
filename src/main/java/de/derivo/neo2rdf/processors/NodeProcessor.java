@@ -1,6 +1,7 @@
 package de.derivo.neo2rdf.processors;
 
-import org.neo4j.values.storable.Value;
+
+import org.neo4j.driver.Value;
 
 public interface NodeProcessor {
 

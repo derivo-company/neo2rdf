@@ -29,15 +29,10 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
     private void processNodePropertyKeyValues() {
         AtomicLong processedNodesCounter = new AtomicLong(0);
         Consumer<Stream<Record>> recordConsumer = records -> records.forEach(record -> {
-            String nodeId = record.get("nodeId").asString();
+            String nodeId = record.get("nodeId").asLong() + "";
             String propertyKey = record.get("propertyKey").asString();
             Value value = record.get("value");
-
-            System.out.println(nodeId);
-            System.out.println(propertyKey);
-            System.out.println(value);
-            // TODO
-            System.out.println("------------------");
+            process(nodeId, propertyKey, value);
 
             if (processedNodesCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_NODES == 0) {
                 log.info("Processed properties of %s nodes.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
@@ -46,7 +41,7 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
 
         this.connector.query("""
                         MATCH (n) UNWIND keys(n) AS propertyKey
-                        RETURN elementId(n) AS nodeId, propertyKey, n[propertyKey] AS value;
+                        RETURN id(n) AS nodeId, propertyKey, n[propertyKey] AS value;
                         """,
                 recordConsumer);
     }
@@ -54,14 +49,11 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
     private void processNodeLabels() {
         AtomicLong processedNodesCounter = new AtomicLong(0);
         Consumer<Stream<Record>> recordConsumer = records -> records.forEach(record -> {
-            Value nodeIdValue = record.get("nodeId");
-            String nodeId = nodeIdValue.asString();
+            String nodeId = record.get("nodeId").asLong() + "";
             List<Object> nodeLabels = record.get("nodeLabels").asList();
-            nodeLabels.forEach(nodeLabel -> {
-                System.out.println(nodeId);
-                System.out.println(nodeLabel);
-                // TODO
-            });
+            nodeLabels.stream()
+                    .map(labelObj -> (String) labelObj)
+                    .forEach(nodeLabel -> process(nodeId, nodeLabel));
 
             if (processedNodesCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_NODES == 0) {
                 log.info("Processed assigned labels of %s nodes.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
@@ -69,7 +61,7 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
         });
 
         this.connector.query("""
-                        MATCH (n) RETURN elementId(n) AS nodeId, labels(n) AS nodeLabels;
+                        MATCH (n) RETURN id(n) AS nodeId, labels(n) AS nodeLabels;
                         """,
                 recordConsumer);
     }

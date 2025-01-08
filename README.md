@@ -196,7 +196,6 @@ OPTIONS
 		   Default: RDF_COLLECTION
 ```
 
-
 ### DB-to-stream - Server Command
 
 ```

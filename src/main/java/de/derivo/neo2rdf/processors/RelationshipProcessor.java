@@ -3,7 +3,6 @@ package de.derivo.neo2rdf.processors;
 import org.neo4j.driver.Value;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
 public interface RelationshipProcessor {
 
@@ -11,7 +10,7 @@ public interface RelationshipProcessor {
                  String sourceID,
                  String targetID,
                  String typeID,
-                 Stream<Map.Entry<String, Value>> propertyValuePairs);
+                 Map<String, Value> propertyValuePairs);
 
     void startProcessing();
 }

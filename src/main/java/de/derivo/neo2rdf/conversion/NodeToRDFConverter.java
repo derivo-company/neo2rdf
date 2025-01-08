@@ -5,18 +5,18 @@ import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFValueFactory;
 import de.derivo.neo2rdf.processors.Neo4jConnectorNodeProcessor;
 import de.derivo.neo2rdf.processors.Neo4jDBConnector;
+import de.derivo.neo2rdf.util.Neo4jValueUtil;
 import de.derivo.neo2rdf.util.SequenceConversionType;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.neo4j.values.SequenceValue;
-import org.neo4j.values.storable.PointValue;
-import org.neo4j.values.storable.Value;
+import org.neo4j.driver.Value;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,23 +55,21 @@ public class NodeToRDFConverter extends Neo4jConnectorNodeProcessor {
         deployedNeo4jLabels.add(assignedLabel);
 
         if (labelToInstanceSet != null) {
-            //labelToInstanceSet.computeIfAbsent(assignedLabel, ignore -> new Roaring64Bitmap()) .add(nodeID);
-            // TODO
-            throw new IllegalStateException();
+            labelToInstanceSet.computeIfAbsent(assignedLabel, ignore -> new Roaring64Bitmap()).add(Long.parseLong(nodeID));
         }
 
         Statement statement = valueFactory.createStatement(
                 neo4jToRDFMapper.nodeIDToResource(nodeID),
                 RDF.TYPE,
-                neo4jToRDFMapper.labelIDToResource(assignedLabel)
+                neo4jToRDFMapper.labelToResource(assignedLabel)
         );
         neo4jToRDFConverter.processStatement(statement);
     }
 
     @Override
     public void process(String nodeID, String propertyKey, Value value) {
-        if (value.isSequenceValue()) {
-            SequenceValue sequenceValue = (SequenceValue) value;
+        if (Neo4jValueUtil.isList(value)) {
+            List<Object> sequenceValue = value.asList();
             neo4jToRDFMapper.sequenceValueToRDF(neo4jToRDFMapper.nodeIDToResource(nodeID),
                     propertyKey,
                     sequenceValue,
@@ -83,19 +81,19 @@ public class NodeToRDFConverter extends Neo4jConnectorNodeProcessor {
             } else {
                 datatypePropertyKeys.add(propertyKey);
             }
-        } else if (value instanceof PointValue) {
+        } else if (Neo4jValueUtil.isPoint(value)) {
             objectPropertyKeys.add(propertyKey);
 
             neo4jToRDFMapper.pointPropertyToRDFStatements(neo4jToRDFMapper.nodeIDToResource(nodeID),
                     propertyKey,
-                    (PointValue) value,
+                    value.asPoint(),
                     neo4jToRDFConverter::processStatement);
         } else {
             datatypePropertyKeys.add(propertyKey);
 
             Statement statement = valueFactory.createStatement(
                     neo4jToRDFMapper.nodeIDToResource(nodeID),
-                    neo4jToRDFMapper.propertyKeyIDToResource(propertyKey),
+                    neo4jToRDFMapper.propertyKeyToResource(propertyKey),
                     Values.literal(valueFactory, value.asObject(), true));
             neo4jToRDFConverter.processStatement(statement);
         }

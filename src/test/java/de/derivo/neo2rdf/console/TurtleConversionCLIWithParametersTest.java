@@ -16,7 +16,6 @@ public class TurtleConversionCLIWithParametersTest {
             .setSequenceConversionType(SequenceConversionType.SEPARATE_LITERALS)
             .setDerivePropertyHierarchyByRelationshipSubsetCheck(true)
             .setDeriveClassHierarchyByLabelSubsetCheck(true)
-            .setSchemaOutputPath(TestUtil.getTempFile("test-schema.ttl"))
             .build();
 
     public static void main(String[] args) {
@@ -27,7 +26,10 @@ public class TurtleConversionCLIWithParametersTest {
 
         args = new String[]{
                 "dump",
-                "--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-derived-type-hierarchy").toString()),
+                "--database=%s".formatted("neo2rdf-test-db"),
+                "--uri=%s".formatted("bolt://localhost:7687"),
+                "--user=%s".formatted("neo4j"),
+                "--password=%s".formatted("aaaaaaaa"),
                 "--basePrefix=%s".formatted(FOAF.NAMESPACE),
                 "--reificationVocabulary=%s".formatted(ReificationVocabulary.OWL_REIFICATION),
                 "--sequenceConversionType=%s".formatted(SequenceConversionType.SEPARATE_LITERALS),

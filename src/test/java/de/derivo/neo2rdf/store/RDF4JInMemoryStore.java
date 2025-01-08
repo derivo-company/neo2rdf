@@ -59,14 +59,15 @@ public class RDF4JInMemoryStore extends RDF4JStore {
                 if (nextLine.equals("exit")) {
                     break;
                 }
-                store.executeQuery(query.toString());
+                TupleQueryResult bindingSets = store.executeQuery(query.toString());
+                bindingSets.close();
             }
         } catch (Exception e) {
             System.exit(0);
         }
     }
 
-    protected void init(List<File> datasetPaths) {
+    void init(List<File> datasetPaths) {
         if (rdfsReasoning) {
             repository = new SailRepository(
                     new SchemaCachingRDFSInferencer(
@@ -80,13 +81,14 @@ public class RDF4JInMemoryStore extends RDF4JStore {
 
     public Set<String> getAssignedClasses(String individualIRI) {
         Set<String> assignedClasses = new UnifiedSet<>();
-        TupleQueryResult bindingSets = executeQuery("""
+        try (TupleQueryResult bindingSets = executeQuery("""
                 SELECT ?c
                 WHERE {
                     <%s> a ?c .
                 }
-                """.formatted(individualIRI));
-        bindingSets.forEach(bindings -> assignedClasses.add(bindings.getValue("c").toString()));
+                """.formatted(individualIRI))) {
+            bindingSets.forEach(bindings -> assignedClasses.add(bindings.getValue("c").toString()));
+        }
         return assignedClasses;
     }
 
@@ -101,14 +103,15 @@ public class RDF4JInMemoryStore extends RDF4JStore {
 
     public Set<String> getInstances(String classIRI) {
         Set<String> result = new UnifiedSet<>();
-        TupleQueryResult bindingSets = executeQuery("""
+        try (TupleQueryResult bindingSets = executeQuery("""
                 PREFIX owl:        <http://www.w3.org/2002/07/owl#>
                 SELECT ?i
                 WHERE {
                     ?i a <%s> .
                 }
-                """.formatted(classIRI));
-        bindingSets.forEach(bindings -> result.add(bindings.getValue("i").toString()));
+                """.formatted(classIRI))) {
+            bindingSets.forEach(bindings -> result.add(bindings.getValue("i").toString()));
+        }
         return result;
     }
 
@@ -120,10 +123,11 @@ public class RDF4JInMemoryStore extends RDF4JStore {
     }
 
     public void printData() {
-        TupleQueryResult bindingSets = executeQuery("""
+        try (TupleQueryResult bindingSets = executeQuery("""
                 SELECT ?s ?p ?o WHERE { ?s ?p ?o }
-                """);
-        bindingSets.forEach(b -> b.forEach(binding -> System.out.println(binding.getValue())));
+                """)) {
+            bindingSets.forEach(b -> b.forEach(binding -> System.out.println(binding.getValue())));
+        }
     }
 
 

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("CanBeFinal")
 public abstract class Neo4jToRDFConverter {
 
     protected Logger log = ConsoleUtil.getLogger();
@@ -54,8 +55,6 @@ public abstract class Neo4jToRDFConverter {
         this.includeDeletedRelationshipTypes = config.isIncludeDeletedRelationshipTypes();
         this.includeDeletedNeo4jLabels = config.isIncludeDeletedNeo4jLabels();
         this.includeDeletedPropertyKeys = config.isIncludeDeletedPropertyKeys();
-
-        log.info("Indexing schema of dataset...");
 
         Neo4jToRDFMapperBuilder builder = new Neo4jToRDFMapperBuilder(config.getBasePrefix());
         builder.setReificationVocabulary(config.getReificationVocabulary());
@@ -102,9 +101,7 @@ public abstract class Neo4jToRDFConverter {
 
         if (this.config.isDeriveClassHierarchyByLabelSubsetCheck()) {
             log.info("Deriving class hierarchy based on Neo4j label subset check...");
-            //deriveClassHierarchy(nodeProcessor.getLabelToInstanceSet());
-            // TODO
-            throw new IllegalStateException();
+            deriveClassHierarchy(nodeProcessor.getLabelToInstanceSet());
         }
 
         if (this.config.isDerivePropertyHierarchyByRelationshipSubsetCheck()) {
@@ -127,7 +124,7 @@ public abstract class Neo4jToRDFConverter {
             if (!includeDeletedNeo4jLabels && !deployedNeo4jLabels.contains(neo4jLabel)) {
                 return;
             }
-            Resource rdfClass = neo4jToRDFMapper.labelIDToResource(neo4jLabel);
+            Resource rdfClass = neo4jToRDFMapper.labelToResource(neo4jLabel);
             Statement s = valueFactory.createStatement(
                     rdfClass,
                     RDFS.LABEL,
@@ -146,12 +143,7 @@ public abstract class Neo4jToRDFConverter {
             if (!includeDeletedPropertyKeys && !deployedPropertyKeys.contains(propertyKey)) {
                 return;
             }
-            Resource dataProperty = neo4jToRDFMapper.propertyKeyIDToResource(propertyKey);
-            if (propertyKey.startsWith("__org.neo4j.SchemaRule.")) {
-                // skip schema rules
-                // TODO still relevant?
-                return;
-            }
+            Resource dataProperty = neo4jToRDFMapper.propertyKeyToResource(propertyKey);
             Statement s = valueFactory.createStatement(
                     dataProperty,
                     RDFS.LABEL,
@@ -199,7 +191,7 @@ public abstract class Neo4jToRDFConverter {
             if (!includeDeletedRelationshipTypes && !deployedRelationshipTypes.contains(relationshipType)) {
                 return;
             }
-            Resource objectProperty = neo4jToRDFMapper.relationshipTypeIDToIRI(relationshipType);
+            Resource objectProperty = neo4jToRDFMapper.relationshipTypeToIRI(relationshipType);
             Statement s = valueFactory.createStatement(
                     objectProperty,
                     RDFS.LABEL,
@@ -216,15 +208,13 @@ public abstract class Neo4jToRDFConverter {
 
     }
 
-    private void deriveClassHierarchy(Map<Long, Roaring64Bitmap> labelIDToInstanceSet) {
+    private void deriveClassHierarchy(Map<String, Roaring64Bitmap> labelIDToInstanceSet) {
         SubsetCheck subsetChecker = new SubsetCheck(labelIDToInstanceSet);
-        Map<Long, Set<Long>> subIDToSuperIDs = subsetChecker.deriveSubsumesRelations();
+        Map<String, Set<String>> subIDToSuperIDs = subsetChecker.deriveSubsumesRelations();
         subIDToSuperIDs.forEach((subID, superIDs) -> {
-            // TODO
-            /*
-            Resource subClassIRI = neo4jToRDFMapper.labelIDToResource(subID);
-            for (Long superID : superIDs) {
-                Resource superClassIRI = neo4jToRDFMapper.labelIDToResource(superID);
+            Resource subClassIRI = neo4jToRDFMapper.labelToResource(subID);
+            for (String superID : superIDs) {
+                Resource superClassIRI = neo4jToRDFMapper.labelToResource(superID);
                 Statement s = valueFactory.createStatement(
                         subClassIRI,
                         RDFS.SUBCLASSOF,
@@ -232,20 +222,16 @@ public abstract class Neo4jToRDFConverter {
                 );
                 processStatementForDerivedSchema(s);
             }
-
-             */
         });
     }
 
-    private void derivePropertyHierarchy(Map<Long, Roaring64Bitmap> relationshipTypeIDToInstanceSet) {
+    private void derivePropertyHierarchy(Map<String, Roaring64Bitmap> relationshipTypeIDToInstanceSet) {
         SubsetCheck subsetChecker = new SubsetCheck(relationshipTypeIDToInstanceSet);
-        Map<Long, Set<Long>> subIDToSuperIDs = subsetChecker.deriveSubsumesRelations();
+        Map<String, Set<String>> subIDToSuperIDs = subsetChecker.deriveSubsumesRelations();
         subIDToSuperIDs.forEach((subID, superIDs) -> {
-            // TODO
-            /*
-            Resource subPropertyIRI = neo4jToRDFMapper.relationshipTypeIDToIRI(subID);
-            for (Long superID : superIDs) {
-                Resource superPropertyIRI = neo4jToRDFMapper.relationshipTypeIDToIRI(superID);
+            Resource subPropertyIRI = neo4jToRDFMapper.relationshipTypeToIRI(subID);
+            for (String superID : superIDs) {
+                Resource superPropertyIRI = neo4jToRDFMapper.relationshipTypeToIRI(superID);
                 Statement s = valueFactory.createStatement(
                         subPropertyIRI,
                         RDFS.SUBPROPERTYOF,
@@ -253,7 +239,6 @@ public abstract class Neo4jToRDFConverter {
                 );
                 processStatementForDerivedSchema(s);
             }
-             */
         });
     }
 

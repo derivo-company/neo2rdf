@@ -17,7 +17,7 @@ public class Neo4jToRDFReificationTests {
     private static final String basePrefix = "https://www.example.org#";
 
     @RegisterExtension
-    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherQuery(
+    public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherCreateQueries(
             "neo4j-multi-relationships.cypher"));
 
 

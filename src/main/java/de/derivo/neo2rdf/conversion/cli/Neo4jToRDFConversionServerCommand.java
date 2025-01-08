@@ -4,6 +4,7 @@ import de.derivo.neo2rdf.conversion.Neo4jToTurtleConversionServer;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import picocli.CommandLine;
 
+@SuppressWarnings("CanBeFinal")
 @CommandLine.Command(name = "server",
         header = "Starts an HTTP server that serves the conversion result as RDF Turtle stream",
         showDefaultValues = true,

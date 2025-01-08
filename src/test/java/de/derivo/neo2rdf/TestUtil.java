@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 public class TestUtil {
     private static final boolean WRITE_TO_TMP_WORKING_DIR = false;
@@ -13,13 +15,17 @@ public class TestUtil {
         return Paths.get(getResourcesDir().toString(), resource).toFile();
     }
 
-    public static String getCypherQuery(String cypherQueryFileName) {
+    public static List<String> getCypherCreateQueries(String cypherQueryFileName) {
         if (!cypherQueryFileName.endsWith(".cypher")) {
             throw new IllegalArgumentException("Query file name does not end with '.cypher'.");
         }
         Path p = Paths.get(getResourcesDir().toString(), cypherQueryFileName);
         try {
-            return Files.readString(p);
+            String queriesStr = Files.readString(p);
+            return Arrays.stream(queriesStr.split(";"))
+                    .map(String::strip)
+                    .filter(q -> !q.isEmpty())
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

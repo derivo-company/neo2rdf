@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("CanBeFinal")
 public abstract class RDF4JStore {
 
     protected static Logger log = ConsoleUtil.getLogger();
@@ -49,7 +50,7 @@ public abstract class RDF4JStore {
             RDFHandler writer = Rio.createWriter(RDFFormat.TURTLE, fos);
             connection.exportStatements(null, null, null, true, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -61,11 +62,11 @@ public abstract class RDF4JStore {
 
     public void importData(List<File> datasetPaths) {
         for (File dataset : datasetPaths) {
-            RDFFormat format = Rio.getParserFormatForFileName(dataset.getName()).get();
+            RDFFormat format = Rio.getParserFormatForFileName(dataset.getName()).orElseThrow();
             try {
                 connection.add(dataset, format);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
