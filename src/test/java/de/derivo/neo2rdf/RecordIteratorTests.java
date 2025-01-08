@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.neo4j.driver.Value;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class RecordIteratorTests {
-    public Logger log = ConsoleUtil.getLogger();
 
     @RegisterExtension
     public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherCreateQueries(
@@ -47,26 +46,26 @@ public class RecordIteratorTests {
     @Test
     public void indexNeo4jSchema() {
         IndexedNeo4jSchema indexedSchema = new IndexedNeo4jSchema(storeTestExtension.getNeo4jDBConnector());
-        log.info(ConsoleUtil.getSeparator());
-        log.info("Labels:");
-        log.info(ConsoleUtil.getSeparator());
-        log.info(indexedSchema.getNeo4jLabels().toString());
+        Logger.info(ConsoleUtil.getSeparator());
+        Logger.info("Labels:");
+        Logger.info(ConsoleUtil.getSeparator());
+        Logger.info(indexedSchema.getNeo4jLabels().toString());
         Assertions.assertEquals(Set.of("Movie", "Person"), new UnifiedSet<>(indexedSchema.getNeo4jLabels()));
 
-        log.info(ConsoleUtil.getSeparator());
-        log.info("Property Keys:");
-        log.info(ConsoleUtil.getSeparator());
+        Logger.info(ConsoleUtil.getSeparator());
+        Logger.info("Property Keys:");
+        Logger.info(ConsoleUtil.getSeparator());
         Set<String> propertyKeys = indexedSchema.getPropertyKeys();
-        log.info(propertyKeys.toString());
+        Logger.info(propertyKeys.toString());
         Assertions.assertTrue(propertyKeys.contains("title"));
         Assertions.assertTrue(propertyKeys.contains("released"));
         Assertions.assertTrue(propertyKeys.contains("name"));
         Assertions.assertTrue(propertyKeys.contains("born"));
 
-        log.info(ConsoleUtil.getSeparator());
-        log.info("Relationship Types:");
-        log.info(ConsoleUtil.getSeparator());
-        log.info(indexedSchema.getRelationshipTypes().toString());
+        Logger.info(ConsoleUtil.getSeparator());
+        Logger.info("Relationship Types:");
+        Logger.info(ConsoleUtil.getSeparator());
+        Logger.info(indexedSchema.getRelationshipTypes().toString());
         Assertions.assertEquals(Set.of("ACTED_IN", "DIRECTED", "PRODUCED", "WROTE", "FOLLOWS", "REVIEWED"),
                 new UnifiedSet<>(indexedSchema.getRelationshipTypes()));
 
@@ -94,12 +93,12 @@ public class RecordIteratorTests {
         NodeProcessor nodeProcessor = new Neo4jConnectorNodeProcessor(storeTestExtension.getNeo4jDBConnector()) {
             @Override
             public void process(String nodeID, String assignedLabel) {
-                log.info("{} {}", nodeID, assignedLabel);
+                Logger.info("{} {}", nodeID, assignedLabel);
             }
 
             @Override
             public void process(String nodeID, String propertyKey, Value value) {
-                log.info("{} {} {}", nodeID, propertyKey, value);
+                Logger.info("{} {} {}", nodeID, propertyKey, value);
             }
         };
         nodeProcessor.startProcessing();
@@ -115,7 +114,7 @@ public class RecordIteratorTests {
                                 String targetID,
                                 String typeID,
                                 Map<String, Value> propertyValuePairs) {
-                log.info("{} {} =={}==> {}", relationshipID, sourceID, typeID, targetID);
+                Logger.info("{} {} =={}==> {}", relationshipID, sourceID, typeID, targetID);
 
             }
         };

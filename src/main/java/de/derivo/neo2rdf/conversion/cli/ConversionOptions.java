@@ -90,15 +90,6 @@ public class ConversionOptions {
                     """)
     private SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
 
-    @CommandLine.Option(names = {"--includeDeletedNeo4jLabels"})
-    private Boolean includeDeletedNeo4jLabels = false;
-
-    @CommandLine.Option(names = {"--includeDeletedPropertyKeys"})
-    private Boolean includeDeletedPropertyKeys = false;
-
-    @CommandLine.Option(names = {"--includeDeletedRelationshipTypes"})
-    private Boolean includeDeletedRelationshipTypes = false;
-
     @CommandLine.Option(names = {"--deriveClassHierarchyByLabelSubsetCheck"},
             description = """
                     Indicates whether the RDF class hierarchy should be derived.
@@ -139,9 +130,6 @@ public class ConversionOptions {
             builder.setReifyRelationships(reifyRelationships);
             builder.setRelationshipTypeReificationBlacklist(relationshipTypeReificationBlacklist);
             builder.setSequenceConversionType(sequenceConversionType);
-            builder.setIncludeDeletedNeo4jLabels(includeDeletedNeo4jLabels);
-            builder.setIncludeDeletedPropertyKeys(includeDeletedPropertyKeys);
-            builder.setIncludeDeletedRelationshipTypes(includeDeletedRelationshipTypes);
             builder.setDerivePropertyHierarchyByRelationshipSubsetCheck(derivePropertyHierarchyByRelationshipSubsetCheck);
             builder.setDeriveClassHierarchyByLabelSubsetCheck(deriveClassHierarchyByLabelSubsetCheck);
             builder.setSchemaOutputPath(schemaOutputPath);

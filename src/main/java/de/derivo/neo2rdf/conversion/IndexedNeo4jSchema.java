@@ -1,17 +1,14 @@
 package de.derivo.neo2rdf.conversion;
 
 import de.derivo.neo2rdf.processors.Neo4jDBConnector;
-import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.util.Collections;
 import java.util.Set;
 
 @SuppressWarnings("CanBeFinal")
 public class IndexedNeo4jSchema {
-    protected Logger log = ConsoleUtil.getLogger();
-
     private final Neo4jDBConnector connector;
 
     private Set<String> propertyKeys = new UnifiedSet<>(1_000);
@@ -24,7 +21,7 @@ public class IndexedNeo4jSchema {
     }
 
     private void init() {
-        log.info("Indexing schema of dataset...");
+        Logger.info("Indexing schema of dataset...");
         this.connector.query("CALL db.labels() YIELD label RETURN label;",
                 records -> records.forEach(r -> neo4jLabels.add(r.get("label").asString())));
         this.connector.query("CALL db.propertyKeys() YIELD propertyKey RETURN propertyKey;",
@@ -34,7 +31,7 @@ public class IndexedNeo4jSchema {
         neo4jLabels = Collections.unmodifiableSet(neo4jLabels);
         propertyKeys = Collections.unmodifiableSet(propertyKeys);
         relationshipTypes = Collections.unmodifiableSet(relationshipTypes);
-        log.info("Schema successfully indexed.");
+        Logger.info("Schema successfully indexed.");
     }
 
 

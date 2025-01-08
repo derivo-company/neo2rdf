@@ -3,7 +3,7 @@ package de.derivo.neo2rdf.processors;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public abstract class Neo4jConnectorRelationshipProcessor implements RelationshipProcessor {
 
     private final Neo4jDBConnector connector;
-    private final Logger log = ConsoleUtil.getLogger();
+
     private final long PROGRESS_MESSAGE_AFTER_X_RELATIONSHIPS = 100_000;
 
     public Neo4jConnectorRelationshipProcessor(Neo4jDBConnector connector) {
@@ -38,7 +38,8 @@ public abstract class Neo4jConnectorRelationshipProcessor implements Relationshi
                     propertyValuePairs);
 
             if (relationshipCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_RELATIONSHIPS == 0) {
-                log.info("Processed %s relationships and their assigned properties.".formatted(ConsoleUtil.formatDecimal(relationshipCounter.get())));
+                Logger.info("Processed %s relationships and their assigned properties.".formatted(ConsoleUtil.formatDecimal(
+                        relationshipCounter.get())));
             }
         });
 

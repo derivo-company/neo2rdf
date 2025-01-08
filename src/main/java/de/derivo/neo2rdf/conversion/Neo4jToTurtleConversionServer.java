@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.processors.Neo4jDBServerConnector;
 import de.derivo.neo2rdf.util.ConsoleUtil;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,7 +17,6 @@ public class Neo4jToTurtleConversionServer {
     private final Neo4jDBServerConnector neo4jDBConnector;
     private final int portNumber;
     private final int numberOfServerThreads;
-    private final Logger log = ConsoleUtil.getLogger();
     private final ConversionConfig config;
 
     public Neo4jToTurtleConversionServer(Neo4jDBServerConnector neo4jDBConnector,
@@ -33,12 +32,12 @@ public class Neo4jToTurtleConversionServer {
         HttpServer server = null;
         try {
             server = HttpServer.create();
-            log.info("Starting neo4j to RDF conversion server on port %d with %d thread(s)..."
+            Logger.info("Starting neo4j to RDF conversion server on port %d with %d thread(s)..."
                     .formatted(portNumber, numberOfServerThreads));
             server.bind(new InetSocketAddress("localhost", this.portNumber), 0);
             server.createContext("/", exchange -> {
-                log.info(ConsoleUtil.getSeparator());
-                log.info("New client connected. Converting data...");
+                Logger.info(ConsoleUtil.getSeparator());
+                Logger.info("New client connected. Converting data...");
                 exchange.getResponseHeaders().add("Content-Type", "text/ttl");
                 exchange.getResponseHeaders().add("Transfer-Encoding", "chunked");
 
@@ -53,7 +52,7 @@ public class Neo4jToTurtleConversionServer {
 
                 responseBody.flush();
                 responseBody.close();
-                log.info("Conversion finished.");
+                Logger.info("Conversion finished.");
             });
 
             ExecutorService executor = Executors.newFixedThreadPool(numberOfServerThreads);
@@ -61,13 +60,13 @@ public class Neo4jToTurtleConversionServer {
 
             server.start();
 
-            log.info("Server started. Press enter to stop.");
+            Logger.info("Server started. Press enter to stop.");
             //noinspection ResultOfMethodCallIgnored
             System.in.read();
             // Stop the server and the executor
             server.stop(0);
 
-            log.info("Server stopped.");
+            Logger.info("Server stopped.");
         } catch (IOException e) {
             throw new IllegalStateException("An error occurred. Terminating Neo4j to RDF conversion server.", e);
         } finally {

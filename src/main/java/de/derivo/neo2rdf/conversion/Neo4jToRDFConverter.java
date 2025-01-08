@@ -6,7 +6,6 @@ import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapperBuilder;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFValueFactory;
 import de.derivo.neo2rdf.processors.Neo4jDBConnector;
-import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
@@ -15,20 +14,15 @@ import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("CanBeFinal")
 public abstract class Neo4jToRDFConverter {
 
-    protected Logger log = ConsoleUtil.getLogger();
     private NodeToRDFConverter nodeProcessor;
     private RelationshipToRDFConverter relationshipProcessor;
-    private boolean includeDeletedNeo4jLabels = false;
-    private boolean includeDeletedPropertyKeys = false;
-    private boolean includeDeletedRelationshipTypes = false;
 
     protected Neo4jToRDFMapper neo4jToRDFMapper;
     protected IndexedNeo4jSchema indexedSchema;
@@ -52,10 +46,6 @@ public abstract class Neo4jToRDFConverter {
     }
 
     protected void init() {
-        this.includeDeletedRelationshipTypes = config.isIncludeDeletedRelationshipTypes();
-        this.includeDeletedNeo4jLabels = config.isIncludeDeletedNeo4jLabels();
-        this.includeDeletedPropertyKeys = config.isIncludeDeletedPropertyKeys();
-
         Neo4jToRDFMapperBuilder builder = new Neo4jToRDFMapperBuilder(config.getBasePrefix());
         builder.setReificationVocabulary(config.getReificationVocabulary());
         this.neo4jToRDFMapper = builder.build();
@@ -72,9 +62,9 @@ public abstract class Neo4jToRDFConverter {
 
     public void startProcessing() {
         onStart();
-        log.info("Processing axiomatic Neo4j triples...");
+        Logger.info("Processing axiomatic Neo4j triples...");
         processNeo4jAxiomaticTriples();
-        log.info("Processing nodes...");
+        Logger.info("Processing nodes...");
         nodeProcessor.startProcessing();
         int defaultMaxExpectedNumberOfProperties = 1_000;
         this.deployedPropertyKeys = new UnifiedSet<>(defaultMaxExpectedNumberOfProperties);
@@ -88,7 +78,7 @@ public abstract class Neo4jToRDFConverter {
         this.datatypePropertyKeys.addAll(this.nodeProcessor.getDatatypePropertyKeys());
         this.objectPropertyKeys.addAll(this.nodeProcessor.getObjectPropertyKeys());
 
-        log.info("Processing relationships...");
+        Logger.info("Processing relationships...");
         relationshipProcessor.startProcessing();
         this.deployedRelationshipTypes = relationshipProcessor.getDeployedRelationshipTypes();
         this.annotationPropertyKeys = new UnifiedSet<>(defaultMaxExpectedNumberOfProperties);
@@ -100,19 +90,19 @@ public abstract class Neo4jToRDFConverter {
         this.objectPropertyKeys.addAll(this.relationshipProcessor.getObjectPropertyKeys());
 
         if (this.config.isDeriveClassHierarchyByLabelSubsetCheck()) {
-            log.info("Deriving class hierarchy based on Neo4j label subset check...");
+            Logger.info("Deriving class hierarchy based on Neo4j label subset check...");
             deriveClassHierarchy(nodeProcessor.getLabelToInstanceSet());
         }
 
         if (this.config.isDerivePropertyHierarchyByRelationshipSubsetCheck()) {
-            log.info("Deriving property hierarchy based on Neo4j relationship subset check...");
+            Logger.info("Deriving property hierarchy based on Neo4j relationship subset check...");
             derivePropertyHierarchy(relationshipProcessor.getRelationshipIDToInstanceSet());
         }
 
-        log.info("Adding schema for present labels, property keys, and relationship types...");
+        Logger.info("Adding schema for present labels, property keys, and relationship types...");
         processPropertyKeysAndLabels();
         onFinish();
-        log.info("Neo4j database successfully processed.");
+        Logger.info("Neo4j database successfully processed.");
     }
 
     private void processNeo4jAxiomaticTriples() {
@@ -121,9 +111,6 @@ public abstract class Neo4jToRDFConverter {
 
     private void processPropertyKeysAndLabels() {
         indexedSchema.getNeo4jLabels().forEach((neo4jLabel) -> {
-            if (!includeDeletedNeo4jLabels && !deployedNeo4jLabels.contains(neo4jLabel)) {
-                return;
-            }
             Resource rdfClass = neo4jToRDFMapper.labelToResource(neo4jLabel);
             Statement s = valueFactory.createStatement(
                     rdfClass,
@@ -140,9 +127,6 @@ public abstract class Neo4jToRDFConverter {
         });
 
         indexedSchema.getPropertyKeys().forEach((propertyKey) -> {
-            if (!includeDeletedPropertyKeys && !deployedPropertyKeys.contains(propertyKey)) {
-                return;
-            }
             Resource dataProperty = neo4jToRDFMapper.propertyKeyToResource(propertyKey);
             Statement s = valueFactory.createStatement(
                     dataProperty,
@@ -188,9 +172,6 @@ public abstract class Neo4jToRDFConverter {
         });
 
         indexedSchema.getRelationshipTypes().forEach((relationshipType) -> {
-            if (!includeDeletedRelationshipTypes && !deployedRelationshipTypes.contains(relationshipType)) {
-                return;
-            }
             Resource objectProperty = neo4jToRDFMapper.relationshipTypeToIRI(relationshipType);
             Statement s = valueFactory.createStatement(
                     objectProperty,

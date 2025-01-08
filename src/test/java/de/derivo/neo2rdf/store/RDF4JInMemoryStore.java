@@ -7,6 +7,7 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.inferencer.fc.SchemaCachingRDFSInferencer;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
+import org.tinylog.Logger;
 
 import java.io.File;
 import java.util.*;
@@ -16,13 +17,13 @@ public class RDF4JInMemoryStore extends RDF4JStore {
 
 
     public static void materializeDataset(List<File> dataset, File exportPath) {
-        log.info("Loading RDF dataset...");
+        Logger.info("Loading RDF dataset...");
         RDF4JInMemoryStore rdf4JStore = new RDF4JInMemoryStore(
                 dataset, true);
-        log.info("Exporting RDFS entailed dataset...");
+        Logger.info("Exporting RDFS entailed dataset...");
         rdf4JStore.export(exportPath);
         rdf4JStore.terminate();
-        log.info("RDFS materialization finished.");
+        Logger.info("RDFS materialization finished.");
     }
 
     public static void materializeDataset(File dataset, File exportPath) {

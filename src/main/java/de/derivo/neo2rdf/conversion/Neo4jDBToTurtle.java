@@ -8,6 +8,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.model.vocabulary.XSD;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
+import org.tinylog.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -71,6 +72,6 @@ public class Neo4jDBToTurtle extends Neo4jToRDFConverter {
         if (schemaWriter != null) {
             schemaWriter.endRDF();
         }
-        log.info("Neo4j to RDF Turtle conversion successfully accomplished.");
+        Logger.info("Neo4j to RDF Turtle conversion successfully accomplished.");
     }
 }

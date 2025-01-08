@@ -5,7 +5,6 @@ import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFValueFactory;
 import de.derivo.neo2rdf.processors.Neo4jConnectorRelationshipProcessor;
 import de.derivo.neo2rdf.processors.Neo4jDBConnector;
-import de.derivo.neo2rdf.util.ConsoleUtil;
 import de.derivo.neo2rdf.util.Neo4jValueUtil;
 import de.derivo.neo2rdf.util.SequenceConversionType;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -14,14 +13,12 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.util.Values;
 import org.neo4j.driver.Value;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProcessor {
-    private static final Logger log = ConsoleUtil.getLogger();
-
     private final Neo4jToRDFConverter neo4jToRDFConverter;
     private final Neo4jToRDFMapper neo4jToRDFMapper;
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
@@ -62,7 +59,8 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
         return config.getRelationshipTypeReificationBlacklist().stream()
                 .peek(blackListedRelType -> {
                     if (!indexedNeo4jSchema.getRelationshipTypes().contains(blackListedRelType)) {
-                        log.warn("Provided relationship type to blacklist for reification does not exist: %s".formatted(blackListedRelType));
+                        Logger.warn("Provided relationship type to blacklist for reification does not exist: %s".formatted(
+                                blackListedRelType));
                     }
                 })
                 .filter(Objects::nonNull)

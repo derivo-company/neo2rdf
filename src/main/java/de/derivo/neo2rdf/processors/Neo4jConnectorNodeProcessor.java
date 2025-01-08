@@ -3,7 +3,7 @@ package de.derivo.neo2rdf.processors;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
-import org.slf4j.Logger;
+import org.tinylog.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
 
     private final Neo4jDBConnector connector;
 
-    private final Logger log = ConsoleUtil.getLogger();
+
     private final long PROGRESS_MESSAGE_AFTER_X_NODES = 100_000;
 
     public Neo4jConnectorNodeProcessor(Neo4jDBConnector connector) {
@@ -36,7 +36,7 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
             nodePropertyMap.forEach((k, v) -> process(nodeId, k, v));
 
             if (processedNodesCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_NODES == 0) {
-                log.info("Processed %s node properties.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
+                Logger.info("Processed %s node properties.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
             }
         });
 
@@ -57,7 +57,7 @@ public abstract class Neo4jConnectorNodeProcessor implements NodeProcessor {
                     .forEach(nodeLabel -> process(nodeId, nodeLabel));
 
             if (processedNodesCounter.incrementAndGet() % PROGRESS_MESSAGE_AFTER_X_NODES == 0) {
-                log.info("Processed assigned labels of %s nodes.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
+                Logger.info("Processed assigned labels of %s nodes.".formatted(ConsoleUtil.formatDecimal(processedNodesCounter.get())));
             }
         });
 

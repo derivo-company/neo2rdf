@@ -1,6 +1,5 @@
 package de.derivo.neo2rdf.store;
 
-import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -10,7 +9,6 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.Rio;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,10 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("CanBeFinal")
 public abstract class RDF4JStore {
 
-    protected static Logger log = ConsoleUtil.getLogger();
     protected Repository repository;
     protected RepositoryConnection connection;
     protected boolean rdfsReasoning = false;
