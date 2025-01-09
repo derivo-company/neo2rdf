@@ -6,8 +6,8 @@ import picocli.CommandLine;
         name = "neo2rdf",
         header = "Converts a Neo4j database to RDF Turtle",
         description = """
-                Neo2RDF is a command line application that converts a Neo4j database into RDF Turtle format. It is
-                implemented in Java and uses the official Neo4j record storage reader.
+                Neo2RDF is a command line application that converts a Neo4j database into an RDF file in Turtle format. It is
+                implemented in Java and uses the Cypher query language via the official Neo4j Java driver.
                 """,
         subcommands = {Neo4jToTurtleDumpCommand.class, Neo4jToRDFConversionServerCommand.class, CommandLine.HelpCommand.class},
         mixinStandardHelpOptions = true,

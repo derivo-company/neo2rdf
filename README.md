@@ -1,6 +1,7 @@
 # Neo2RDF
 
-Neo2RDF is a command line application that converts a Neo4j database into a RDF file in [Turtle](https://www.w3.org/TR/turtle/) format. It is
+Neo2RDF is a command line application that converts a Neo4j database into an RDF file
+in [Turtle](https://www.w3.org/TR/turtle/) format. It is
 implemented in Java and uses the [Cypher](https://neo4j.com/docs/cypher-manual/current/) query language via the official Neo4j Java driver.
 With the help of Neo2RDF you can connect to a running Neo4j instance (local, remote or on [Neo4j Aura](https://neo4j.com/product/auradb/)) and
 either dump a Turtle file or generate a Turtle data stream.
@@ -63,8 +64,9 @@ SYNOPSIS
        neo2rdf [-hV] [COMMAND]
 
 DESCRIPTION
-       Neo2RDF is a command line application that converts a Neo4j database into RDF Turtle
-       format. It is implemented in Java and uses the official Neo4j record storage reader.
+       Neo2RDF is a command line application that converts a Neo4j database into an RDF file
+       in Turtle format. It is implemented in Java and uses the Cypher query language via
+       the official Neo4j Java driver.
 
 OPTIONS
        -h, --help
@@ -108,8 +110,12 @@ SYNOPSIS
 
 DESCRIPTION
        The Neo4j database is converted into an RDF file in Turtle format, which is written
-       to the specified location on disk. Exemplary usage: dump -db=./path/to/neo4jdb
-       -o=output/path/data.ttl
+       to the specified location on disk. 
+       Exemplary usage: dump --database="someDBName" \
+                     --uri="bolt://localhost:7687" \
+                     --user="neo4j" \ 
+                     --password="PASSWORD123" \
+                     --outputPath=output/path/data.ttl
 
 OPTIONS
        --basePrefix=<basePrefix>
@@ -140,6 +146,9 @@ OPTIONS
 	   each other.
 
        -o, --outputPath=<outputPath>
+       
+       --password=<neo4jPassword>
+	   The password for the Neo4j user.
 
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
@@ -222,7 +231,11 @@ DESCRIPTION
        The application starts an HTTP server for the provided Neo4j database. When a GET
        request is sent to the server, the conversion procedure is initiated and the response
        returns an RDF Turtle stream to the client. 
-       Exemplary usage: server -db=./path/to/neo4jdb -p=8080
+       Exemplary usage: server --database="neo4j" \
+                    --uri="neo4j+s://867928679.databases.neo4j.io" \
+                    --user="neo4j" \
+                    --password="eBWczH5dRt2VR1C1eYKvk5jRt2VR1C1eY72NUCk" \
+                    --port=8080
 
 OPTIONS
        --basePrefix=<basePrefix>
