@@ -16,9 +16,6 @@ public class ConversionConfig {
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     boolean reifyOnlyRelationshipsWithProperties = false;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
-    boolean includeDeletedNeo4jLabels = false;
-    boolean includeDeletedPropertyKeys = false;
-    boolean includeDeletedRelationshipTypes = false;
     boolean deriveClassHierarchyByLabelSubsetCheck = false;
     boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
     public boolean reifyRelationships;
@@ -29,18 +26,6 @@ public class ConversionConfig {
 
     public ReificationVocabulary getReificationVocabulary() {
         return reificationVocabulary;
-    }
-
-    public boolean isIncludeDeletedNeo4jLabels() {
-        return includeDeletedNeo4jLabels;
-    }
-
-    public boolean isIncludeDeletedPropertyKeys() {
-        return includeDeletedPropertyKeys;
-    }
-
-    public boolean isIncludeDeletedRelationshipTypes() {
-        return includeDeletedRelationshipTypes;
     }
 
     public boolean isDeriveClassHierarchyByLabelSubsetCheck() {

@@ -20,7 +20,7 @@ public class Neo4jToRDFValueFactory extends SimpleValueFactory {
             return PLUS_INFINITY;
         }
         if (value > 0 && value < 2.225073858507201E-308
-                || value < 0 && value > -2.225073858507201E-308) {
+            || value < 0 && value > -2.225073858507201E-308) {
             // Java double values have higher precision than XSD datatype, i.e., 4.94065645841246544E-324
             return ZERO;
         }

@@ -11,9 +11,6 @@ public class ConversionConfigurationTests {
 
     private final String basePrefix = "https://www.example.org#";
     private final ConversionConfig config = new ConversionConfigBuilder()
-            .setIncludeDeletedNeo4jLabels(true)
-            .setIncludeDeletedRelationshipTypes(true)
-            .setIncludeDeletedPropertyKeys(true)
             .setBasePrefix(basePrefix)
             .build();
 

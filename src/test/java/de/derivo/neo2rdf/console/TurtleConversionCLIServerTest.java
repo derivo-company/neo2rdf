@@ -19,7 +19,10 @@ public class TurtleConversionCLIServerTest {
 
         args = new String[]{
                 "server",
-                "--neo4jDBDirectory=%s".formatted(TestUtil.getResource("neo4j-db-example").toString()),
+                "--database=%s".formatted("neo2rdf-test-db"),
+                "--uri=%s".formatted("bolt://localhost:7687"),
+                "--user=%s".formatted("neo4j"),
+                "--password=%s".formatted("aaaaaaaa"),
                 "--config=%s".formatted(configPath.toString()),
                 "--port=8080"};
 

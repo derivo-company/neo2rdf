@@ -1,6 +1,5 @@
 package de.derivo.neo2rdf.store;
 
-import de.derivo.neo2rdf.util.ConsoleUtil;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
@@ -10,7 +9,6 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.Rio;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,7 +20,6 @@ import java.util.Set;
 
 public abstract class RDF4JStore {
 
-    protected static Logger log = ConsoleUtil.getLogger();
     protected Repository repository;
     protected RepositoryConnection connection;
     protected boolean rdfsReasoning = false;
@@ -49,7 +46,7 @@ public abstract class RDF4JStore {
             RDFHandler writer = Rio.createWriter(RDFFormat.TURTLE, fos);
             connection.exportStatements(null, null, null, true, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -61,11 +58,11 @@ public abstract class RDF4JStore {
 
     public void importData(List<File> datasetPaths) {
         for (File dataset : datasetPaths) {
-            RDFFormat format = Rio.getParserFormatForFileName(dataset.getName()).get();
+            RDFFormat format = Rio.getParserFormatForFileName(dataset.getName()).orElseThrow();
             try {
                 connection.add(dataset, format);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
