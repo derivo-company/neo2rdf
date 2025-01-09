@@ -9,6 +9,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import java.util.*;
 
+@SuppressWarnings("CanBeFinal")
 public class Neo4jRDFSchema {
     public static Namespace neo4jNamespace = Values.namespace("neo4j", "https://neo4j.com/");
     public static IRI pointClass = Values.iri(

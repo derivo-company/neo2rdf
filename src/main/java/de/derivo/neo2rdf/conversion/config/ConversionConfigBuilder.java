@@ -11,9 +11,6 @@ public class ConversionConfigBuilder {
     private String basePrefix = "https://www.example.org#";
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
-    private boolean includeDeletedNeo4jLabels = false;
-    private boolean includeDeletedPropertyKeys = false;
-    private boolean includeDeletedRelationshipTypes = false;
     private boolean deriveClassHierarchyByLabelSubsetCheck = false;
     private boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
     private boolean reifyRelationships = true;
@@ -40,21 +37,6 @@ public class ConversionConfigBuilder {
 
     public ConversionConfigBuilder setDerivePropertyHierarchyByRelationshipSubsetCheck(boolean derivePropertyHierarchyByRelationshipSubsetCheck) {
         this.derivePropertyHierarchyByRelationshipSubsetCheck = derivePropertyHierarchyByRelationshipSubsetCheck;
-        return this;
-    }
-
-    public ConversionConfigBuilder setIncludeDeletedNeo4jLabels(boolean includeDeletedNeo4jLabels) {
-        this.includeDeletedNeo4jLabels = includeDeletedNeo4jLabels;
-        return this;
-    }
-
-    public ConversionConfigBuilder setIncludeDeletedPropertyKeys(boolean includeDeletedPropertyKeys) {
-        this.includeDeletedPropertyKeys = includeDeletedPropertyKeys;
-        return this;
-    }
-
-    public ConversionConfigBuilder setIncludeDeletedRelationshipTypes(boolean includeDeletedRelationshipTypes) {
-        this.includeDeletedRelationshipTypes = includeDeletedRelationshipTypes;
         return this;
     }
 
@@ -104,9 +86,6 @@ public class ConversionConfigBuilder {
         ConversionConfig config = new ConversionConfig();
         config.reificationVocabulary = reificationVocabulary;
         config.reifyOnlyRelationshipsWithProperties = reifyOnlyRelationshipsWithProperties;
-        config.includeDeletedPropertyKeys = includeDeletedPropertyKeys;
-        config.includeDeletedNeo4jLabels = includeDeletedNeo4jLabels;
-        config.includeDeletedRelationshipTypes = includeDeletedRelationshipTypes;
         config.basePrefix = basePrefix;
         config.sequenceConversionType = sequenceConversionType;
         config.deriveClassHierarchyByLabelSubsetCheck = deriveClassHierarchyByLabelSubsetCheck;

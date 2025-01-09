@@ -16,8 +16,9 @@
         <revision>1.2.0${sha1}${changelist}</revision>
         <version.mvn.plugin.flatten>1.6.0</version.mvn.plugin.flatten>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>5.25.1</neo4j.version>
+        <neo4j.version>5.26.0</neo4j.version>
         <rdf4j.version>5.0.2</rdf4j.version>
+        <tinylog.version>2.7.0</tinylog.version>
     </properties>
 
     <build>
@@ -250,84 +251,39 @@
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.neo4j/neo4j -->
+
+        <!-- https://mvnrepository.com/artifact/org.neo4j.driver/neo4j-java-driver -->
         <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>5.27.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.neo4j.test/neo4j-harness -->
+        <dependency>
+            <groupId>org.neo4j.test</groupId>
+            <artifactId>neo4j-harness</artifactId>
             <version>${neo4j.version}</version>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>scala-library</artifactId>
-                    <groupId>org.scala-lang</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                    <groupId>jakarta.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jakarta.activation-api</artifactId>
-                    <groupId>jakarta.activation</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-nop</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>neo4j-java-driver</artifactId>
+                    <groupId>org.neo4j.driver</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>log4j-api</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>eclipse-collections</artifactId>
+                    <groupId>org.eclipse.collections</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>neo4j-slf4j-provider</artifactId>
                     <groupId>org.neo4j</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>netty-codec-http2</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-codec-http</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
             </exclusions>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.neo4j/neo4j-kernel -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <version>${neo4j.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.neo4j/neo4j-record-storage-engine -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-record-storage-engine</artifactId>
-            <version>${neo4j.version}</version>
-        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-model -->
         <dependency>
@@ -354,6 +310,20 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections -->
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections</artifactId>
+            <version>12.0.0.M3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections-api -->
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections-api</artifactId>
+            <version>12.0.0.M3</version>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-storage -->
         <dependency>
@@ -435,11 +405,20 @@
             <version>4.7.6</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.12</version>
+            <groupId>org.tinylog</groupId>
+            <artifactId>tinylog-api</artifactId>
+            <version>${tinylog.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>tinylog-impl</artifactId>
+            <version>${tinylog.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>slf4j-tinylog</artifactId>
+            <version>${tinylog.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
@@ -499,10 +478,6 @@
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-text</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>lucene-core</artifactId>
                     <groupId>org.apache.lucene</groupId>
                 </exclusion>
@@ -545,6 +520,30 @@
                 <exclusion>
                     <artifactId>netty-resolver</artifactId>
                     <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-buffer</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-transport</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-transport-native-unix-common</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>zookeeper</artifactId>
+                    <groupId>org.apache.zookeeper</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>eclipse-collections</artifactId>
+                    <groupId>org.eclipse.collections</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>eclipse-collections-api</artifactId>
+                    <groupId>org.eclipse.collections</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

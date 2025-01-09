@@ -2,7 +2,7 @@ package de.derivo.neo2rdf.conversion.cli;
 
 import de.derivo.neo2rdf.conversion.Neo4jDBToTurtle;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
-import org.neo4j.kernel.impl.store.NeoStores;
+import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -15,7 +15,11 @@ import java.io.FileOutputStream;
         usageHelpWidth = 95,
         description = """
                 The Neo4j database is converted into an RDF file in Turtle format, which is written to the specified location on disk.
-                Exemplary usage: `dump -db=./path/to/neo4jdb -o=output/path/data.ttl`
+                Exemplary usage: `dump --database="someDBName" \\
+                                  --uri="bolt://localhost:7687" \\
+                                  --user="neo4j" \\
+                                  --password="PASSWORD123" \\
+                                  --outputPath=output/path/data.ttl`
                 """)
 public class Neo4jToTurtleDumpCommand implements Runnable {
 
@@ -31,9 +35,9 @@ public class Neo4jToTurtleDumpCommand implements Runnable {
     public void run() {
         try {
             ConversionConfig config = options.getConversionConfig();
-            NeoStores neoStores = options.getNeo4jStore();
+            Neo4jDBConnector neo4jDBConnector = options.getNeo4jDBConnector();
             Neo4jDBToTurtle neo4jDBToTurtle;
-            neo4jDBToTurtle = new Neo4jDBToTurtle(neoStores, config, new FileOutputStream(outputPath));
+            neo4jDBToTurtle = new Neo4jDBToTurtle(neo4jDBConnector, config, new FileOutputStream(outputPath));
             neo4jDBToTurtle.startProcessing();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

@@ -1,3 +1,10 @@
+## 2.0.0 (2025-01-09)
+
+- Refactoring: Replaced the record storage reader with the Java Neo4j driver to support databases that use
+  the new Neo4j block storage format.
+  - The block storage engine is not open source and therefore could not be used in the project.
+  - The conversion procedure now requires a database URI, user, and password to access the database.
+
 ## 1.2.0 (2024-09-26)
 
 - New feature: Option `--reifyRelationships` can now be used to disable the reification of Neo4j relationships

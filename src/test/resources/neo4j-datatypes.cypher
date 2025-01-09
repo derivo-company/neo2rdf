@@ -21,4 +21,4 @@ CREATE (node1:Label1:Label2
        }
        ),
        (node2:Label1:Label2 {name: 'node 2'}),
-       (node1)-[:RELATION {name: 'node1 to node2'}]->(node2)
+       (node1)-[:RELATION {name: 'node1 to node2', relationshipInteger: 42}]->(node2)

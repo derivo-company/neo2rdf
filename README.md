@@ -1,7 +1,10 @@
 # Neo2RDF
 
-Neo2RDF is a command line application that converts a Neo4j database into an RDF file in Turtle format. It is
-implemented in Java and uses the official Neo4j record storage reader.
+Neo2RDF is a command line application that converts a Neo4j database into an RDF file
+in [Turtle](https://www.w3.org/TR/turtle/) format. It is
+implemented in Java and uses the [Cypher](https://neo4j.com/docs/cypher-manual/current/) query language via the official Neo4j Java driver.
+With the help of Neo2RDF you can connect to a running Neo4j instance (local, remote or on [Neo4j Aura](https://neo4j.com/product/auradb/)) and
+either dump a Turtle file or generate a Turtle data stream.
 
 ## Installation & Quickstart
 
@@ -16,7 +19,7 @@ The command line application can be invoked as follows:
 ./neo2rdf.sh
 ```
 
-The execution of the script will print general information on the application and an exemplary usage of the 2 available
+The execution of the script will print general information on the application and an exemplary usage of the two available
 conversion modes.
 
 ### Conversion Modes
@@ -24,19 +27,26 @@ conversion modes.
 Two conversion modes are available:
 
 - **DB-to-File**: A provided Neo4j database is converted into an RDF file in Turtle format, which is written to a
-  specified
-  location on disk. \
-  **Example:**
+  specified location on disk. \
+  Example that connects to a local Neo4j instance:
   ```
-  ./neo2rdf.sh dump -db=./path/to/dbmss/dbms-xxx/data/databases/neo4j/ -o=output/path/data.ttl
+  ./neo2rdf.sh dump --database="someDBName" \
+  --uri="bolt://localhost:7687" \
+  --user="neo4j" \
+  --password="PASSWORD123" \
+  --outputPath=output/path/data.ttl
   ```
 
 - **DB-to-Stream**: The application starts an HTTP server for the provided Neo4j database. When a GET request is sent to
   the server (e.g., to `http://localhost:8080`), the conversion procedure is initiated and the response returns an RDF
   Turtle stream to the client. \
-  **Example:**
+  Example that connects to an Neo4j cloud instance on Aura and generates a stream on request:
   ```
-  ./neo2rdf.sh server -db=./path/to/neo4jdb -p=8080
+  ./neo2rdf.sh server --database="neo4j" \
+  --uri="neo4j+s://867928679.databases.neo4j.io" \
+  --user="neo4j" \
+  --password="eBWczH5dRt2VR1C1eYKvk5jRt2VR1C1eY72NUCk" \
+  --port=8080
   ```
 
 To get more information on the available configuration parameters read the subsequent section or
@@ -54,8 +64,9 @@ SYNOPSIS
        neo2rdf [-hV] [COMMAND]
 
 DESCRIPTION
-       Neo2RDF is a command line application that converts a Neo4j database into RDF Turtle
-       format. It is implemented in Java and uses the official Neo4j record storage reader.
+       Neo2RDF is a command line application that converts a Neo4j database into an RDF file
+       in Turtle format. It is implemented in Java and uses the Cypher query language via
+       the official Neo4j Java driver.
 
 OPTIONS
        -h, --help
@@ -85,21 +96,26 @@ NAME
 
 SYNOPSIS
        neo2rdf dump [--deriveClassHierarchyByLabelSubsetCheck]
-       [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
-       [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
-       [--reifyRelationships]
-       [--reifyOnlyRelationshipsWithProperties] [--basePrefix=<basePrefix>]
-       [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory>
-       -o=<outputPath> [--reificationVocabulary=<reificationVocabulary>]
+       [--derivePropertyHierarchyByRelationshipSubsetCheck]
+       [--reifyOnlyRelationshipsWithProperties] [--reifyRelationships]
+       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<neo4jDatabase>
+       -o=<outputPath> --password=<neo4jPassword>
+       [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
-       [--sequenceConversionType=<sequenceConversionType>]
+       [--sequenceConversionType=<sequenceConversionType>] 
+       -u=<neo4jUser> 
+       --uri=<neo4jURI>
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
 DESCRIPTION
        The Neo4j database is converted into an RDF file in Turtle format, which is written
-       to the specified location on disk. Exemplary usage: dump -db=./path/to/neo4jdb
-       -o=output/path/data.ttl
+       to the specified location on disk. 
+       Exemplary usage: dump --database="someDBName" \
+                     --uri="bolt://localhost:7687" \
+                     --user="neo4j" \ 
+                     --password="PASSWORD123" \
+                     --outputPath=output/path/data.ttl
 
 OPTIONS
        --basePrefix=<basePrefix>
@@ -114,23 +130,8 @@ OPTIONS
 	   The YAML keys must have the same identifiers as the long option names, e.g.,
 	   'basePrefix: https://www.example.org/other-prefix#'.
 
-       -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
-	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
-	   extracted to the appropriate target Neo4j DB directory first, and subsequently,
-	   the conversion procedure gets executed as usual.
-
-       -db, --neo4jDBDirectory=<neo4jDBDirectory>
-	   If you do not know the directory location of your DBMS, check out the following
-	   link:
-	      https://neo4j.com/docs/desktop-manual/current/troubleshooting/locating-dbms/
-	   The individual DB directories of your DBMS are subsequently located under
-	    "./dbmss/dbms-XYZ/data/databases/*" (specify one for the given parameter).
-	   Although the conversion procedure often runs successfully while the Neo4j DB is
-	    running, it is suggested to correctly shut the DB down beforehand since it can
-	    also lead to execution errors.
-	   Also if the DB is not running but has not been shut down correctly, the DB files
-	    might be in a corrupt state. In this case, try to start and stop the Neo4j DB to
-	    resolve the issue.
+       -db, --database=<neo4jDatabase>
+	   The name of the Neo4j database to connect to.
 
        --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
@@ -144,13 +145,10 @@ OPTIONS
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
-       --includeDeletedNeo4jLabels
-
-       --includeDeletedPropertyKeys
-
-       --includeDeletedRelationshipTypes
-
        -o, --outputPath=<outputPath>
+       
+       --password=<neo4jPassword>
+	   The password for the Neo4j user.
 
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
@@ -169,10 +167,14 @@ OPTIONS
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
 	   If this option is set, only Neo4j relationships with properties will be reified
 	   in RDF.
+	   
+	      Default: "false".
 
        --reifyRelationships
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
-	   If this option is set, no Neo4j relationships will be reified in RDF.
+	   If this option is set to false, no Neo4j relationships will be reified in RDF. 
+	   
+	      Default: "true".
 
        --relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,<relationshipTypeReificationBlacklist>...]
 	   By default, each Neo4j relationship is reified in RDF by a distinct blank node.
@@ -194,8 +196,14 @@ OPTIONS
 	       e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
 
 		   Default: RDF_COLLECTION
-```
 
+       -u, --user=<neo4jUser>
+	   The username for the Neo4j instance.
+
+       --uri=<neo4jURI>
+	   The URI for the Neo4j instance. Example: bolt://localhost:7687
+
+```
 
 ### DB-to-stream - Server Command
 
@@ -208,14 +216,14 @@ NAME
 
 SYNOPSIS
        neo2rdf server [--deriveClassHierarchyByLabelSubsetCheck]
-       [--derivePropertyHierarchyByRelationshipSubsetCheck] [--includeDeletedNeo4jLabels]
-       [--includeDeletedPropertyKeys] [--includeDeletedRelationshipTypes]
-       [--reifyRelationships]
-       [--reifyOnlyRelationshipsWithProperties] [--basePrefix=<basePrefix>]
-       [-cfg=<conversionConfigFile>] [-d=<neo4jDBDumpPath>] -db=<neo4jDBDirectory> -p=<port>
+       [--derivePropertyHierarchyByRelationshipSubsetCheck]
+       [--reifyOnlyRelationshipsWithProperties] [--reifyRelationships]
+       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<neo4jDatabase>
+       -p=<port> --password=<neo4jPassword>
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
+       -u=<neo4jUser> --uri=<neo4jURI>
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -223,7 +231,11 @@ DESCRIPTION
        The application starts an HTTP server for the provided Neo4j database. When a GET
        request is sent to the server, the conversion procedure is initiated and the response
        returns an RDF Turtle stream to the client. 
-       Exemplary usage: server -db=./path/to/neo4jdb -p=8080
+       Exemplary usage: server --database="neo4j" \
+                    --uri="neo4j+s://867928679.databases.neo4j.io" \
+                    --user="neo4j" \
+                    --password="eBWczH5dRt2VR1C1eYKvk5jRt2VR1C1eY72NUCk" \
+                    --port=8080
 
 OPTIONS
        --basePrefix=<basePrefix>
@@ -237,23 +249,8 @@ OPTIONS
 	   The YAML keys must have the same identifiers as the long option names, e.g.,
 	   'basePrefix: https://www.example.org/other-prefix#'.
 
-       -d, --neo4jDBDumpPath=<neo4jDBDumpPath>
-	   If a path to a Neo4j dump has been specified using this parameter, the DB dump is
-	   extracted to the appropriate target Neo4j DB directory first, and subsequently,
-	   the conversion procedure gets executed as usual.
-
-       -db, --neo4jDBDirectory=<neo4jDBDirectory>
-	   If you do not know the directory location of your DBMS, check out the following
-	   link:
-	      https://neo4j.com/docs/desktop-manual/current/troubleshooting/locating-dbms/
-	   The individual DB directories of your DBMS are subsequently located under
-	    "./dbmss/dbms-XYZ/data/databases/*" (specify one for the given parameter).
-	   Although the conversion procedure often runs successfully while the Neo4j DB is
-	    running, it is suggested to correctly shut the DB down beforehand since it can
-	    also lead to execution errors.
-	   Also if the DB is not running but has not been shut down correctly, the DB files
-	    might be in a corrupt state. In this case, try to start and stop the Neo4j DB to
-	    resolve the issue.
+       -db, --database=<neo4jDatabase>
+	   The name of the Neo4j database to connect to.
 
        --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
@@ -267,14 +264,11 @@ OPTIONS
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
-       --includeDeletedNeo4jLabels
-
-       --includeDeletedPropertyKeys
-
-       --includeDeletedRelationshipTypes 
-       
        -p, --port=<port>
 	      Default: 8080
+
+       --password=<neo4jPassword>
+	   The password for the Neo4j user.
 
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
@@ -321,5 +315,11 @@ OPTIONS
 		   Default: RDF_COLLECTION
 
        -t, --numberOfServerThreads=<numberOfServerThreads>
-	      Default: 2
+	   Default: 2
+
+       -u, --user=<neo4jUser>
+	   The username for the Neo4j instance.
+
+       --uri=<neo4jURI>
+	   The URI for the Neo4j instance. Example: bolt://localhost:7687
 ```

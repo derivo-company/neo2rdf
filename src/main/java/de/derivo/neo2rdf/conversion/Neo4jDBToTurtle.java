@@ -1,13 +1,14 @@
 package de.derivo.neo2rdf.conversion;
 
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
+import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.model.vocabulary.XSD;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
-import org.neo4j.kernel.impl.store.NeoStores;
+import org.tinylog.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,8 +19,8 @@ public class Neo4jDBToTurtle extends Neo4jToRDFConverter {
     private TurtleWriter schemaWriter = null;
     private final OutputStream outputStream;
 
-    public Neo4jDBToTurtle(NeoStores neoStores, ConversionConfig config, OutputStream outputStream) {
-        super(neoStores, config);
+    public Neo4jDBToTurtle(Neo4jDBConnector neo4jDBConnector, ConversionConfig config, OutputStream outputStream) {
+        super(neo4jDBConnector, config);
         this.outputStream = outputStream;
     }
 
@@ -71,6 +72,6 @@ public class Neo4jDBToTurtle extends Neo4jToRDFConverter {
         if (schemaWriter != null) {
             schemaWriter.endRDF();
         }
-        log.info("Neo4j to RDF Turtle conversion successfully accomplished.");
+        Logger.info("Neo4j to RDF Turtle conversion successfully accomplished.");
     }
 }
