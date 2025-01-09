@@ -1,7 +1,9 @@
 # Neo2RDF
 
-Neo2RDF is a command line application that converts a Neo4j database into an RDF file in Turtle format. It is
-implemented in Java and uses the official Neo4j Java driver.
+Neo2RDF is a command line application that converts a Neo4j database into a RDF file in [Turtle](https://www.w3.org/TR/turtle/) format. It is
+implemented in Java and uses the [Cypher](https://neo4j.com/docs/cypher-manual/current/) query language via the official Neo4j Java driver.
+With the help of Neo2RDF you can connect to a running Neo4j instance (local, remote or on [Neo4j Aura](https://neo4j.com/product/auradb/)) and
+either dump a Turtle file or generate a Turtle data stream.
 
 ## Installation & Quickstart
 
@@ -16,7 +18,7 @@ The command line application can be invoked as follows:
 ./neo2rdf.sh
 ```
 
-The execution of the script will print general information on the application and an exemplary usage of the 2 available
+The execution of the script will print general information on the application and an exemplary usage of the two available
 conversion modes.
 
 ### Conversion Modes
@@ -25,7 +27,7 @@ Two conversion modes are available:
 
 - **DB-to-File**: A provided Neo4j database is converted into an RDF file in Turtle format, which is written to a
   specified location on disk. \
-  **Example:**
+  Example that connects to a local Neo4j instance:
   ```
   ./neo2rdf.sh dump --database="someDBName" \
   --uri="bolt://localhost:7687" \
@@ -37,12 +39,12 @@ Two conversion modes are available:
 - **DB-to-Stream**: The application starts an HTTP server for the provided Neo4j database. When a GET request is sent to
   the server (e.g., to `http://localhost:8080`), the conversion procedure is initiated and the response returns an RDF
   Turtle stream to the client. \
-  **Example:**
+  Example that connects to an Neo4j cloud instance on Aura and generates a stream on request:
   ```
-  ./neo2rdf.sh server --database="someDBName" \
-  --uri="bolt://localhost:7687" \
+  ./neo2rdf.sh server --database="neo4j" \
+  --uri="neo4j+s://867928679.databases.neo4j.io" \
   --user="neo4j" \
-  --password="PASSWORD123" \
+  --password="eBWczH5dRt2VR1C1eYKvk5jRt2VR1C1eY72NUCk" \
   --port=8080
   ```
 
