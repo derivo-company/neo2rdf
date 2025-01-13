@@ -16,7 +16,7 @@
         <revision>2.0.0${sha1}${changelist}</revision>
         <version.mvn.plugin.flatten>1.6.0</version.mvn.plugin.flatten>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>5.26.0</neo4j.version>
+        <neo4j.version>5.26.1</neo4j.version>
         <rdf4j.version>5.1.0</rdf4j.version>
         <tinylog.version>2.7.0</tinylog.version>
     </properties>
