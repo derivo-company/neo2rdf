@@ -105,13 +105,11 @@ SYNOPSIS
        neo2rdf dump [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck]
        [--reifyOnlyRelationshipsWithProperties] [--reifyRelationships]
-       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<neo4jDatabase>
-       -o=<outputPath> --password=<neo4jPassword>
+       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<databaseName>
+       -o=<outputPath> [--password=<dbPassword>]
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
-       [--sequenceConversionType=<sequenceConversionType>] 
-       -u=<neo4jUser> 
-       --uri=<neo4jURI>
+       [--sequenceConversionType=<sequenceConversionType>] [-u=<dbUser>] --uri=<dbURI>
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -137,11 +135,12 @@ OPTIONS
 	   The YAML keys must have the same identifiers as the long option names, e.g.,
 	   'basePrefix: https://www.example.org/other-prefix#'.
 
-       -db, --database=<neo4jDatabase>
-	   The name of the Neo4j database to connect to.
+       -db, --database=<databaseName>
+	   The name of the database to connect to.
 
        --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
+
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
 
@@ -152,10 +151,10 @@ OPTIONS
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
 
-       -o, --outputPath=<outputPath>
-       
-       --password=<neo4jPassword>
-	   The password for the Neo4j user.
+       -o, --outputPath=<outputPath>,
+        
+        --password=<dbPassword>
+	   The password for the database user.
 
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
@@ -204,11 +203,11 @@ OPTIONS
 
 		   Default: RDF_COLLECTION
 
-       -u, --user=<neo4jUser>
-	   The username for the Neo4j instance.
+       -u, --user=<dbUser>
+	   The username for the database instance.
 
-       --uri=<neo4jURI>
-	   The URI for the Neo4j instance. Example: bolt://localhost:7687
+       --uri=<dbURI>
+	   The URI for the database instance. Example: bolt://localhost:7687
 
 ```
 
@@ -225,12 +224,11 @@ SYNOPSIS
        neo2rdf server [--deriveClassHierarchyByLabelSubsetCheck]
        [--derivePropertyHierarchyByRelationshipSubsetCheck]
        [--reifyOnlyRelationshipsWithProperties] [--reifyRelationships]
-       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<neo4jDatabase>
-       -p=<port> --password=<neo4jPassword>
-       [--reificationVocabulary=<reificationVocabulary>]
+       [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<databaseName>
+       -p=<port> [--password=<dbPassword>] [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
-       -u=<neo4jUser> --uri=<neo4jURI>
+       [-u=<dbUser>] --uri=<dbURI>
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -256,8 +254,8 @@ OPTIONS
 	   The YAML keys must have the same identifiers as the long option names, e.g.,
 	   'basePrefix: https://www.example.org/other-prefix#'.
 
-       -db, --database=<neo4jDatabase>
-	   The name of the Neo4j database to connect to.
+       -db, --database=<databaseName>
+	   The name of the database to connect to.
 
        --deriveClassHierarchyByLabelSubsetCheck
 	   Indicates whether the RDF class hierarchy should be derived.
@@ -272,10 +270,10 @@ OPTIONS
 	   each other.
 
        -p, --port=<port>
-	      Default: 8080
+	   Default: 8080
 
-       --password=<neo4jPassword>
-	   The password for the Neo4j user.
+       --password=<dbPassword>
+	   The password for the database user.
 
        --reificationVocabulary=<reificationVocabulary>
 	   The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID)
@@ -324,9 +322,8 @@ OPTIONS
        -t, --numberOfServerThreads=<numberOfServerThreads>
 	   Default: 2
 
-       -u, --user=<neo4jUser>
-	   The username for the Neo4j instance.
+       -u, --user=<dbUser>
+	   The username for the database instance.
 
-       --uri=<neo4jURI>
-	   The URI for the Neo4j instance. Example: bolt://localhost:7687
-```
+       --uri=<dbURI>
+	   The URI for the database instance. Example: bolt://localhost:7687
