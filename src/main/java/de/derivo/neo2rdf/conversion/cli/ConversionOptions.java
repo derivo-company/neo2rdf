@@ -15,25 +15,23 @@ public class ConversionOptions {
 
     @CommandLine.Option(names = {"-db", "--database"},
             required = true,
-            description = "The name of the Neo4j database to connect to."
-    )
-    private String neo4jDatabase = null;
+            description = "The name of the database to connect to.")
+    private String databaseName = null;
 
     @CommandLine.Option(names = {"-u", "--user"},
-            required = true,
-            description = "The username for the Neo4j instance.")
-    protected String neo4jUser = null;
+            required = false,
+            description = "The username for the database instance.")
+    protected String dbUser = null;
 
     @CommandLine.Option(names = {"--uri"},
             required = true,
-            description = "The URI for the Neo4j instance. Example: bolt://localhost:7687")
-    protected String neo4jURI = null;
-
+            description = "The URI for the database instance. Example: bolt://localhost:7687")
+    protected String dbURI = null;
 
     @CommandLine.Option(names = {"--password"},
-            required = true,
-            description = "The password for the Neo4j user.")
-    protected String neo4jPassword = null;
+            required = false,
+            description = "The password for the database user.")
+    protected String dbPassword = null;
 
     @CommandLine.Option(names = {"-cfg", "--config"},
             description = """
@@ -139,10 +137,10 @@ public class ConversionOptions {
     }
 
     protected Neo4jDBServerConnector getNeo4jDBConnector() {
-        return new Neo4jDBServerConnector(neo4jURI, neo4jUser, neo4jPassword, neo4jDatabase);
+        return new Neo4jDBServerConnector(dbURI, dbUser, dbPassword, databaseName);
     }
 
     public String getNeo4jDatabase() {
-        return neo4jDatabase;
+        return databaseName;
     }
 }

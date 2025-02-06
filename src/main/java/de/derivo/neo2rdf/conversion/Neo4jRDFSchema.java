@@ -13,15 +13,17 @@ import java.util.*;
 public class Neo4jRDFSchema {
     public static Namespace neo4jNamespace = Values.namespace("neo4j", "https://neo4j.com/");
     public static IRI pointClass = Values.iri(
-            "https://neo4j.com/docs/graphql-manual/current/type-definitions/types/#type-definitions-types-point");
+            "https://neo4j.com/docs/cypher-manual/current/values-and-types/spatial/#spatial-values-point-type");
     public static IRI cartesianPoint = Values.iri(
-            "https://neo4j.com/docs/cypher-manual/current/syntax/spatial/#cypher-spatial-crs-cartesian");
+            "https://neo4j.com/docs/cypher-manual/current/values-and-types/spatial/#spatial-values-crs-cartesian");
     public static IRI geographicPoint = Values.iri(
-            "https://neo4j.com/docs/cypher-manual/current/syntax/spatial/#cypher-spatial-crs-geographic");
+            "https://neo4j.com/docs/cypher-manual/current/values-and-types/spatial/#spatial-values-crs-geographic");
     public static IRI geographicPoint2DClass = Values.iri("https://spatialreference.org/ref/epsg/4326/");
     public static IRI geographicPoint3DClass = Values.iri("https://spatialreference.org/ref/epsg/4979/");
-    public static IRI cartesianPoint2D = Values.iri("https://spatialreference.org/ref/sr-org/7203/");
-    public static IRI cartesianPoint3D = Values.iri("https://spatialreference.org/ref/sr-org/9157/");
+    public static IRI cartesianPoint2D = Values.iri(
+            "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-cartesian-2d");
+    public static IRI cartesianPoint3D = Values.iri(
+            "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point-cartesian-3d");
     public static IRI xPropertyKey = Values.iri(neo4jNamespace, "x-coordinate");
     public static IRI yPropertyKey = Values.iri(neo4jNamespace, "y-coordinate");
     public static IRI zPropertyKey = Values.iri(neo4jNamespace, "z-coordinate");

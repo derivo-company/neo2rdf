@@ -41,12 +41,13 @@ public class NodeToRDFConverter extends Neo4jConnectorNodeProcessor {
     }
 
     private void init() {
-        this.datatypePropertyKeys = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getPropertyKeys().size());
-        this.objectPropertyKeys = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getRelationshipTypes().size());
-        this.deployedNeo4jLabels = new UnifiedSet<>(neo4jToRDFConverter.getIndexedSchema().getNeo4jLabels().size());
+        int initialCapacity = 10_000;
+        this.datatypePropertyKeys = new UnifiedSet<>(initialCapacity);
+        this.objectPropertyKeys = new UnifiedSet<>(initialCapacity);
+        this.deployedNeo4jLabels = new UnifiedSet<>(initialCapacity);
 
         if (config.isDeriveClassHierarchyByLabelSubsetCheck()) {
-            this.labelToInstanceSet = new HashMap<>(neo4jToRDFConverter.getIndexedSchema().getNeo4jLabels().size());
+            this.labelToInstanceSet = new HashMap<>(initialCapacity);
         }
     }
 

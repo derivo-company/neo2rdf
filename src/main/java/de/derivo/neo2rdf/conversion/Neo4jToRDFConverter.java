@@ -25,7 +25,6 @@ public abstract class Neo4jToRDFConverter {
     private RelationshipToRDFConverter relationshipProcessor;
 
     protected Neo4jToRDFMapper neo4jToRDFMapper;
-    protected IndexedNeo4jSchema indexedSchema;
 
     private Set<String> deployedNeo4jLabels;
     private Set<String> deployedRelationshipTypes;
@@ -50,7 +49,6 @@ public abstract class Neo4jToRDFConverter {
         builder.setReificationVocabulary(config.getReificationVocabulary());
         this.neo4jToRDFMapper = builder.build();
 
-        indexedSchema = new IndexedNeo4jSchema(neo4jDBConnector);
         nodeProcessor = new NodeToRDFConverter(neo4jDBConnector, this, config);
         relationshipProcessor = new RelationshipToRDFConverter(neo4jDBConnector, this, config);
     }
@@ -110,7 +108,7 @@ public abstract class Neo4jToRDFConverter {
     }
 
     private void processPropertyKeysAndLabels() {
-        indexedSchema.getNeo4jLabels().forEach((neo4jLabel) -> {
+        deployedNeo4jLabels.forEach((neo4jLabel) -> {
             Resource rdfClass = neo4jToRDFMapper.labelToResource(neo4jLabel);
             Statement s = valueFactory.createStatement(
                     rdfClass,
@@ -126,7 +124,7 @@ public abstract class Neo4jToRDFConverter {
             processStatement(s);
         });
 
-        indexedSchema.getPropertyKeys().forEach((propertyKey) -> {
+        deployedPropertyKeys.forEach((propertyKey) -> {
             Resource dataProperty = neo4jToRDFMapper.propertyKeyToResource(propertyKey);
             Statement s = valueFactory.createStatement(
                     dataProperty,
@@ -171,7 +169,7 @@ public abstract class Neo4jToRDFConverter {
 
         });
 
-        indexedSchema.getRelationshipTypes().forEach((relationshipType) -> {
+        deployedRelationshipTypes.forEach((relationshipType) -> {
             Resource objectProperty = neo4jToRDFMapper.relationshipTypeToIRI(relationshipType);
             Statement s = valueFactory.createStatement(
                     objectProperty,
@@ -223,13 +221,19 @@ public abstract class Neo4jToRDFConverter {
         });
     }
 
-    public IndexedNeo4jSchema getIndexedSchema() {
-        return indexedSchema;
-    }
-
     protected abstract void onStart();
 
     protected abstract void onFinish();
 
+    public Set<String> getDeployedNeo4jLabels() {
+        return deployedNeo4jLabels;
+    }
 
+    public Set<String> getDeployedRelationshipTypes() {
+        return deployedRelationshipTypes;
+    }
+
+    public Set<String> getDeployedPropertyKeys() {
+        return deployedPropertyKeys;
+    }
 }
