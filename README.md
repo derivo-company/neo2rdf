@@ -3,11 +3,11 @@
 Neo2RDF is a command line application that converts a Neo4j database into an RDF file
 in [Turtle](https://www.w3.org/TR/turtle/) format. It is implemented in Java and
 uses the [Cypher](https://neo4j.com/docs/cypher-manual/current/) query language
-via the official Neo4j Java driver. Neo2RDF is compliant with the OpenCypher
-standard, ensuring compatibility with other graph databases that support the
-OpenCypher query language.
+via the official Neo4j Java driver. Neo2RDF exclusively uses the [openCypher](https://opencypher.org)
+standard in order to achieve the greatest possible compatibility with other graph databases
+(tested with [Neo4j](https://neo4j.com) and [Memgraph](https://memgraph.com)).
 
-With the help of Neo2RDF, you can connect to a running Neo4j instance (local, remote,
+For instance, with the help of Neo2RDF, you can connect to a running Neo4j instance (local, remote,
 or on [Neo4j Aura](https://neo4j.com/product/auradb/)) and either dump a Turtle
 file or generate a Turtle data stream. While Neo2RDF uses the Neo4j driver,
 it may also work with other graph databases that support the Bolt protocol, such
