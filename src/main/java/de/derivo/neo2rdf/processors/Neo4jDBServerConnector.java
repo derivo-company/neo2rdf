@@ -23,7 +23,11 @@ public class Neo4jDBServerConnector implements Neo4jDBConnector {
     }
 
     private void init() {
-        driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+        if (user != null && password != null) {
+            driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+        } else {
+            driver = GraphDatabase.driver(uri);
+        }
     }
 
 

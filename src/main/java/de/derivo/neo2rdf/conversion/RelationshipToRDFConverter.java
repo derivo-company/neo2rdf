@@ -13,9 +13,11 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.util.Values;
 import org.neo4j.driver.Value;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
-import org.tinylog.Logger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProcessor {
@@ -32,7 +34,6 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
     private Set<String> relationshipTypeIDReificationBlacklist;
 
     private Map<String, Roaring64Bitmap> relationshipIDToInstanceSet = null;
-    private IndexedNeo4jSchema indexedNeo4jSchema;
 
     public RelationshipToRDFConverter(Neo4jDBConnector neo4jDBConnector, Neo4jToRDFConverter neo4jToRDFConverter, ConversionConfig config) {
         super(neo4jDBConnector);
@@ -43,13 +44,13 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
     }
 
     private void init() {
-        this.indexedNeo4jSchema = neo4jToRDFConverter.getIndexedSchema();
-        this.deployedRelationshipTypes = new UnifiedSet<>(indexedNeo4jSchema.getRelationshipTypes().size());
-        this.datatypePropertyKeys = new UnifiedSet<>(indexedNeo4jSchema.getPropertyKeys().size());
-        this.objectPropertyKeys = new UnifiedSet<>(indexedNeo4jSchema.getPropertyKeys().size());
+        int initialCapacity = 10_000;
+        this.deployedRelationshipTypes = new UnifiedSet<>(initialCapacity);
+        this.datatypePropertyKeys = new UnifiedSet<>(initialCapacity);
+        this.objectPropertyKeys = new UnifiedSet<>(initialCapacity);
 
         if (this.config.isDerivePropertyHierarchyByRelationshipSubsetCheck()) {
-            this.relationshipIDToInstanceSet = new HashMap<>(indexedNeo4jSchema.getPropertyKeys().size());
+            this.relationshipIDToInstanceSet = new HashMap<>(initialCapacity);
         }
         this.reifyRelationships = config.isReifyRelationships();
         this.relationshipTypeIDReificationBlacklist = getRelationshipTypeBlacklistSet();
@@ -57,13 +58,6 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
 
     private Set<String> getRelationshipTypeBlacklistSet() {
         return config.getRelationshipTypeReificationBlacklist().stream()
-                .peek(blackListedRelType -> {
-                    if (!indexedNeo4jSchema.getRelationshipTypes().contains(blackListedRelType)) {
-                        Logger.warn("Provided relationship type to blacklist for reification does not exist: %s".formatted(
-                                blackListedRelType));
-                    }
-                })
-                .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(UnifiedSet::new));
     }
 

@@ -1,3 +1,8 @@
+## 2.1.0 (2025-02-07)
+
+- New feature: Neo2RDF now uses the OpenCypher standard. While Neo2RDF deploys the Neo4j driver, it now may also work
+  with other graph databases that support the Bolt protocol, such as Memgraph.
+
 ## 2.0.0 (2025-01-09)
 
 - Refactoring: Replaced the record storage reader with the Java Neo4j driver to support databases that use

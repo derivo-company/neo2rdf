@@ -1,6 +1,5 @@
 package de.derivo.neo2rdf;
 
-import de.derivo.neo2rdf.conversion.IndexedNeo4jSchema;
 import de.derivo.neo2rdf.conversion.Neo4jDBToTurtle;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.conversion.config.ConversionConfigBuilder;
@@ -11,7 +10,6 @@ import de.derivo.neo2rdf.store.RDF4JInMemoryStore;
 import de.derivo.neo2rdf.store.RDFStoreTestExtension;
 import de.derivo.neo2rdf.util.ConsoleUtil;
 import de.derivo.neo2rdf.util.SequenceConversionType;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RecordIteratorTests {
+public class Neo4jEntityProcessorTests {
 
     @RegisterExtension
     public static final RDFStoreTestExtension storeTestExtension = new RDFStoreTestExtension(TestUtil.getCypherCreateQueries(
@@ -44,18 +42,19 @@ public class RecordIteratorTests {
 
 
     @Test
-    public void indexNeo4jSchema() {
-        IndexedNeo4jSchema indexedSchema = new IndexedNeo4jSchema(storeTestExtension.getNeo4jDBConnector());
+    public void testCollectionOfDeployedLabelsRelationshipTypesAndPropertyKeys() {
+        String outputFileName = "movie-db-test.ttl";
+        storeTestExtension.convertAndImportIntoStore(outputFileName, config);
         Logger.info(ConsoleUtil.getSeparator());
         Logger.info("Labels:");
         Logger.info(ConsoleUtil.getSeparator());
-        Logger.info(indexedSchema.getNeo4jLabels().toString());
-        Assertions.assertEquals(Set.of("Movie", "Person"), new UnifiedSet<>(indexedSchema.getNeo4jLabels()));
+        Logger.info(storeTestExtension.getAllProperties());
+        Assertions.assertEquals(Set.of("Movie", "Person"), storeTestExtension.getCollectedNeo4jLabels());
 
         Logger.info(ConsoleUtil.getSeparator());
         Logger.info("Property Keys:");
         Logger.info(ConsoleUtil.getSeparator());
-        Set<String> propertyKeys = indexedSchema.getPropertyKeys();
+        Set<String> propertyKeys = storeTestExtension.getCollectedNeo4jPropertyKeys();
         Logger.info(propertyKeys.toString());
         Assertions.assertTrue(propertyKeys.contains("title"));
         Assertions.assertTrue(propertyKeys.contains("released"));
@@ -65,10 +64,9 @@ public class RecordIteratorTests {
         Logger.info(ConsoleUtil.getSeparator());
         Logger.info("Relationship Types:");
         Logger.info(ConsoleUtil.getSeparator());
-        Logger.info(indexedSchema.getRelationshipTypes().toString());
+        Logger.info(storeTestExtension.getCollectedNeo4jRelationshipTypes());
         Assertions.assertEquals(Set.of("ACTED_IN", "DIRECTED", "PRODUCED", "WROTE", "FOLLOWS", "REVIEWED"),
-                new UnifiedSet<>(indexedSchema.getRelationshipTypes()));
-
+                storeTestExtension.getCollectedNeo4jRelationshipTypes());
     }
 
 
