@@ -143,6 +143,8 @@ OPTIONS
 
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
+	   
+	      Default: "false".
 
        --derivePropertyHierarchyByRelationshipSubsetCheck
 	   Indicates whether the RDF property hierarchy should be derived.
@@ -150,6 +152,8 @@ OPTIONS
 	   collected in a set.
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
+	   
+	      Default: "false".
 
        -o, --outputPath=<outputPath>,
         
@@ -261,6 +265,8 @@ OPTIONS
 	   Indicates whether the RDF class hierarchy should be derived.
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
+	   
+	      Default: "false".
 
        --derivePropertyHierarchyByRelationshipSubsetCheck
 	   Indicates whether the RDF property hierarchy should be derived.
@@ -268,6 +274,8 @@ OPTIONS
 	   collected in a set.
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
+	   
+	      Default: "false".
 
        -p, --port=<port>
 	   Default: 8080
