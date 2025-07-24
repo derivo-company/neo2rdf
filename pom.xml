@@ -243,6 +243,17 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.13.4</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
@@ -429,13 +440,11 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.12.2</version>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
 
 
-        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-storage</artifactId>
@@ -488,10 +497,6 @@
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>httpclient</artifactId>
                     <groupId>org.apache.httpcomponents</groupId>
                 </exclusion>
@@ -542,6 +547,10 @@
                 <exclusion>
                     <artifactId>eclipse-collections-api</artifactId>
                     <groupId>org.eclipse.collections</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>zookeeper-jute</artifactId>
+                    <groupId>org.apache.zookeeper</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
