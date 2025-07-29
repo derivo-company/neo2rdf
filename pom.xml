@@ -326,13 +326,13 @@
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>
-            <version>12.0.0.M3</version>
+            <version>13.0.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections-api -->
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections-api</artifactId>
-            <version>12.0.0.M3</version>
+            <version>13.0.0</version>
         </dependency>
 
 
