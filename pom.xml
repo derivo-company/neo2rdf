@@ -248,7 +248,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.13.4</version>
+                <version>6.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -267,7 +267,7 @@
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
-            <version>5.28.4</version>
+            <version>6.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.neo4j.test/neo4j-harness -->
         <dependency>
@@ -326,13 +326,13 @@
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>
-            <version>12.0.0.M3</version>
+            <version>13.0.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections-api -->
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections-api</artifactId>
-            <version>12.0.0.M3</version>
+            <version>13.0.0</version>
         </dependency>
 
 
