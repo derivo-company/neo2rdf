@@ -2,6 +2,7 @@ package de.derivo.neo2rdf.conversion.config;
 
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
+import de.derivo.neo2rdf.util.VectorConversionType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class ConversionConfigBuilder {
     private String basePrefix = "https://www.example.org#";
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
+    VectorConversionType vectorConversionType = VectorConversionType.COMMA_SEPARATED_STRING;
     private boolean deriveClassHierarchyByLabelSubsetCheck = false;
     private boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
     private boolean reifyRelationships = true;
@@ -47,6 +49,11 @@ public class ConversionConfigBuilder {
 
     public ConversionConfigBuilder setSequenceConversionType(SequenceConversionType sequenceConversionType) {
         this.sequenceConversionType = sequenceConversionType;
+        return this;
+    }
+
+    public ConversionConfigBuilder setVectorConversionType(VectorConversionType vectorConversionType) {
+        this.vectorConversionType = vectorConversionType;
         return this;
     }
 
@@ -88,6 +95,7 @@ public class ConversionConfigBuilder {
         config.reifyOnlyRelationshipsWithProperties = reifyOnlyRelationshipsWithProperties;
         config.basePrefix = basePrefix;
         config.sequenceConversionType = sequenceConversionType;
+        config.vectorConversionType = vectorConversionType;
         config.deriveClassHierarchyByLabelSubsetCheck = deriveClassHierarchyByLabelSubsetCheck;
         config.derivePropertyHierarchyByRelationshipSubsetCheck = derivePropertyHierarchyByRelationshipSubsetCheck;
         config.schemaOutputPath = schemaOutputPath;

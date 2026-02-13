@@ -35,7 +35,6 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore
 
     private final List<String> cypherCreateQueries;
     private Neo4jTestDBStub neo4jDBConnector;
-    private Driver driver;
 
     private Set<String> collectedNeo4jLabels = Collections.emptySet();
     private Set<String> collectedNeo4jRelationshipTypes = Collections.emptySet();
@@ -53,12 +52,12 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        this.driver = GraphDatabase.driver(
+        Driver driver = GraphDatabase.driver(
                 neo4jContainer.getBoltUrl(),
                 AuthTokens.basic("neo4j", neo4jContainer.getAdminPassword())
         );
 
-        this.neo4jDBConnector = new Neo4jTestDBStub(this.driver);
+        this.neo4jDBConnector = new Neo4jTestDBStub(driver);
 
         neo4jDBConnector.clearDatabase();
         neo4jDBConnector.updateQuery(cypherCreateQueries);
