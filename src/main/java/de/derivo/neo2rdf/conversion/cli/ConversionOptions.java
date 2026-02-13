@@ -5,6 +5,7 @@ import de.derivo.neo2rdf.conversion.config.ConversionConfigBuilder;
 import de.derivo.neo2rdf.processors.Neo4jDBServerConnector;
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
+import de.derivo.neo2rdf.util.VectorConversionType;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -88,6 +89,13 @@ public class ConversionOptions {
                     """)
     private SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
 
+    @CommandLine.Option(names = {"--vectorConversionType"}, description = """
+            Options:
+            - `COMMA_SEPARATED_STRING`: Neo4j vectors are converted into a single string literal with comma-separated values.
+            - `RDF_COLLECTION`: Neo4j vectors are converted into open lists in RDF.
+            """)
+    private VectorConversionType vectorConversionType = VectorConversionType.COMMA_SEPARATED_STRING;
+
     @CommandLine.Option(names = {"--deriveClassHierarchyByLabelSubsetCheck"},
             description = """
                     Indicates whether the RDF class hierarchy should be derived.
@@ -113,7 +121,6 @@ public class ConversionOptions {
 
     private ConversionConfig config = null;
 
-
     protected ConversionConfig getConversionConfig() {
         if (config != null) {
             return config;
@@ -128,7 +135,9 @@ public class ConversionOptions {
             builder.setReifyRelationships(reifyRelationships);
             builder.setRelationshipTypeReificationBlacklist(relationshipTypeReificationBlacklist);
             builder.setSequenceConversionType(sequenceConversionType);
-            builder.setDerivePropertyHierarchyByRelationshipSubsetCheck(derivePropertyHierarchyByRelationshipSubsetCheck);
+            builder.setVectorConversionType(vectorConversionType);
+            builder.setDerivePropertyHierarchyByRelationshipSubsetCheck(
+                    derivePropertyHierarchyByRelationshipSubsetCheck);
             builder.setDeriveClassHierarchyByLabelSubsetCheck(deriveClassHierarchyByLabelSubsetCheck);
             builder.setSchemaOutputPath(schemaOutputPath);
             config = builder.build();

@@ -4,11 +4,13 @@ import de.derivo.neo2rdf.conversion.config.ConversionConfig;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.util.Neo4jValueUtil;
 import de.derivo.neo2rdf.util.SequenceConversionType;
+import de.derivo.neo2rdf.util.VectorConversionType;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.util.Values;
 import org.neo4j.driver.Value;
+import org.neo4j.driver.types.Vector;
 
 import java.util.List;
 import java.util.Set;
@@ -38,6 +40,15 @@ public interface RDFPropertyProcessor {
                     getConfig().getSequenceConversionType());
 
             isObjectProperty = getConfig().getSequenceConversionType() == SequenceConversionType.RDF_COLLECTION;
+
+            // handle vector
+        } else if (Neo4jValueUtil.isVector(value)) {
+            Vector vector = value.asVector();
+            getMapper().vectorValueToRDF(subjectResource, key, vector,
+                    getConverter()::processStatement,
+                    getConfig().getVectorConversionType());
+
+            isObjectProperty = getConfig().getVectorConversionType() == VectorConversionType.RDF_COLLECTION;
 
             // handle spatial point
         } else if (Neo4jValueUtil.isPoint(value)) {

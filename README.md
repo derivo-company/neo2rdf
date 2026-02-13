@@ -110,6 +110,7 @@ SYNOPSIS
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-u=<dbUser>] --uri=<dbURI>
+       [--vectorConversionType=<vectorConversionType>]
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -213,6 +214,13 @@ OPTIONS
        --uri=<dbURI>
 	   The URI for the database instance. Example: bolt://localhost:7687
 
+       --vectorConversionType=<vectorConversionType>
+	   Options:
+	   •   COMMA_SEPARATED_STRING: Neo4j vectors are converted into a single string
+	       literal with comma-separated values.
+	   •   RDF_COLLECTION: Neo4j vectors are converted into open lists in RDF.
+		   Default: COMMA_SEPARATED_STRING
+
 ```
 
 ### DB-to-stream - Server Command
@@ -233,6 +241,7 @@ SYNOPSIS
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
        [-u=<dbUser>] --uri=<dbURI>
+       [--vectorConversionType=<vectorConversionType>]
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -335,3 +344,12 @@ OPTIONS
 
        --uri=<dbURI>
 	   The URI for the database instance. Example: bolt://localhost:7687
+
+       --vectorConversionType=<vectorConversionType>
+	   Options:
+	   •   COMMA_SEPARATED_STRING: Neo4j vectors are converted into a single string
+	       literal with comma-separated values.
+	   •   RDF_COLLECTION: Neo4j vectors are converted into open lists in RDF.
+		   Default: COMMA_SEPARATED_STRING
+
+```
