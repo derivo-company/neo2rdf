@@ -1,18 +1,19 @@
 package de.derivo.neo2rdf.util;
 
 import org.neo4j.driver.Value;
+import org.neo4j.driver.types.TypeSystem;
 
 public class Neo4jValueUtil {
 
     public static boolean isList(Value value) {
-        return isOfType(value, "LIST OF ANY?");
+        return value.type().equals(TypeSystem.getDefault().LIST());
     }
 
     public static boolean isPoint(Value value) {
-        return isOfType(value, "POINT");
+        return value.type().equals(TypeSystem.getDefault().POINT());
     }
 
-    private static boolean isOfType(Value value, String type) {
-        return value.type().name().equals(type);
+    public static boolean isVector(Value value) {
+        return value.type().equals(TypeSystem.getDefault().VECTOR());
     }
 }

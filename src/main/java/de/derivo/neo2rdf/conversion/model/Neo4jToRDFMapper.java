@@ -5,11 +5,12 @@ import de.derivo.neo2rdf.conversion.Neo4jRDFSchema;
 import de.derivo.neo2rdf.util.Neo4jPoint;
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
+import de.derivo.neo2rdf.util.VectorConversionType;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.util.RDFCollections;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.neo4j.driver.types.Point;
+import org.neo4j.driver.types.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 
 public class Neo4jToRDFMapper {
     private final AtomicLong listIDCounter = new AtomicLong(1);
@@ -97,9 +97,60 @@ public class Neo4jToRDFMapper {
         return Values.iri(baseNamespace, relationshipPrefix + relationshipID);
     }
 
-
     private String getListHeadBlankNodeID() {
         return listBNodePrefix + listIDCounter.getAndIncrement();
+    }
+
+    public void vectorValueToRDF(Resource resource,
+                                 String propertyKey,
+                                 Vector vectorValue,
+                                 Consumer<Statement> statementConsumer,
+                                 VectorConversionType vectorConversionType) {
+        // unpack the sealed primitive vector into a standard list
+        List<Object> elements = extractVectorElements(vectorValue);
+
+        switch (vectorConversionType) {
+            case RDF_COLLECTION -> sequenceValueToRDFListStatements(resource, propertyKey, elements, statementConsumer);
+
+            case COMMA_SEPARATED_STRING -> {
+                String vectorString = elements.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(","));
+
+                Statement statement = valueFactory.createStatement(
+                        resource,
+                        propertyKeyToResource(propertyKey),
+                        valueFactory.createLiteral(vectorString));
+                statementConsumer.accept(statement);
+            }
+        }
+    }
+
+    private List<Object> extractVectorElements(Vector vector) {
+        List<Object> result = new ArrayList<>(vector.length());
+
+        switch (vector) {
+            case Float32Vector v -> {
+                for (float f : v.toArray()) result.add(f);
+            }
+            case Float64Vector v -> {
+                for (double d : v.toArray()) result.add(d);
+            }
+            case Int8Vector v -> {
+                for (byte b : v.toArray()) result.add(b);
+            }
+            case Int16Vector v -> {
+                for (short s : v.toArray()) result.add(s);
+            }
+            case Int32Vector v -> {
+                for (int i : v.toArray()) result.add(i);
+            }
+            case Int64Vector v -> {
+                for (long l : v.toArray()) result.add(l);
+            }
+        }
+
+        return result;
     }
 
     public void sequenceValueToRDF(Resource resource,
@@ -129,7 +180,8 @@ public class Neo4jToRDFMapper {
         listBNodeFactory.getCurrentListElementID().set(0);
 
         BNode listHeadBNode = Values.bnode(listBNodeID);
-        Statement hasListStatement = valueFactory.createStatement(resource, propertyKeyToResource(propertyKey), listHeadBNode);
+        Statement hasListStatement = valueFactory.createStatement(resource, propertyKeyToResource(propertyKey),
+                listHeadBNode);
         rdfListStatementConsumer.accept(hasListStatement);
         Iterable<?> list = Streams.stream(sequenceValue.iterator())
                 .collect(Collectors.toList());
@@ -207,7 +259,8 @@ public class Neo4jToRDFMapper {
     }
 
     public void statementToReificationTriples(Statement statement, Consumer<Statement> consumer) {
-        Statement toProcess = valueFactory.createStatement(statement.getContext(), RDF.TYPE, reificationVocabulary.getStatementClassIRI());
+        Statement toProcess = valueFactory.createStatement(statement.getContext(), RDF.TYPE,
+                reificationVocabulary.getStatementClassIRI());
         consumer.accept(toProcess);
 
         toProcess = valueFactory.createStatement(statement.getContext(),

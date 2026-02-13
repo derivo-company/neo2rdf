@@ -15,7 +15,7 @@ as Memgraph.
 
 ## Installation & Quickstart
 
-Neo2RDF requires Java 17 or higher. To get started, download the latest zip file from
+Neo2RDF requires Java 21 or higher. To get started, download the latest zip file from
 the [releases page](https://github.com/derivo-company/neo2rdf/releases), which contains the executable JAR with all
 dependencies as well as Bash and Batch startup scripts. Unpack the archive to your preferred location and add
 the directory to your PATH environment variable in case you want to invoke the Neo2RDF scripts from any location.
@@ -110,6 +110,7 @@ SYNOPSIS
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-u=<dbUser>] --uri=<dbURI>
+       [--vectorConversionType=<vectorConversionType>]
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -143,6 +144,8 @@ OPTIONS
 
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
+	   
+	      Default: "false".
 
        --derivePropertyHierarchyByRelationshipSubsetCheck
 	   Indicates whether the RDF property hierarchy should be derived.
@@ -150,6 +153,8 @@ OPTIONS
 	   collected in a set.
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
+	   
+	      Default: "false".
 
        -o, --outputPath=<outputPath>,
         
@@ -209,6 +214,14 @@ OPTIONS
        --uri=<dbURI>
 	   The URI for the database instance. Example: bolt://localhost:7687
 
+       --vectorConversionType=<vectorConversionType>
+	   Options:
+	   •   COMMA_SEPARATED_STRING: Neo4j vectors are converted into a single string
+	       literal with comma-separated values.
+	   •   RDF_COLLECTION: Neo4j vectors are converted into open lists in RDF.
+
+		   Default: COMMA_SEPARATED_STRING
+
 ```
 
 ### DB-to-stream - Server Command
@@ -229,6 +242,7 @@ SYNOPSIS
        [--schemaOutputPath=<schemaOutputPath>]
        [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
        [-u=<dbUser>] --uri=<dbURI>
+       [--vectorConversionType=<vectorConversionType>]
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
 
@@ -261,6 +275,8 @@ OPTIONS
 	   Indicates whether the RDF class hierarchy should be derived.
 	   For this purpose, it is examined which sets of Neo4j nodes with an assigned label
 	   are a subset of one another.
+	   
+	      Default: "false".
 
        --derivePropertyHierarchyByRelationshipSubsetCheck
 	   Indicates whether the RDF property hierarchy should be derived.
@@ -268,6 +284,8 @@ OPTIONS
 	   collected in a set.
 	   Subsequently, for every pair of sets, it is examined whether they are a subset of
 	   each other.
+	   
+	      Default: "false".
 
        -p, --port=<port>
 	   Default: 8080
@@ -327,3 +345,13 @@ OPTIONS
 
        --uri=<dbURI>
 	   The URI for the database instance. Example: bolt://localhost:7687
+
+       --vectorConversionType=<vectorConversionType>
+	   Options:
+	   •   COMMA_SEPARATED_STRING: Neo4j vectors are converted into a single string
+	       literal with comma-separated values.
+	   •   RDF_COLLECTION: Neo4j vectors are converted into open lists in RDF.
+
+		   Default: COMMA_SEPARATED_STRING
+
+```

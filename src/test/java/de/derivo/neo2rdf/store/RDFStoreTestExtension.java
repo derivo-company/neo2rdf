@@ -4,9 +4,15 @@ import de.derivo.neo2rdf.Neo4jTestDBStub;
 import de.derivo.neo2rdf.TestUtil;
 import de.derivo.neo2rdf.conversion.Neo4jDBToTurtle;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
-import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.testcontainers.containers.Neo4jContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +21,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEachCallback, BeforeEachCallback {
+public class RDFStoreTestExtension extends RDF4JInMemoryStore
+        implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
+
+    @SuppressWarnings("resource")
+    private static final Neo4jContainer<?> neo4jContainer = new Neo4jContainer<>(DockerImageName.parse("neo4j:2026.01.4"))
+            .withAdminPassword("password")
+            .withReuse(true);
+
+    static {
+        neo4jContainer.start();
+    }
 
     private final List<String> cypherCreateQueries;
     private Neo4jTestDBStub neo4jDBConnector;
@@ -25,24 +41,41 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
     private Set<String> collectedNeo4jPropertyKeys = Collections.emptySet();
 
     public RDFStoreTestExtension(List<String> cypherCreateQueries) {
+        super(Collections.emptyList());
         this.cypherCreateQueries = cypherCreateQueries;
-        init();
     }
 
     public RDFStoreTestExtension(List<String> cypherCreateQueries, boolean rdfsReasoning) {
+        super(Collections.emptyList(), rdfsReasoning);
         this.cypherCreateQueries = cypherCreateQueries;
-        this.rdfsReasoning = rdfsReasoning;
-        init();
+    }
+
+    @Override
+    public void beforeAll(ExtensionContext context) {
+        Driver driver = GraphDatabase.driver(
+                neo4jContainer.getBoltUrl(),
+                AuthTokens.basic("neo4j", neo4jContainer.getAdminPassword())
+        );
+
+        this.neo4jDBConnector = new Neo4jTestDBStub(driver);
+
+        neo4jDBConnector.clearDatabase();
+        neo4jDBConnector.updateQuery(cypherCreateQueries);
+    }
+
+    @Override
+    public void beforeEach(ExtensionContext extensionContext) {
+        this.init(Collections.emptyList());
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        this.neo4jDBConnector.close();
+        this.terminate();
     }
 
     public void convertAndImportIntoStore(String outputFileName, ConversionConfig config) {
         convertAndImportIntoStore(outputFileName, config, false);
-    }
-
-    private void init() {
-        this.neo4jDBConnector = new Neo4jTestDBStub();
-        this.neo4jDBConnector.clearDatabase();
-        this.neo4jDBConnector.updateQuery(cypherCreateQueries);
     }
 
     public void convertAndImportIntoStore(String outputFileName, ConversionConfig config, boolean rdfsReasoning) {
@@ -50,15 +83,17 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
 
         File outputFile = TestUtil.getTempFile(outputFileName);
         outputFile.getParentFile().mkdirs();
+
         Neo4jDBToTurtle neo4jDBToTurtle;
         try {
             neo4jDBToTurtle = new Neo4jDBToTurtle(neo4jDBConnector, config, new FileOutputStream(outputFile));
             neo4jDBToTurtle.startProcessing();
+
             this.collectedNeo4jLabels = neo4jDBToTurtle.getDeployedNeo4jLabels();
             this.collectedNeo4jPropertyKeys = neo4jDBToTurtle.getDeployedPropertyKeys();
             this.collectedNeo4jRelationshipTypes = neo4jDBToTurtle.getDeployedRelationshipTypes();
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not create output file for Turtle export", e);
         }
 
         if (rdfsReasoning) {
@@ -66,16 +101,6 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore implements AfterEa
         }
 
         this.importData(List.of(outputFile));
-    }
-
-    @Override
-    public void beforeEach(ExtensionContext extensionContext) {
-        init(List.of());
-    }
-
-    @Override
-    public void afterEach(ExtensionContext extensionContext) {
-        terminate();
     }
 
     public Neo4jTestDBStub getNeo4jDBConnector() {

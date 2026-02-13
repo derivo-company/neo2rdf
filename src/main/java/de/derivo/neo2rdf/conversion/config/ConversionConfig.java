@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.derivo.neo2rdf.util.ReificationVocabulary;
 import de.derivo.neo2rdf.util.SequenceConversionType;
+import de.derivo.neo2rdf.util.VectorConversionType;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +17,7 @@ public class ConversionConfig {
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     boolean reifyOnlyRelationshipsWithProperties = false;
     SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
+    VectorConversionType vectorConversionType = VectorConversionType.COMMA_SEPARATED_STRING;
     boolean deriveClassHierarchyByLabelSubsetCheck = false;
     boolean derivePropertyHierarchyByRelationshipSubsetCheck = false;
     public boolean reifyRelationships;
@@ -50,6 +52,10 @@ public class ConversionConfig {
 
     public SequenceConversionType getSequenceConversionType() {
         return sequenceConversionType;
+    }
+
+    public VectorConversionType getVectorConversionType() {
+        return vectorConversionType;
     }
 
     public boolean isReifyRelationships() {
