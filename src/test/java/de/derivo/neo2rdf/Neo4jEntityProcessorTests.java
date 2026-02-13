@@ -48,7 +48,7 @@ public class Neo4jEntityProcessorTests {
         Logger.info(ConsoleUtil.getSeparator());
         Logger.info("Labels:");
         Logger.info(ConsoleUtil.getSeparator());
-        Logger.info(storeTestExtension.getAllProperties());
+        Logger.info(storeTestExtension.getCollectedNeo4jLabels());
         Assertions.assertEquals(Set.of("Movie", "Person"), storeTestExtension.getCollectedNeo4jLabels());
 
         Logger.info(ConsoleUtil.getSeparator());
@@ -77,7 +77,11 @@ public class Neo4jEntityProcessorTests {
             Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(storeTestExtension.getNeo4jDBConnector(), config, outputStream);
             neo4jDBToTurtle.startProcessing();
             RDF4JInMemoryStore store = new RDF4JInMemoryStore(List.of(outputFile));
-            Set<String> assignedClasses = store.getAssignedClasses(config.getBasePrefix() + "node-1");
+            String personNodeUri = store.getInstances(config.getBasePrefix() + "Person").stream()
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("No Person nodes were exported!"));
+            Set<String> assignedClasses = store.getAssignedClasses(personNodeUri);
+            Assertions.assertTrue(assignedClasses.contains(config.getBasePrefix() + "Person"));
             Assertions.assertEquals(Set.of(config.getBasePrefix() + "Person"), assignedClasses);
 
             Set<String> allClasses = store.getInstances(OWL.CLASS.toString());

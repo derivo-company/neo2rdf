@@ -6,7 +6,6 @@ import de.derivo.neo2rdf.processors.Neo4jDBConnector;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 @CommandLine.Command(name = "dump",
@@ -33,14 +32,15 @@ public class Neo4jToTurtleDumpCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
+        try (Neo4jDBConnector neo4jDBConnector = options.getNeo4jDBConnector()) {
             ConversionConfig config = options.getConversionConfig();
-            Neo4jDBConnector neo4jDBConnector = options.getNeo4jDBConnector();
-            Neo4jDBToTurtle neo4jDBToTurtle;
-            neo4jDBToTurtle = new Neo4jDBToTurtle(neo4jDBConnector, config, new FileOutputStream(outputPath));
-            neo4jDBToTurtle.startProcessing();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+
+            try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+                Neo4jDBToTurtle neo4jDBToTurtle = new Neo4jDBToTurtle(neo4jDBConnector, config, fos);
+                neo4jDBToTurtle.startProcessing();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Export failed", e);
         }
     }
 }

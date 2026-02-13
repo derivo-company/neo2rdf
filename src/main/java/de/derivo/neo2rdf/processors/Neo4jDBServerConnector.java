@@ -46,7 +46,7 @@ public class Neo4jDBServerConnector implements Neo4jDBConnector {
     }
 
     @Override
-    public Driver getDriver() {
+    public Driver driver() {
         return driver;
     }
 
