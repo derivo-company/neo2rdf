@@ -5,22 +5,20 @@ import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapper;
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFValueFactory;
 import de.derivo.neo2rdf.processors.Neo4jConnectorRelationshipProcessor;
 import de.derivo.neo2rdf.processors.Neo4jDBConnector;
-import de.derivo.neo2rdf.util.Neo4jValueUtil;
-import de.derivo.neo2rdf.util.SequenceConversionType;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.util.Values;
 import org.neo4j.driver.Value;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProcessor {
+public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProcessor implements RDFPropertyProcessor {
     private final Neo4jToRDFConverter neo4jToRDFConverter;
     private final Neo4jToRDFMapper neo4jToRDFMapper;
     private final ValueFactory valueFactory = new Neo4jToRDFValueFactory();
@@ -35,7 +33,8 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
 
     private Map<String, Roaring64Bitmap> relationshipIDToInstanceSet = null;
 
-    public RelationshipToRDFConverter(Neo4jDBConnector neo4jDBConnector, Neo4jToRDFConverter neo4jToRDFConverter, ConversionConfig config) {
+    public RelationshipToRDFConverter(Neo4jDBConnector neo4jDBConnector, Neo4jToRDFConverter neo4jToRDFConverter,
+                                      ConversionConfig config) {
         super(neo4jDBConnector);
         this.neo4jToRDFConverter = neo4jToRDFConverter;
         this.neo4jToRDFMapper = neo4jToRDFConverter.neo4jToRDFMapper;
@@ -67,65 +66,56 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
                         String targetID,
                         String relationshipType,
                         Map<String, Value> propertyValuePairs) {
+
         deployedRelationshipTypes.add(relationshipType);
-        Statement statement = valueFactory.createStatement(
-                neo4jToRDFMapper.nodeIDToResource(sourceID),
-                neo4jToRDFMapper.relationshipTypeToIRI(relationshipType),
-                neo4jToRDFMapper.nodeIDToResource(targetID),
-                neo4jToRDFMapper.relationshipIDToResource(relationshipID)
-        );
-        if (reifyRelationships
-            && (!config.isReifyOnlyRelationshipsWithProperties() || !propertyValuePairs.isEmpty())
-            && (relationshipTypeIDReificationBlacklist.isEmpty() || !relationshipTypeIDReificationBlacklist.contains(relationshipType))) {
-            neo4jToRDFConverter.processStatement(statement);
+
+        // create the main statement (s - p - o)
+        Resource subject = neo4jToRDFMapper.nodeIDToResource(sourceID);
+        IRI predicate = neo4jToRDFMapper.relationshipTypeToIRI(relationshipType);
+        Resource object = neo4jToRDFMapper.nodeIDToResource(targetID);
+        Resource relResource = neo4jToRDFMapper.relationshipIDToResource(relationshipID);
+
+        Statement statement = valueFactory.createStatement(subject, predicate, object, relResource);
+
+        // process statement & reification
+        neo4jToRDFConverter.processStatement(statement);
+
+        if (shouldReify(relationshipType, propertyValuePairs)) {
             neo4jToRDFMapper.statementToReificationTriples(statement, neo4jToRDFConverter::processStatement);
-        } else {
-            neo4jToRDFConverter.processStatement(statement);
         }
 
-        if (relationshipIDToInstanceSet != null) {
-            long sourceIDLongVal = Long.parseLong(sourceID);
-            long targetIDLongVal = Long.parseLong(targetID);
-            relationshipIDToInstanceSet.computeIfAbsent(relationshipType, ignore -> new Roaring64Bitmap())
-                    .add(sourceIDLongVal << 32 | targetIDLongVal);
-        }
+        // track instances
+        trackRelationshipInstance(relationshipType, sourceID, targetID);
 
-        propertyValuePairs.forEach((key, value) -> process(relationshipID, key, value));
+        // process properties (delegating to the unified handler)
+        propertyValuePairs.forEach((key, value) -> processProperty(relResource, key, value));
     }
 
-    private void process(String relationshipID, String propertyKey, Value value) {
-        if (Neo4jValueUtil.isList(value)) {
-            List<Object> sequenceValue = value.asList();
-            neo4jToRDFMapper.sequenceValueToRDF(neo4jToRDFMapper.relationshipIDToResource(relationshipID),
-                    propertyKey,
-                    sequenceValue,
-                    neo4jToRDFConverter::processStatement,
-                    config.getSequenceConversionType());
-
-            if (this.config.getSequenceConversionType().equals(SequenceConversionType.RDF_COLLECTION)) {
-                objectPropertyKeys.add(propertyKey);
-            } else {
-                datatypePropertyKeys.add(propertyKey);
-            }
-        } else if (Neo4jValueUtil.isPoint(value)) {
-            objectPropertyKeys.add(propertyKey);
-
-            neo4jToRDFMapper.pointPropertyToRDFStatements(neo4jToRDFMapper.relationshipIDToResource(relationshipID),
-                    propertyKey,
-                    value.asPoint(),
-                    neo4jToRDFConverter::processStatement);
-        } else {
-            datatypePropertyKeys.add(propertyKey);
-
-            Statement statement = valueFactory.createStatement(
-                    neo4jToRDFMapper.relationshipIDToResource(relationshipID),
-                    neo4jToRDFMapper.propertyKeyToResource(propertyKey),
-                    Values.literal(valueFactory, value.asObject(), true)
-            );
-            neo4jToRDFConverter.processStatement(statement);
+    private boolean shouldReify(String relationshipType, Map<String, Value> properties) {
+        if (!reifyRelationships) {
+            return false;
         }
+
+        // check config: reify only if it has properties?
+        if (config.isReifyOnlyRelationshipsWithProperties() && properties.isEmpty()) {
+            return false;
+        }
+
+        // check blacklist
+        return relationshipTypeIDReificationBlacklist.isEmpty()
+               || !relationshipTypeIDReificationBlacklist.contains(relationshipType);
     }
 
+    private void trackRelationshipInstance(String relationshipType, String sourceID, String targetID) {
+        if (relationshipIDToInstanceSet == null) return;
+
+        long sourceVal = Long.parseLong(sourceID);
+        long targetVal = Long.parseLong(targetID);
+
+        relationshipIDToInstanceSet
+                .computeIfAbsent(relationshipType, k -> new Roaring64Bitmap())
+                .add(sourceVal << 32 | targetVal);
+    }
 
     public Map<String, Roaring64Bitmap> getRelationshipIDToInstanceSet() {
         return relationshipIDToInstanceSet;
@@ -137,6 +127,26 @@ public class RelationshipToRDFConverter extends Neo4jConnectorRelationshipProces
 
     public Set<String> getDatatypePropertyKeys() {
         return datatypePropertyKeys;
+    }
+
+    @Override
+    public Neo4jToRDFMapper getMapper() {
+        return neo4jToRDFMapper;
+    }
+
+    @Override
+    public ConversionConfig getConfig() {
+        return config;
+    }
+
+    @Override
+    public ValueFactory getValueFactory() {
+        return valueFactory;
+    }
+
+    @Override
+    public Neo4jToRDFConverter getConverter() {
+        return neo4jToRDFConverter;
     }
 
     public Set<String> getObjectPropertyKeys() {
