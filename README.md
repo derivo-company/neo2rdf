@@ -219,6 +219,7 @@ OPTIONS
 	   •   COMMA_SEPARATED_STRING: Neo4j vectors are converted into a single string
 	       literal with comma-separated values.
 	   •   RDF_COLLECTION: Neo4j vectors are converted into open lists in RDF.
+
 		   Default: COMMA_SEPARATED_STRING
 
 ```
@@ -350,6 +351,7 @@ OPTIONS
 	   •   COMMA_SEPARATED_STRING: Neo4j vectors are converted into a single string
 	       literal with comma-separated values.
 	   •   RDF_COLLECTION: Neo4j vectors are converted into open lists in RDF.
+
 		   Default: COMMA_SEPARATED_STRING
 
 ```
