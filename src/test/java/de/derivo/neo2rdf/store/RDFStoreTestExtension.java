@@ -71,9 +71,7 @@ public class RDFStoreTestExtension extends RDF4JInMemoryStore
 
     @Override
     public void afterAll(ExtensionContext context) {
-        if (this.driver != null) {
-            this.driver.close();
-        }
+        this.neo4jDBConnector.close();
         this.terminate();
     }
 

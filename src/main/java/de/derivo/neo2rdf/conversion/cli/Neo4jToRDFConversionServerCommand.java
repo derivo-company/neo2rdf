@@ -2,6 +2,7 @@ package de.derivo.neo2rdf.conversion.cli;
 
 import de.derivo.neo2rdf.conversion.Neo4jToTurtleConversionServer;
 import de.derivo.neo2rdf.conversion.config.ConversionConfig;
+import de.derivo.neo2rdf.processors.Neo4jDBServerConnector;
 import picocli.CommandLine;
 
 @SuppressWarnings("CanBeFinal")
@@ -33,9 +34,13 @@ public class Neo4jToRDFConversionServerCommand implements Runnable {
     @Override
     public void run() {
         ConversionConfig config = options.getConversionConfig();
-        Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(options.getNeo4jDBConnector(),
-                config,
-                port, numberOfServerThreads);
-        server.startServer();
+        try (Neo4jDBServerConnector neo4jDBConnector = options.getNeo4jDBConnector()) {
+            Neo4jToTurtleConversionServer server = new Neo4jToTurtleConversionServer(neo4jDBConnector,
+                    config,
+                    port, numberOfServerThreads);
+            server.startServer();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
