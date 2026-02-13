@@ -2,6 +2,7 @@ package de.derivo.neo2rdf;
 
 import de.derivo.neo2rdf.conversion.model.Neo4jToRDFMapperBuilder;
 import de.derivo.neo2rdf.util.VectorConversionType;
+import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -14,7 +15,9 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.neo4j.driver.internal.InternalFloat32Vector;
+import org.neo4j.driver.internal.InternalFloat64Vector;
 import org.neo4j.driver.internal.InternalInt32Vector;
+import org.neo4j.driver.types.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,58 +78,59 @@ public class VectorConversionUnitTest {
 
     @Test
     public void testFloatVectorToRDFCollection() {
-        InternalFloat32Vector floatVector = new InternalFloat32Vector(new float[]{0.1f, 0.5f, 0.9f});
-        List<Statement> statements = new ArrayList<>();
+        float v1 = 0.1f;
+        float v2 = 0.5f;
+        float v3 = 0.9f;
+        InternalFloat32Vector floatVector = new InternalFloat32Vector(new float[]{v1, v2, v3});
 
-        new Neo4jToRDFMapperBuilder(prefix).build().vectorValueToRDF(
-                valueFactory.createIRI(prefix + "node-1"),
-                "embedding",
-                floatVector,
-                statements::add,
-                VectorConversionType.RDF_COLLECTION
-        );
+        List<Literal> results = extractRdfListValues(floatVector);
 
-        // verify using an isolated in-memory RDF4J repository
-        Repository rep = new SailRepository(new MemoryStore());
-        try (RepositoryConnection conn = rep.getConnection()) {
-            conn.add(statements);
-
-            String query = """
-                    PREFIX : <%s>
-                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                    SELECT ?val
-                    WHERE {
-                        <url:node-1> :embedding ?list .
-                        ?list rdf:rest*/rdf:first ?val .
-                    }
-                    """.formatted(prefix).replace("url:node-1", prefix + "node-1");
-
-            TupleQuery tupleQuery = conn.prepareTupleQuery(query);
-            try (TupleQueryResult result = tupleQuery.evaluate()) {
-                List<Float> results = new ArrayList<>();
-                for (BindingSet bindings : result) {
-                    results.add(((org.eclipse.rdf4j.model.Literal) bindings.getValue("val")).floatValue());
-                }
-
-                Assertions.assertEquals(3, results.size(), "List should contain exactly 3 elements");
-                Assertions.assertTrue(results.contains(0.1f));
-                Assertions.assertTrue(results.contains(0.5f));
-                Assertions.assertTrue(results.contains(0.9f));
-            }
-        } finally {
-            rep.shutDown();
-        }
+        Assertions.assertEquals(3, results.size(), "List should contain exactly 3 elements");
+        List<Float> floatResults = results.stream().map(Literal::floatValue).toList();
+        Assertions.assertTrue(floatResults.contains(v1));
+        Assertions.assertTrue(floatResults.contains(v2));
+        Assertions.assertTrue(floatResults.contains(v3));
     }
 
     @Test
     public void testIntegerVectorToRDFCollection() {
-        InternalInt32Vector intVector = new InternalInt32Vector(new int[]{42, 1337});
+        int v1 = 42;
+        int v2 = 1337;
+        InternalInt32Vector intVector = new InternalInt32Vector(new int[]{v1, v2});
+
+        List<Literal> results = extractRdfListValues(intVector);
+
+        Assertions.assertEquals(2, results.size(), "List should contain exactly 2 elements");
+        List<Integer> intResults = results.stream().map(Literal::intValue).toList();
+        Assertions.assertTrue(intResults.contains(v1));
+        Assertions.assertTrue(intResults.contains(v2));
+    }
+
+    @Test
+    public void testDoubleVectorToRDFCollection() {
+        double v1 = 42.21d;
+        double v2 = 4.221E32;
+        InternalFloat64Vector intVector = new InternalFloat64Vector(new double[]{v1, v2});
+
+        List<Literal> results = extractRdfListValues(intVector);
+
+        Assertions.assertEquals(2, results.size(), "List should contain exactly 2 elements");
+        List<Double> intResults = results.stream().map(Literal::doubleValue).toList();
+        Assertions.assertTrue(intResults.contains(v1));
+        Assertions.assertTrue(intResults.contains(v2));
+    }
+
+    /**
+     * Helper method to map a vector to an RDF Collection, load it into an in-memory
+     * RDF4J store, and extract the resulting list elements via SPARQL.
+     */
+    private List<Literal> extractRdfListValues(Vector vector) {
         List<Statement> statements = new ArrayList<>();
 
         new Neo4jToRDFMapperBuilder(prefix).build().vectorValueToRDF(
                 valueFactory.createIRI(prefix + "node-1"),
                 "embedding",
-                intVector,
+                vector,
                 statements::add,
                 VectorConversionType.RDF_COLLECTION
         );
@@ -147,14 +151,11 @@ public class VectorConversionUnitTest {
 
             TupleQuery tupleQuery = conn.prepareTupleQuery(query);
             try (TupleQueryResult result = tupleQuery.evaluate()) {
-                List<Integer> results = new ArrayList<>();
+                List<Literal> output = new ArrayList<>();
                 for (BindingSet bindings : result) {
-                    results.add(((org.eclipse.rdf4j.model.Literal) bindings.getValue("val")).intValue());
+                    output.add((Literal) bindings.getValue("val"));
                 }
-
-                Assertions.assertEquals(2, results.size());
-                Assertions.assertTrue(results.contains(42));
-                Assertions.assertTrue(results.contains(1337));
+                return output;
             }
         } finally {
             rep.shutDown();
