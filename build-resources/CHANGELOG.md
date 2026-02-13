@@ -1,3 +1,9 @@
+## 3.0.0 (2026-02-13)
+
+* Breaking change: Project has been upgraded and now requires Java 21 to run.
+* Updated Java dependencies to their latest versions, including Neo4j Java driver to 6.0.2.
+* Fixed: Resolved a resource leak in CLI command to ensure database connections are properly closed after conversion.
+
 ## 2.1.0 (2025-02-07)
 
 - New feature: Neo2RDF now uses the OpenCypher standard. While Neo2RDF deploys the Neo4j driver, it now may also work

@@ -15,7 +15,7 @@ as Memgraph.
 
 ## Installation & Quickstart
 
-Neo2RDF requires Java 17 or higher. To get started, download the latest zip file from
+Neo2RDF requires Java 21 or higher. To get started, download the latest zip file from
 the [releases page](https://github.com/derivo-company/neo2rdf/releases), which contains the executable JAR with all
 dependencies as well as Bash and Batch startup scripts. Unpack the archive to your preferred location and add
 the directory to your PATH environment variable in case you want to invoke the Neo2RDF scripts from any location.
