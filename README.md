@@ -1,5 +1,7 @@
 # Neo2RDF
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Neo2RDF is a command line application that converts a Neo4j database into an RDF file
 in [Turtle](https://www.w3.org/TR/turtle/) format. It is implemented in Java and
 uses the [Cypher](https://neo4j.com/docs/cypher-manual/current/) query language
@@ -355,3 +357,8 @@ OPTIONS
 		   Default: COMMA_SEPARATED_STRING
 
 ```
+
+## License
+
+Neo2RDF is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+You are free to use, modify, and distribute this software in both open-source and commercial/proprietary projects.
