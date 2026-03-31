@@ -1,3 +1,8 @@
+## 3.1.0 (2026-03-31)
+
+- License Change: Neo2RDF has transitioned from the GPL to Apache License 2.0.
+- Updated Java dependencies to their latest versions, including Neo4j Java driver to 6.0.3.
+
 ## 3.0.0 (2026-02-13)
 
 - Breaking change: Project has been upgraded and now requires Java 21 to run.
