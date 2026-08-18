@@ -45,4 +45,19 @@ public class ConversionConfigurationTests {
         Assertions.assertEquals(basePrefix, cfg.getBasePrefix());
     }
 
+    @Test
+    public void readWriteConversionConfigAllVocabularies() {
+        for (de.derivo.neo2rdf.util.ReificationVocabulary vocab : de.derivo.neo2rdf.util.ReificationVocabulary.values()) {
+            ConversionConfig c = new ConversionConfigBuilder()
+                    .setBasePrefix(basePrefix)
+                    .setReificationVocabulary(vocab)
+                    .build();
+            File outputFile = TestUtil.getTempFile("configTest_" + vocab.name() + ".yaml");
+            c.write(outputFile);
+            Assertions.assertTrue(outputFile.exists());
+
+            ConversionConfig readConfig = ConversionConfig.read(outputFile);
+            Assertions.assertEquals(vocab, readConfig.getReificationVocabulary());
+        }
+    }
 }
