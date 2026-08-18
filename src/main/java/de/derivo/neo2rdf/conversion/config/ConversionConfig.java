@@ -29,10 +29,12 @@ import de.derivo.neo2rdf.util.VectorConversionType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConversionConfig {
-    public List<String> relationshipTypeReificationBlacklist;
+    public List<String> relationshipTypeReificationBlacklist = new ArrayList<>();
+    public List<String> sequenceConversionTypeBlacklist = new ArrayList<>();
     String basePrefix = "https://www.example.org/";
     ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
     boolean reifyOnlyRelationshipsWithProperties = false;
@@ -84,6 +86,10 @@ public class ConversionConfig {
 
     public List<String> getRelationshipTypeReificationBlacklist() {
         return relationshipTypeReificationBlacklist;
+    }
+
+    public List<String> getSequenceConversionTypeBlacklist() {
+        return sequenceConversionTypeBlacklist;
     }
 
     public void write(File outputPath) {

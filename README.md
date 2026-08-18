@@ -111,7 +111,9 @@ SYNOPSIS
        -o=<outputPath> [--password=<dbPassword>]
        [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
-       [--sequenceConversionType=<sequenceConversionType>] [-u=<dbUser>] --uri=<dbURI>
+       [--sequenceConversionType=<sequenceConversionType>]
+       [--sequenceConversionTypeBlacklist=<sequenceConversionTypeBlacklist>[,
+       <sequenceConversionTypeBlacklist>...]]... [-u=<dbUser>] --uri=<dbURI>
        [--vectorConversionType=<vectorConversionType>]
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
        <relationshipTypeReificationBlacklist>...]]...
@@ -217,6 +219,17 @@ OPTIONS
 
 		   Default: RDF_COLLECTION
 
+       --sequenceConversionTypeBlacklist=<sequenceConversionTypeBlacklist>[,<sequenceConversionTypeBlacklist>...]
+	   The "sequenceConversionType" setting controls the way each Neo4j sequence (LIST)
+	   is converted into RDF.
+	   Using this option, the blacklisted Neo4j properties will be converted using
+	   the other method (e.g., SEPARATE_LITERALS when the global setting is
+	   RDF_COLLECTION, or vice versa).
+	   The intended usage is to limit the rdf collection encoding to the properties
+	   where values are repeated and/or order matters.
+
+	       Default: []
+
        -u, --user=<dbUser>
 	   The username for the database instance.
 
@@ -249,7 +262,9 @@ SYNOPSIS
        [--basePrefix=<basePrefix>] [-cfg=<conversionConfigFile>] -db=<databaseName>
        -p=<port> [--password=<dbPassword>] [--reificationVocabulary=<reificationVocabulary>]
        [--schemaOutputPath=<schemaOutputPath>]
-       [--sequenceConversionType=<sequenceConversionType>] [-t=<numberOfServerThreads>]
+       [--sequenceConversionType=<sequenceConversionType>]
+       [--sequenceConversionTypeBlacklist=<sequenceConversionTypeBlacklist>[,
+       <sequenceConversionTypeBlacklist>...]]... [-t=<numberOfServerThreads>]
        [-u=<dbUser>] --uri=<dbURI>
        [--vectorConversionType=<vectorConversionType>]
        [--relationshipTypeReificationBlacklist=<relationshipTypeReificationBlacklist>[,
@@ -352,6 +367,17 @@ OPTIONS
 	       e.g., (x { has: [1, 2] }) is converted to (:x, :has, 1) and (:x, :has, 2).
 
 		   Default: RDF_COLLECTION
+
+       --sequenceConversionTypeBlacklist=<sequenceConversionTypeBlacklist>[,<sequenceConversionTypeBlacklist>...]
+	   The "sequenceConversionType" setting controls the way each Neo4j sequence (LIST)
+	   is converted into RDF.
+	   Using this option, the blacklisted Neo4j properties will be converted using
+	   the other method (e.g., SEPARATE_LITERALS when the global setting is
+	   RDF_COLLECTION, or vice versa).
+	   The intended usage is to limit the rdf collection encoding to the properties
+	   where values are repeated and/or order matters.
+
+	       Default: []
 
        -t, --numberOfServerThreads=<numberOfServerThreads>
 	   Default: 2

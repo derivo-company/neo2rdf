@@ -113,6 +113,15 @@ public class ConversionOptions {
                     """)
     private SequenceConversionType sequenceConversionType = SequenceConversionType.RDF_COLLECTION;
 
+    @CommandLine.Option(names = {"--sequenceConversionTypeBlacklist"},
+            description = """
+                    The "sequenceConversionType" setting controls the way each Neo4j sequence (LIST) is converted into RDF.
+                    Using this option, the blacklisted Neo4j properties will be converted using the other method (e.g., `SEPARATE_LITERALS` when the global setting is `RDF_COLLECTION`, or vice versa).
+                    The intended usage is to limit the RDF collection encoding to properties where values are repeated and/or order matters.
+                    """,
+            split = ",")
+    private List<String> sequenceConversionTypeBlacklist = new ArrayList<>();
+
     @CommandLine.Option(names = {"--vectorConversionType"}, description = """
             Options:
             - `COMMA_SEPARATED_STRING`: Neo4j vectors are converted into a single string literal with comma-separated values.
@@ -159,6 +168,7 @@ public class ConversionOptions {
             builder.setReifyRelationships(reifyRelationships);
             builder.setRelationshipTypeReificationBlacklist(relationshipTypeReificationBlacklist);
             builder.setSequenceConversionType(sequenceConversionType);
+            builder.setSequenceConversionTypeBlacklist(sequenceConversionTypeBlacklist);
             builder.setVectorConversionType(vectorConversionType);
             builder.setDerivePropertyHierarchyByRelationshipSubsetCheck(
                     derivePropertyHierarchyByRelationshipSubsetCheck);
