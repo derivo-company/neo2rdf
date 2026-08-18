@@ -3,6 +3,10 @@
 - Breaking change: Project has been upgraded and now requires Java 25 to run.
 - New feature: Added support for RDF 1.2 / RDF4J 6.0.0 Triple Terms (`RDF_12_TRIPLE_TERM`) and W3C RDF 1.2 Basic
   Encoding / Proposition Form (`RDF_INTEROPERABILITY_VOCABULARY`).
+- New feature: Option `--sequenceConversionTypeBlacklist` can now be used to specify Neo4j properties whose sequence
+  values will be converted into RDF using the alternate sequence conversion strategy (e.g. `SEPARATE_LITERALS` when
+  global
+  setting is `RDF_COLLECTION`, or vice versa).
 - Updated Java dependencies to their latest versions, including RDF4J to 6.0.0 and Neo4j Java driver to 6.1.0.
 
 ## 3.1.0 (2026-03-31)

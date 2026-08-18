@@ -60,4 +60,24 @@ public class ConversionConfigurationTests {
             Assertions.assertEquals(vocab, readConfig.getReificationVocabulary());
         }
     }
+
+    @Test
+    public void readWriteConversionConfigWithBlacklists() {
+        java.util.List<String> relBlacklist = java.util.List.of("FRIENDS_WITH", "KNOWS");
+        java.util.List<String> seqBlacklist = java.util.List.of("tags", "items");
+
+        ConversionConfig c = new ConversionConfigBuilder()
+                .setBasePrefix(basePrefix)
+                .setRelationshipTypeReificationBlacklist(relBlacklist)
+                .setSequenceConversionTypeBlacklist(seqBlacklist)
+                .build();
+
+        File outputFile = TestUtil.getTempFile("configTest_blacklists.yaml");
+        c.write(outputFile);
+        Assertions.assertTrue(outputFile.exists());
+
+        ConversionConfig readConfig = ConversionConfig.read(outputFile);
+        Assertions.assertEquals(relBlacklist, readConfig.getRelationshipTypeReificationBlacklist());
+        Assertions.assertEquals(seqBlacklist, readConfig.getSequenceConversionTypeBlacklist());
+    }
 }

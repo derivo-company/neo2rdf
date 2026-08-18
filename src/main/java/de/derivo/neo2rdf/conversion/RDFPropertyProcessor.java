@@ -55,11 +55,18 @@ public interface RDFPropertyProcessor {
         // handle sequence (list)
         if (Neo4jValueUtil.isList(value)) {
             List<Object> listValue = value.asList();
+            SequenceConversionType sequenceConversionType = getConfig().getSequenceConversionType();
+            if (getConfig().getSequenceConversionTypeBlacklist() != null
+                && getConfig().getSequenceConversionTypeBlacklist().contains(key)) {
+                sequenceConversionType = sequenceConversionType == SequenceConversionType.RDF_COLLECTION
+                        ? SequenceConversionType.SEPARATE_LITERALS
+                        : SequenceConversionType.RDF_COLLECTION;
+            }
             getMapper().sequenceValueToRDF(subjectResource, key, listValue,
                     getConverter()::processStatement,
-                    getConfig().getSequenceConversionType());
+                    sequenceConversionType);
 
-            isObjectProperty = getConfig().getSequenceConversionType() == SequenceConversionType.RDF_COLLECTION;
+            isObjectProperty = sequenceConversionType == SequenceConversionType.RDF_COLLECTION;
 
             // handle vector
         } else if (Neo4jValueUtil.isVector(value)) {
