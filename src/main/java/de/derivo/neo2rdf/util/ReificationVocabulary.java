@@ -25,57 +25,50 @@ import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 public enum ReificationVocabulary {
-    RDF_REIFICATION,
-    OWL_REIFICATION;
+    RDF_REIFICATION(RDF.SUBJECT, RDF.PREDICATE, RDF.OBJECT, RDF.STATEMENT, false),
+    OWL_REIFICATION(OWL.ANNOTATEDSOURCE, OWL.ANNOTATEDPROPERTY, OWL.ANNOTATEDTARGET, OWL.AXIOM, false),
+    RDF_INTEROPERABILITY_VOCABULARY(RDF.PROPOSITION_FORM_SUBJECT,
+            RDF.PROPOSITION_FORM_PREDICATE,
+            RDF.PROPOSITION_FORM_OBJECT,
+            RDF.PROPOSITION_FORM,
+            false),
+    RDF_12_TRIPLE_TERM(null, null, null, null, true);
 
-    ReificationVocabulary() {
+    private final IRI subjectProperty;
+    private final IRI predicateProperty;
+    private final IRI objectProperty;
+    private final IRI statementClass;
+    private final boolean isNativeRDF12;
+
+    ReificationVocabulary(IRI subjectProperty,
+                          IRI predicateProperty,
+                          IRI objectProperty,
+                          IRI statementClass,
+                          boolean isNativeRDF12) {
+        this.subjectProperty = subjectProperty;
+        this.predicateProperty = predicateProperty;
+        this.objectProperty = objectProperty;
+        this.statementClass = statementClass;
+        this.isNativeRDF12 = isNativeRDF12;
+    }
+
+    public boolean isNativeRDF12() {
+        return isNativeRDF12;
     }
 
     public IRI getStatementClassIRI() {
-        switch (this) {
-            case OWL_REIFICATION -> {
-                return OWL.AXIOM;
-            }
-            case RDF_REIFICATION -> {
-                return RDF.STATEMENT;
-            }
-            default -> throw new IllegalStateException();
-        }
+        return statementClass;
     }
 
     public IRI getPropertyForReifiedSubject() {
-        switch (this) {
-            case OWL_REIFICATION -> {
-                return OWL.ANNOTATEDSOURCE;
-            }
-            case RDF_REIFICATION -> {
-                return RDF.SUBJECT;
-            }
-            default -> throw new IllegalStateException();
-        }
+        return subjectProperty;
     }
 
     public IRI getPropertyForReifiedPredicate() {
-        switch (this) {
-            case OWL_REIFICATION -> {
-                return OWL.ANNOTATEDPROPERTY;
-            }
-            case RDF_REIFICATION -> {
-                return RDF.PREDICATE;
-            }
-            default -> throw new IllegalStateException();
-        }
+        return predicateProperty;
     }
 
     public IRI getPropertyForReifiedObject() {
-        switch (this) {
-            case OWL_REIFICATION -> {
-                return OWL.ANNOTATEDTARGET;
-            }
-            case RDF_REIFICATION -> {
-                return RDF.OBJECT;
-            }
-            default -> throw new IllegalStateException();
-        }
+        return objectProperty;
     }
 }

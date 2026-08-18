@@ -72,10 +72,14 @@ public class ConversionOptions {
             description = """
                     The reification vocabulary defines how a quadruple (sbj, pred, obj, statementID) should be reified.
                     Options:
-                     - `RDF_REIFICATION`: uses the RDF reification vocabulary, i.e.,  rdf:Statement, rdf:subject, rdf:predicate, and rdf:object
+                     - `RDF_REIFICATION`: uses the RDF reification vocabulary, i.e., rdf:Statement, rdf:subject, rdf:predicate, and rdf:object
                         (cf. https://www.w3.org/TR/rdf11-mt/#reification)
-                     - `OWL_REIFICATION`: uses the OWL vocabulary, i.e.,  owl:Axiom, rdf:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
-                     (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
+                     - `OWL_REIFICATION`: uses the OWL vocabulary, i.e., owl:Axiom, owl:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
+                        (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
+                     - `RDF_INTEROPERABILITY_VOCABULARY`: uses the RDF 1.2 Basic Encoding / interoperability vocabulary, i.e., rdf:PropositionForm, rdf:propositionFormSubject, rdf:propositionFormPredicate, and rdf:propositionFormObject
+                        (cf. https://www.w3.org/TR/rdf12-interop/#sec-basic-encoding)
+                     - `RDF_12_TRIPLE_TERM`: uses native RDF 1.2 triple terms and rdf:reifies, i.e., reifier rdf:reifies <<( s p o )>>
+                        (cf. https://www.w3.org/TR/rdf12-concepts/#section-triple-terms-reification)
                     """)
     private ReificationVocabulary reificationVocabulary = ReificationVocabulary.OWL_REIFICATION;
 

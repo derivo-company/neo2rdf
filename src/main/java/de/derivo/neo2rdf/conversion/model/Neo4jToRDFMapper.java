@@ -279,6 +279,21 @@ public class Neo4jToRDFMapper {
     }
 
     public void statementToReificationTriples(Statement statement, Consumer<Statement> consumer) {
+        if (reificationVocabulary.isNativeRDF12()) {
+            TripleTerm tripleTerm = valueFactory.createTripleTerm(
+                    statement.getSubject(),
+                    statement.getPredicate(),
+                    statement.getObject()
+            );
+            Statement reifyingStatement = valueFactory.createStatement(
+                    statement.getContext(),
+                    RDF.REIFIES,
+                    tripleTerm
+            );
+            consumer.accept(reifyingStatement);
+            return;
+        }
+
         Statement toProcess = valueFactory.createStatement(statement.getContext(), RDF.TYPE,
                 reificationVocabulary.getStatementClassIRI());
         consumer.accept(toProcess);

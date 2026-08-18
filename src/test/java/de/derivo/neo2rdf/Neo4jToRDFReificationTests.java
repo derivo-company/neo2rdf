@@ -76,6 +76,60 @@ public class Neo4jToRDFReificationTests {
     }
 
     @Test
+    void testRDFInteroperabilityReification() {
+        ConversionConfig config = new ConversionConfigBuilder()
+                .setBasePrefix(basePrefix)
+                .setReificationVocabulary(ReificationVocabulary.RDF_INTEROPERABILITY_VOCABULARY).build();
+        storeTestExtension.convertAndImportIntoStore("multi-relationship-reified-with-interop.ttl", config);
+        try (TupleQueryResult bindingSets = storeTestExtension.executeQuery("""
+                PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX :        <https://www.example.org#>
+                SELECT ?statement WHERE {
+                    ?statement rdf:propositionFormSubject ?s ; rdf:propositionFormPredicate :WATCHED ; rdf:propositionFormObject ?o .
+                }
+                """)) {
+            Assertions.assertEquals(12, bindingSets.stream().count());
+        }
+
+        try (TupleQueryResult bindingSets = storeTestExtension.executeQuery("""
+                PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX :           <https://www.example.org#>
+                SELECT ?statement WHERE {
+                    ?statement a rdf:PropositionForm ;
+                               rdf:propositionFormPredicate :WATCHED .
+                }
+                """)) {
+            Assertions.assertEquals(12, bindingSets.stream().count());
+        }
+
+        try (TupleQueryResult bindingSets = storeTestExtension.executeQuery("""
+                PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                SELECT ?statement WHERE {
+                    ?statement a rdf:PropositionForm .
+                }
+                """)) {
+            Assertions.assertEquals(19, bindingSets.stream().count());
+        }
+    }
+
+    @Test
+    void testRDF12TripleTermReification() {
+        ConversionConfig config = new ConversionConfigBuilder()
+                .setBasePrefix(basePrefix)
+                .setReificationVocabulary(ReificationVocabulary.RDF_12_TRIPLE_TERM).build();
+        storeTestExtension.convertAndImportIntoStore("multi-relationship-reified-with-rdf12.ttl", config);
+        try (TupleQueryResult bindingSets = storeTestExtension.executeQuery("""
+                PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX :        <https://www.example.org#>
+                SELECT ?statement ?s ?o WHERE {
+                    ?statement rdf:reifies <<( ?s :WATCHED ?o )>> .
+                }
+                """)) {
+            Assertions.assertEquals(12, bindingSets.stream().count());
+        }
+    }
+
+    @Test
     void testReificationOnlyOfRelationshipsWithNeo4jProperties() {
         ConversionConfig config = new ConversionConfigBuilder().setReificationVocabulary(ReificationVocabulary.OWL_REIFICATION)
                 .setBasePrefix(basePrefix)

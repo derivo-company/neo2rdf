@@ -17,7 +17,7 @@ as Memgraph.
 
 ## Installation & Quickstart
 
-Neo2RDF requires Java 21 or higher. To get started, download the latest zip file from
+Neo2RDF requires Java 25 or higher. To get started, download the latest zip file from
 the [releases page](https://github.com/derivo-company/neo2rdf/releases), which contains the executable JAR with all
 dependencies as well as Bash and Batch startup scripts. Unpack the archive to your preferred location and add
 the directory to your PATH environment variable in case you want to invoke the Neo2RDF scripts from any location.
@@ -173,6 +173,13 @@ OPTIONS
 	   •   OWL_REIFICATION: uses the OWL vocabulary, i.e.,	owl:Axiom,
 	       rdf:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
 		   (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
+	   •   RDF_INTEROPERABILITY_VOCABULARY: uses the RDF 1.2 Basic Encoding / interoperability
+	       vocabulary, i.e., rdf:PropositionForm, rdf:propositionFormSubject, rdf:propositionFormPredicate,
+	       and rdf:propositionFormObject
+		   (cf. https://www.w3.org/TR/rdf12-interop/#sec-basic-encoding)
+	   •   RDF_12_TRIPLE_TERM: uses native RDF 1.2 triple terms and rdf:reifies, i.e.,
+	       reifier rdf:reifies <<( s p o )>>
+		   (cf. https://www.w3.org/TR/rdf12-concepts/#section-triple-terms-reification)
 
 		   Default: OWL_REIFICATION
 
@@ -306,6 +313,13 @@ OPTIONS
 	   •   OWL_REIFICATION: uses the OWL vocabulary, i.e.,	owl:Axiom,
 	       rdf:annotatedSource, owl:annotatedProperty, and owl:annotatedTarget
 		   (cf. https://www.w3.org/TR/owl2-quick-reference/#Annotations)
+	   •   RDF_INTEROPERABILITY_VOCABULARY: uses the RDF 1.2 Basic Encoding / interoperability
+	       vocabulary, i.e., rdf:PropositionForm, rdf:propositionFormSubject, rdf:propositionFormPredicate,
+	       and rdf:propositionFormObject
+		   (cf. https://www.w3.org/TR/rdf12-interop/#sec-basic-encoding)
+	   •   RDF_12_TRIPLE_TERM: uses native RDF 1.2 triple terms and rdf:reifies, i.e.,
+	       reifier rdf:reifies <<( s p o )>>
+		   (cf. https://www.w3.org/TR/rdf12-concepts/#section-triple-terms-reification)
 
 		   Default: OWL_REIFICATION
 
