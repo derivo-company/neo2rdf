@@ -38,6 +38,7 @@ public class ConversionConfigBuilder {
     private boolean reifyRelationships = true;
     private boolean reifyOnlyRelationshipsWithProperties = false;
     private List<String> relationshipTypeReificationBlacklist = new ArrayList<>();
+    private List<String> sequenceConversionTypeBlacklist = new ArrayList<>();
     private File schemaOutputPath = null;
 
     public ConversionConfigBuilder() {
@@ -109,6 +110,15 @@ public class ConversionConfigBuilder {
         return this;
     }
 
+    public List<String> getSequenceConversionTypeBlacklist() {
+        return sequenceConversionTypeBlacklist;
+    }
+
+    public ConversionConfigBuilder setSequenceConversionTypeBlacklist(List<String> sequenceConversionTypeBlacklist) {
+        this.sequenceConversionTypeBlacklist = sequenceConversionTypeBlacklist;
+        return this;
+    }
+
     public ConversionConfig build() {
         ConversionConfig config = new ConversionConfig();
         config.reificationVocabulary = reificationVocabulary;
@@ -121,6 +131,7 @@ public class ConversionConfigBuilder {
         config.schemaOutputPath = schemaOutputPath;
         config.reifyRelationships = reifyRelationships;
         config.relationshipTypeReificationBlacklist = relationshipTypeReificationBlacklist;
+        config.sequenceConversionTypeBlacklist = sequenceConversionTypeBlacklist;
         return config;
     }
 

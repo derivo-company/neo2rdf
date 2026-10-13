@@ -58,6 +58,7 @@ public class TurtleConversionCLIWithParametersTest {
                 "--reifyOnlyRelationshipsWithProperties=%s".formatted(true),
                 "--reifyRelationships=%s".formatted(true),
                 "--relationshipTypeReificationBlacklist=FRIENDS_WITH,NON_EXISTENT,KNOWS",
+                "--sequenceConversionTypeBlacklist=intList,otherList",
                 "--schemaOutputPath=%s".formatted(schemaOutputPath),
                 "--outputPath=%s".formatted(outputPath),
         };
