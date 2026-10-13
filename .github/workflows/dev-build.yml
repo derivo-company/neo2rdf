@@ -1,12 +1,12 @@
 name: Dev build
 on:
+  workflow_dispatch:
   push:
     branches-ignore:
       - master
   pull_request:
     branches-ignore:
       - master
-
 jobs:
   dev-build:
     name: "Build Artifacts"
