@@ -22,7 +22,7 @@
         <rdf4j.version>6.1.0</rdf4j.version>
         <tinylog.version>2.8.1</tinylog.version>
         <picocli.version>4.7.7</picocli.version>
-        <jackson.version>3.2.3</jackson.version>
+        <jackson.version>3.2.4</jackson.version>
         <commons.io.version>2.22.0</commons.io.version>
 
         <version.mvn.plugin.flatten>1.8.0</version.mvn.plugin.flatten>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.roaringbitmap</groupId>
             <artifactId>RoaringBitmap</artifactId>
-            <version>1.6.24</version>
+            <version>1.6.25</version>
         </dependency>
 
         <dependency>
@@ -227,7 +227,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
             </plugin>
 
             <plugin>
